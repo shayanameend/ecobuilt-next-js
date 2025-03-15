@@ -177,10 +177,28 @@ const app = {
       label: "Contact",
     },
   },
-  protected: {
+  common: {
     profile: {
       url: () => "/profile",
       label: "Profile",
+    },
+  },
+  admin: {
+    settings: {
+      url: () => "/admin/settings",
+      label: "Settings",
+    },
+  },
+  vendor: {
+    settings: {
+      url: () => "/vendor/settings",
+      label: "Settings",
+    },
+  },
+  user: {
+    settings: {
+      url: () => "/user/settings",
+      label: "Settings",
     },
   },
 };
@@ -189,3 +207,34 @@ export const routes = {
   api,
   app,
 };
+
+export const authRoutes = [
+  routes.app.auth.signUp,
+  routes.app.auth.signIn,
+  routes.app.auth.forgotPassword,
+  routes.app.auth.resendOtp,
+  routes.app.auth.verifyOtp,
+  routes.app.auth.updatePassword,
+  routes.app.auth.refresh,
+];
+
+export const publicRoutes = [
+  ...authRoutes,
+  routes.app.public.root,
+  routes.app.public.products,
+  routes.app.public.vendors,
+  routes.app.public.community,
+  routes.app.public.contact,
+];
+
+export const adminRoutes = [
+  routes.app.common.profile,
+  routes.app.admin.settings,
+];
+
+export const vendorRoutes = [
+  routes.app.common.profile,
+  routes.app.vendor.settings,
+];
+
+export const userRoutes = [routes.app.common.profile, routes.app.user.settings];
