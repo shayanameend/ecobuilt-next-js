@@ -1,14 +1,18 @@
 import type { PropsWithChildren } from "react";
 
-import "~/styles/globals.css";
 import { RootHeader } from "./_components/root-header";
+import { RootProvider } from "./_components/root-provider";
+
+import "~/styles/globals.css";
 
 export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
   return (
     <html lang="en">
       <body>
-        <RootHeader />
-        {children}
+        <RootProvider>
+          <RootHeader />
+          {children}
+        </RootProvider>
       </body>
     </html>
   );

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 
 import { MenuIcon, ShoppingCartIcon } from "lucide-react";
 
+import Link from "next/link";
 import { assets } from "~/assets";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -153,8 +154,10 @@ export function RootHeader() {
 
 function RootHeaderCTAButton({ className }: { className?: string }) {
   return (
-    <Button variant="default" size="lg" className={className}>
-      Sign In
-    </Button>
+    <Link href={routes.app.auth.signIn.url()}>
+      <Button variant="default" size="lg" className={className}>
+        Sign In
+      </Button>
+    </Link>
   );
 }
