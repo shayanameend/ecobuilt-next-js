@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { OtpType } from "~/lib/types";
@@ -57,6 +58,8 @@ async function signIn({ email, password }: zod.infer<typeof SignInFormSchema>) {
 export default function SignInPage() {
   const router = useRouter();
 
+  const { setAuth } = useAuthContext();
+
   const form = useForm<zod.infer<typeof SignInFormSchema>>({
     resolver: zodResolver(SignInFormSchema),
     defaultValues: {
@@ -79,6 +82,8 @@ export default function SignInPage() {
           );
           break;
         case "Sign In Successfull!":
+          setAuth(data.user);
+
           sessionStorage.removeItem("token");
 
           localStorage.setItem("token", data.token);

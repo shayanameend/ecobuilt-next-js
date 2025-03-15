@@ -1,8 +1,9 @@
 "use client";
 
 import type { Dispatch, PropsWithChildren, SetStateAction } from "react";
-import type { AuthType } from "~/lib/types";
+import { type AuthType, Role } from "~/lib/types";
 
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { useMutation } from "@tanstack/react-query";
@@ -11,7 +12,14 @@ import axios, { AxiosError } from "axios";
 
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
-import { routes } from "~/lib/routes";
+import {
+  adminRoutes,
+  authRoutes,
+  publicRoutes,
+  routes,
+  userRoutes,
+  vendorRoutes,
+} from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
 const AuthContext = createContext<{
@@ -47,6 +55,9 @@ async function refresh() {
 }
 
 export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
+  const pathname = usePathname();
+  const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(true);
   const [auth, setAuth] = useState<AuthType | null>(null);
 
@@ -81,6 +92,67 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
       setIsLoading(false);
     }
   }, [refreshMutation.mutate]);
+
+  useEffect(() => {
+    const localToken = localStorage.getItem("token");
+
+    const isAuthRoute = authRoutes.includes(pathname);
+    const isPublicRoute = publicRoutes.includes(pathname);
+    const isProfileRoute = pathname === routes.app.unspecified.profile.url();
+    const isAdminRoute = adminRoutes.includes(pathname);
+    const isVendorRoute = vendorRoutes.includes(pathname);
+    const isUserRoute = userRoutes.includes(pathname);
+
+    console.log({
+      isLoading,
+      auth,
+      pathname,
+      isAuthRoute,
+      isPublicRoute,
+      isProfileRoute,
+      isAdminRoute,
+      isVendorRoute,
+      isUserRoute,
+    });
+
+    if (isPublicRoute) {
+      return;
+    }
+
+    if (!localToken && !isAuthRoute) {
+      return router.push(routes.app.auth.signIn.url());
+    }
+
+    if (!isLoading && auth) {
+      if (isAuthRoute) {
+        return router.push(routes.app.public.root.url());
+      }
+
+      if (!isProfileRoute && auth.role === Role.UNSPECIFIED) {
+        return router.push(routes.app.unspecified.profile.url());
+      }
+
+      if (isProfileRoute && auth.role !== Role.UNSPECIFIED) {
+        return router.push(routes.app.public.root.url());
+      }
+
+      if (
+        isAdminRoute &&
+        auth.role !== Role.SUPER_ADMIN &&
+        auth.role !== Role.ADMIN
+      ) {
+        return router.push(routes.app.public.root.url());
+      }
+
+      if (isVendorRoute && auth.role !== Role.VENDOR) {
+        return router.push(routes.app.public.root.url());
+      }
+
+      if (isUserRoute && auth.role !== Role.USER) {
+        return router.push(routes.app.public.root.url());
+      }
+    }
+  }, [pathname, router.push, isLoading, auth]);
 
   if (!isLoading) {
     return (

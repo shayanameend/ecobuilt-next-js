@@ -177,7 +177,7 @@ const app = {
       label: "Contact",
     },
   },
-  common: {
+  unspecified: {
     profile: {
       url: () => "/profile",
       label: "Profile",
@@ -209,32 +209,25 @@ export const routes = {
 };
 
 export const authRoutes = [
-  routes.app.auth.signUp,
-  routes.app.auth.signIn,
-  routes.app.auth.forgotPassword,
-  routes.app.auth.resendOtp,
-  routes.app.auth.verifyOtp,
-  routes.app.auth.updatePassword,
-  routes.app.auth.refresh,
+  routes.app.auth.signUp.url(),
+  routes.app.auth.signIn.url(),
+  routes.app.auth.forgotPassword.url(),
+  routes.app.auth.resendOtp.url(),
+  routes.app.auth.verifyOtp.url(),
+  routes.app.auth.updatePassword.url(),
+  routes.app.auth.refresh.url(),
 ];
 
 export const publicRoutes = [
-  ...authRoutes,
-  routes.app.public.root,
-  routes.app.public.products,
-  routes.app.public.vendors,
-  routes.app.public.community,
-  routes.app.public.contact,
+  routes.app.public.root.url(),
+  routes.app.public.products.url(),
+  routes.app.public.vendors.url(),
+  routes.app.public.community.url(),
+  routes.app.public.contact.url(),
 ];
 
-export const adminRoutes = [
-  routes.app.common.profile,
-  routes.app.admin.settings,
-];
+export const adminRoutes = [routes.app.admin.settings.url()];
 
-export const vendorRoutes = [
-  routes.app.common.profile,
-  routes.app.vendor.settings,
-];
+export const vendorRoutes = [routes.app.vendor.settings.url()];
 
-export const userRoutes = [routes.app.common.profile, routes.app.user.settings];
+export const userRoutes = [routes.app.user.settings.url()];
