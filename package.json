@@ -1,0 +1,30 @@
+{
+	"name": "ecobuilt-next-js",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"biome:only": "biome check",
+		"biome:safe": "biome check --write",
+		"biome:unsafe": "biome check --write --unsafe",
+		"ui": "shadcn",
+		"dev": "next dev --turbopack",
+		"build": "next build",
+		"start": "next start"
+	},
+	"packageManager": "pnpm@10.6.2",
+	"dependencies": {
+		"next": "15.2.2",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@tailwindcss/postcss": "^4",
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"shadcn": "2.4.0-canary.14",
+		"tailwindcss": "^4",
+		"typescript": "^5"
+	}
+}
