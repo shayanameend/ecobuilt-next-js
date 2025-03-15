@@ -8,13 +8,13 @@ export default function AuthLayout({ children }: Readonly<PropsWithChildren>) {
     <main>
       <section
         className={cn(
-          // "p-14 md:px-24 min-h-[calc(100svh_-_7rem)] flex gap-12 justify-center bg-black",
+          "py-14 px-7 md:px-24 min-h-[calc(100svh_-_5rem)] md:min-h-[calc(100svh_-_6rem)] flex gap-12 justify-center",
         )}
       >
         {children}
-        {/* <div
+        <div
           className={cn(
-            // "hidden md:block flex-1 lg:flex-[2] my-4 mx-2 rounded-lg overflow-hidden",
+            "hidden md:block flex-1 lg:flex-[2] rounded-lg overflow-hidden",
           )}
         >
           <iframe
@@ -25,7 +25,7 @@ export default function AuthLayout({ children }: Readonly<PropsWithChildren>) {
             allowFullScreen
             src={googleMap.src}
           />
-        </div> */}
+        </div>
       </section>
     </main>
   );

@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+
 import axios, { AxiosError } from "axios";
 import { Loader2Icon } from "lucide-react";
+import { useForm } from "react-hook-form";
 import zod from "zod";
 
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -30,17 +31,17 @@ import { cn } from "~/lib/utils";
 const SignInFormSchema = zod.object({
   email: zod
     .string({
-      message: "Email is required",
+      message: "Email is Required",
     })
     .email({
-      message: "Invalid email",
+      message: "Invalid Email",
     }),
   password: zod
     .string({
-      message: "Password is required",
+      message: "Password is Required",
     })
     .nonempty({
-      message: "Password is required",
+      message: "Password is Required",
     }),
 });
 
@@ -80,7 +81,7 @@ export default function SignInPage() {
         case "Sign In Successfull!":
           sessionStorage.removeItem("token");
 
-          // createToken({ access: data.token, ...data.user });
+          localStorage.setItem("token", data.token);
           break;
       }
     },
@@ -99,14 +100,18 @@ export default function SignInPage() {
   };
 
   return (
-    <div>
-      <h2 className={cn("text-black/75 text-3xl font-bold", domine.className)}>
-        Sign In
-      </h2>
-      <p className={"ml-1 text-muted-foreground text-base font-medium"}>
-        Welcome back! Sign in to access exclusive features and content. Let's
-        get you logged in so you can continue where you left off.
-      </p>
+    <div className={cn("flex-1 space-y-8 md:p-4")}>
+      <div className={cn("space-y-2 text-center")}>
+        <h2
+          className={cn("text-black/75 text-3xl font-bold", domine.className)}
+        >
+          Sign In
+        </h2>
+        <p className={"text-muted-foreground text-base font-medium"}>
+          Welcome back! Sign in to access exclusive features and content. Let's
+          get you logged in so you can continue where you left off.
+        </p>
+      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -143,7 +148,7 @@ export default function SignInPage() {
                       href={routes.app.auth.forgotPassword.url()}
                       className={cn("underline underline-offset-4")}
                     >
-                      Forgot password?
+                      Forgot Password?
                     </Link>
                   </FormDescription>
                 </FormItem>
@@ -173,7 +178,7 @@ export default function SignInPage() {
               Don't have an account?{" "}
               <Link
                 href={routes.app.auth.signUp.url()}
-                className={cn("text-primary")}
+                className={cn("text-primary underline underline-offset-4")}
               >
                 Sign Up
               </Link>
