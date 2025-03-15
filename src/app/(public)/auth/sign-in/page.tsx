@@ -146,7 +146,9 @@ export default function SignInPage() {
                   <FormDescription className={cn("text-right")}>
                     <Link
                       href={routes.app.auth.forgotPassword.url()}
-                      className={cn("underline underline-offset-4")}
+                      className={cn(
+                        "text-primary underline underline-offset-4",
+                      )}
                     >
                       Forgot Password?
                     </Link>
@@ -178,7 +180,7 @@ export default function SignInPage() {
               Don't have an account?{" "}
               <Link
                 href={routes.app.auth.signUp.url()}
-                className={cn("text-primary underline underline-offset-4")}
+                className={cn("text-primary")}
               >
                 Sign Up
               </Link>
