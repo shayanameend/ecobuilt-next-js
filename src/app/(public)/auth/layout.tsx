@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import { googleMap } from "~/lib/constants";
+import { googleMap } from "~/lib/config";
 import { cn } from "~/lib/utils";
 
 export default function AuthLayout({ children }: Readonly<PropsWithChildren>) {
