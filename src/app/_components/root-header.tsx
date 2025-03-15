@@ -23,6 +23,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/components/ui/sheet";
+import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
@@ -152,6 +153,16 @@ export function RootHeader() {
 }
 
 function RootHeaderCTAButton({ className }: { className?: string }) {
+  const { auth } = useAuthContext();
+
+  if (auth) {
+    return (
+      <Button variant="default" size="lg" className={className}>
+        Dashboard
+      </Button>
+    );
+  }
+
   return (
     <Button variant="default" size="lg" className={className}>
       Sign In
