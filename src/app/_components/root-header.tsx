@@ -26,6 +26,7 @@ import {
 import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
+import { Role } from "~/lib/types";
 
 const navLinks = [
   {
@@ -153,18 +154,51 @@ export function RootHeader() {
 }
 
 function RootHeaderCTAButton({ className }: { className?: string }) {
+  const router = useRouter();
+
   const { auth } = useAuthContext();
 
   if (auth) {
     return (
-      <Button variant="default" size="lg" className={className}>
+      <Button
+        variant="default"
+        size="lg"
+        className={className}
+        onClick={() => {
+          let url: string;
+          switch (auth.role) {
+            case Role.SUPER_ADMIN:
+            case Role.ADMIN:
+              url = routes.app.admin.settings.url();
+              break;
+            case Role.VENDOR:
+              url = routes.app.vendor.settings.url();
+              break;
+            case Role.USER:
+              url = routes.app.user.settings.url();
+              break;
+            default:
+              url = routes.app.public.root.url();
+              break;
+          }
+
+          router.push(url);
+        }}
+      >
         Dashboard
       </Button>
     );
   }
 
   return (
-    <Button variant="default" size="lg" className={className}>
+    <Button
+      variant="default"
+      size="lg"
+      className={className}
+      onClick={() => {
+        router.push(routes.app.auth.signIn.url());
+      }}
+    >
       Sign In
     </Button>
   );
