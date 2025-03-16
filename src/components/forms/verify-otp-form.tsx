@@ -21,43 +21,58 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
+import { OtpType } from "~/lib/types";
 import { cn } from "~/lib/utils";
 
-const UpdatePasswordFormSchema = zod.object({
-  password: zod.string({
-    message: "Password must be string",
+const VerifyOTPFormSchema = zod.object({
+  otp: zod.string({
+    message: "OTP must be string",
   }),
 });
 
-async function updatePassword({
-  password,
-}: zod.infer<typeof UpdatePasswordFormSchema>) {
-  const response = await axios.post(routes.api.auth.updatePassword.url(), {
-    password,
+async function verifyOtp({ otp }: zod.infer<typeof VerifyOTPFormSchema>) {
+  const response = await axios.post(routes.api.auth.verifyOtp.url(), {
+    otp,
   });
 
   return response.data;
 }
 
-export function UpdatePasswordForm() {
+export function VerifyOTPForm({
+  type,
+}: Readonly<{
+  type: OtpType;
+}>) {
   const router = useRouter();
 
-  const form = useForm<zod.infer<typeof UpdatePasswordFormSchema>>({
-    resolver: zodResolver(UpdatePasswordFormSchema),
+  const { setAuth } = useAuthContext();
+
+  const form = useForm<zod.infer<typeof VerifyOTPFormSchema>>({
+    resolver: zodResolver(VerifyOTPFormSchema),
     defaultValues: {
-      password: "",
+      otp: "",
     },
   });
 
-  const updatePasswordMutation = useMutation({
-    mutationFn: updatePassword,
-    onSuccess: ({ info }) => {
+  const verifyOtpMutation = useMutation({
+    mutationFn: verifyOtp,
+    onSuccess: ({ data, info }) => {
       toast.success(info.message);
 
-      sessionStorage.removeItem("token");
+      switch (type) {
+        case OtpType.VERIFY:
+          setAuth(data.user);
 
-      router.push(routes.app.auth.signIn.url());
+          sessionStorage.removeItem("token");
+
+          localStorage.setItem("token", data.token);
+          break;
+        case OtpType.RESET:
+          router.push(routes.app.auth.updatePassword.url());
+          break;
+      }
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
@@ -69,8 +84,8 @@ export function UpdatePasswordForm() {
     },
   });
 
-  const onSubmit = (data: zod.infer<typeof UpdatePasswordFormSchema>) => {
-    updatePasswordMutation.mutate(data);
+  const onSubmit = (data: zod.infer<typeof VerifyOTPFormSchema>) => {
+    verifyOtpMutation.mutate(data);
   };
 
   return (
@@ -79,12 +94,12 @@ export function UpdatePasswordForm() {
         <div className={cn("flex gap-2 items-start")}>
           <FormField
             control={form.control}
-            name="password"
+            name="otp"
             render={({ field }) => (
               <FormItem className={cn("flex-1")}>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>OTP</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="********" {...field} />
+                  <Input type="text" placeholder="******" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -97,12 +112,12 @@ export function UpdatePasswordForm() {
             size="lg"
             className={cn("w-full")}
             type="submit"
-            disabled={updatePasswordMutation.isPending}
+            disabled={verifyOtpMutation.isPending}
           >
-            {updatePasswordMutation.isPending && (
+            {verifyOtpMutation.isPending && (
               <Loader2Icon className={cn("animate-spin")} />
             )}
-            <span>Update Password</span>
+            <span>Verify OTP</span>
           </Button>
         </div>
       </form>
