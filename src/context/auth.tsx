@@ -84,9 +84,9 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const localToken = localStorage.getItem("token");
 
-    if (token) {
+    if (localToken) {
       refreshMutation.mutate();
     } else {
       setIsLoading(false);
