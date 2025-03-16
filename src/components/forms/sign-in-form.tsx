@@ -114,7 +114,7 @@ export function SignInForm() {
               <FormItem className={cn("flex-1")}>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="john@domain.com" {...field} />
+                  <Input type="text" placeholder="john@domain.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -42,6 +42,9 @@ const api = {
       url: (productId: string) =>
         `${process.env.NEXT_PUBLIC_API_URL}/reviews/${productId}`,
     },
+    contact: {
+      url: () => `${process.env.NEXT_PUBLIC_API_URL}/contact`,
+    },
     profile: {
       url: () => `${process.env.NEXT_PUBLIC_API_URL}/profile`,
     },
