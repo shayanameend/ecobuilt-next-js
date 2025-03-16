@@ -32,10 +32,24 @@ const VerifyOTPFormSchema = zod.object({
   }),
 });
 
-async function verifyOtp({ otp }: zod.infer<typeof VerifyOTPFormSchema>) {
-  const response = await axios.post(routes.api.auth.verifyOtp.url(), {
-    otp,
-  });
+async function verifyOtp({
+  otp,
+  type,
+}: zod.infer<typeof VerifyOTPFormSchema> & {
+  type: OtpType;
+}) {
+  const response = await axios.post(
+    routes.api.auth.verifyOtp.url(),
+    {
+      otp,
+      type,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+    },
+  );
 
   return response.data;
 }
@@ -68,6 +82,8 @@ export function VerifyOTPForm({
           sessionStorage.removeItem("token");
 
           localStorage.setItem("token", data.token);
+
+          router.push(routes.app.unspecified.profile.url());
           break;
         case OtpType.RESET:
           router.push(routes.app.auth.updatePassword.url());
@@ -85,7 +101,7 @@ export function VerifyOTPForm({
   });
 
   const onSubmit = (data: zod.infer<typeof VerifyOTPFormSchema>) => {
-    verifyOtpMutation.mutate(data);
+    verifyOtpMutation.mutate({ ...data, type });
   };
 
   return (
