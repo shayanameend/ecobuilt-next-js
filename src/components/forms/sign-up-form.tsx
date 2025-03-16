@@ -16,19 +16,17 @@ import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { OtpType } from "~/lib/types";
 import { cn } from "~/lib/utils";
 
-const SignInFormSchema = zod.object({
+const SignUpFormSchema = zod.object({
   email: zod
     .string({
       message: "Email must be string",
@@ -41,8 +39,8 @@ const SignInFormSchema = zod.object({
   }),
 });
 
-async function signIn({ email, password }: zod.infer<typeof SignInFormSchema>) {
-  const response = await axios.post(routes.api.auth.signIn.url(), {
+async function signUp({ email, password }: zod.infer<typeof SignUpFormSchema>) {
+  const response = await axios.post(routes.api.auth.signUp.url(), {
     email,
     password,
   });
@@ -50,40 +48,25 @@ async function signIn({ email, password }: zod.infer<typeof SignInFormSchema>) {
   return response.data;
 }
 
-export function SignInForm() {
+export function SignUpForm() {
   const router = useRouter();
 
-  const { setAuth } = useAuthContext();
-
-  const form = useForm<zod.infer<typeof SignInFormSchema>>({
-    resolver: zodResolver(SignInFormSchema),
+  const form = useForm<zod.infer<typeof SignUpFormSchema>>({
+    resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const signInMutation = useMutation({
-    mutationFn: signIn,
+  const signUpMutation = useMutation({
+    mutationFn: signUp,
     onSuccess: ({ data, info }) => {
       toast.success(info.message);
 
-      switch (info.message) {
-        case "OTP Sent Successfully!":
-          sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("token", data.token);
 
-          router.push(
-            `${routes.app.auth.verifyOtp.url()}?type=${OtpType.VERIFY}`,
-          );
-          break;
-        case "Sign In Successfull!":
-          setAuth(data.user);
-
-          sessionStorage.removeItem("token");
-
-          localStorage.setItem("token", data.token);
-          break;
-      }
+      router.push(`${routes.app.auth.verifyOtp.url()}?type=${OtpType.VERIFY}`);
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
@@ -95,8 +78,8 @@ export function SignInForm() {
     },
   });
 
-  const onSubmit = (data: zod.infer<typeof SignInFormSchema>) => {
-    signInMutation.mutate(data);
+  const onSubmit = (data: zod.infer<typeof SignUpFormSchema>) => {
+    signUpMutation.mutate(data);
   };
 
   return (
@@ -128,14 +111,6 @@ export function SignInForm() {
                   <Input type="password" placeholder="********" {...field} />
                 </FormControl>
                 <FormMessage />
-                <FormDescription className={cn("text-right")}>
-                  <Link
-                    href={routes.app.auth.forgotPassword.url()}
-                    className={cn("text-primary underline underline-offset-4")}
-                  >
-                    Forgot Password?
-                  </Link>
-                </FormDescription>
               </FormItem>
             )}
           />
@@ -146,12 +121,12 @@ export function SignInForm() {
             size="lg"
             className={cn("w-full")}
             type="submit"
-            disabled={signInMutation.isPending}
+            disabled={signUpMutation.isPending}
           >
-            {signInMutation.isPending && (
+            {signUpMutation.isPending && (
               <Loader2Icon className={cn("animate-spin")} />
             )}
-            <span>Sign In</span>
+            <span>Sign Up</span>
           </Button>
         </div>
         <div>
@@ -160,12 +135,12 @@ export function SignInForm() {
               "text-muted-foreground text-center text-base font-medium",
             )}
           >
-            Don't have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href={routes.app.auth.signUp.url()}
+              href={routes.app.auth.signIn.url()}
               className={cn("text-primary")}
             >
-              Sign Up
+              Sign In
             </Link>
           </p>
         </div>
