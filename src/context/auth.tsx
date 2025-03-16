@@ -96,12 +96,20 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
   useEffect(() => {
     const localToken = localStorage.getItem("token");
 
-    const isAuthRoute = authRoutes.includes(pathname);
-    const isPublicRoute = publicRoutes.includes(pathname);
-    const isProfileRoute = pathname === routes.app.unspecified.profile.url();
-    const isAdminRoute = adminRoutes.includes(pathname);
-    const isVendorRoute = vendorRoutes.includes(pathname);
-    const isUserRoute = userRoutes.includes(pathname);
+    const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+    const isPublicRoute = publicRoutes.some((route) =>
+      pathname.startsWith(route),
+    );
+    const isProfileRoute = pathname.startsWith(
+      routes.app.unspecified.profile.url(),
+    );
+    const isAdminRoute = adminRoutes.some((route) =>
+      pathname.startsWith(route),
+    );
+    const isVendorRoute = vendorRoutes.some((route) =>
+      pathname.startsWith(route),
+    );
+    const isUserRoute = userRoutes.some((route) => pathname.startsWith(route));
 
     console.log({
       isLoading,
