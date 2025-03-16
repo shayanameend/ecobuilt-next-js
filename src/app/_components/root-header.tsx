@@ -74,8 +74,8 @@ export function RootHeader() {
         priority
         src={assets.pictures.app.logo.src}
         alt={assets.pictures.app.logo.alt}
-        sizes="(max-width: 640px) 120px, (max-width: 1024px) 150px, 180px"
-        className={cn("mt-1 ml-1 h-14 md:h-18 w-auto object-cover")}
+        sizes="(max-width: 768px) 56px, 72px"
+        className={cn("mt-1 ml-1 w-14 md:w-18 object-cover")}
       />
       <nav>
         <ul className={cn("hidden md:flex gap-4")}>
