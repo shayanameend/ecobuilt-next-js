@@ -97,8 +97,10 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
     const localToken = localStorage.getItem("token");
 
     const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
-    const isPublicRoute = publicRoutes.some((route) =>
-      pathname.startsWith(route),
+    const isPublicRoute = publicRoutes.some(
+      (route) =>
+        pathname === route ||
+        (pathname.startsWith(route) && route !== routes.app.public.root.url()),
     );
     const isProfileRoute = pathname.startsWith(
       routes.app.unspecified.profile.url(),

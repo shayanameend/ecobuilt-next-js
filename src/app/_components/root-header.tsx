@@ -83,13 +83,11 @@ export function RootHeader() {
             <li key={url}>
               <Button
                 variant={
-                  pathname === routes.app.public.root.url() &&
-                  url === routes.app.public.root.url()
+                  pathname === url ||
+                  (pathname.startsWith(url) &&
+                    url !== routes.app.public.root.url())
                     ? "secondary"
-                    : pathname.startsWith(url) &&
-                        url !== routes.app.public.root.url()
-                      ? "secondary"
-                      : "ghost"
+                    : "ghost"
                 }
                 size="sm"
                 onClick={() => {
