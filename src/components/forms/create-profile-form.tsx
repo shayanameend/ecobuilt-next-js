@@ -211,7 +211,11 @@ export function CreateProfileForm() {
         >
           <div className="relative group">
             <Avatar className={cn("size-32 border-2 border-primary/20")}>
-              <AvatarImage src={profileImage} />
+              <AvatarImage
+                src={profileImage}
+                alt={form.getValues("name")}
+                className={cn("object-cover")}
+              />
               <AvatarFallback>
                 {form.watch("name")
                   ? form
@@ -268,7 +272,7 @@ export function CreateProfileForm() {
           <div className={cn("flex gap-2 items-start")}>
             <FormField
               control={form.control}
-              name="name"
+              name="description"
               render={({ field }) => (
                 <FormItem className={cn("flex-1")}>
                   <FormLabel>Description</FormLabel>
