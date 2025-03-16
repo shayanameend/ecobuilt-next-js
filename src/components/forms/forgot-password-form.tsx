@@ -29,7 +29,7 @@ import { cn } from "~/lib/utils";
 const ForgotPasswordFormSchema = zod.object({
   email: zod
     .string({
-      message: "Email must be string",
+      message: "Email must be a string",
     })
     .email({
       message: "Invalid Email",

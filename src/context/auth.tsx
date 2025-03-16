@@ -24,13 +24,17 @@ import { cn } from "~/lib/utils";
 
 const AuthContext = createContext<{
   isLoading: boolean;
+  token: string | null;
   auth: AuthType | null;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
+  setToken: Dispatch<SetStateAction<string | null>>;
   setAuth: Dispatch<SetStateAction<AuthType | null>>;
 }>({
   isLoading: true,
+  token: null,
   auth: null,
   setIsLoading: () => {},
+  setToken: () => {},
   setAuth: () => {},
 });
 
@@ -59,11 +63,13 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
   const [auth, setAuth] = useState<AuthType | null>(null);
 
   const refreshMutation = useMutation({
     mutationFn: refresh,
     onSuccess: ({ data }) => {
+      setToken(data.token);
       setAuth(data.user);
 
       localStorage.setItem("token", data.token);
@@ -73,6 +79,7 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
         toast.error(error.response?.data.info.message);
       }
 
+      setToken(null);
       setAuth(null);
 
       sessionStorage.removeItem("token");
@@ -169,8 +176,10 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
       <AuthContext.Provider
         value={{
           isLoading,
+          token,
           auth,
           setIsLoading,
+          setToken,
           setAuth,
         }}
       >

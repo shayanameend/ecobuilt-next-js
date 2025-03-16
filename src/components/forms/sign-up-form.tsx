@@ -29,13 +29,13 @@ import { cn } from "~/lib/utils";
 const SignUpFormSchema = zod.object({
   email: zod
     .string({
-      message: "Email must be string",
+      message: "Email must be a string",
     })
     .email({
       message: "Invalid Email",
     }),
   password: zod.string({
-    message: "Password must be string",
+    message: "Password must be a string",
   }),
 });
 

@@ -25,23 +25,23 @@ import { cn } from "~/lib/utils";
 
 const ContactFormSchema = zod.object({
   name: zod.string({
-    message: "Name must be string",
+    message: "Name must be a string",
   }),
   email: zod
     .string({
-      message: "Email must be string",
+      message: "Email must be a string",
     })
     .email({
       message: "Invalid email",
     }),
   phone: zod.string({
-    message: "Phone must be string",
+    message: "Phone must be a string",
   }),
   subject: zod.string({
-    message: "Subject must be string",
+    message: "Subject must be a string",
   }),
   message: zod.string({
-    message: "Message must be string",
+    message: "Message must be a string",
   }),
 });
 

@@ -31,13 +31,13 @@ import { cn } from "~/lib/utils";
 const SignInFormSchema = zod.object({
   email: zod
     .string({
-      message: "Email must be string",
+      message: "Email must be a string",
     })
     .email({
       message: "Invalid Email",
     }),
   password: zod.string({
-    message: "Password must be string",
+    message: "Password must be a string",
   }),
 });
 
@@ -53,7 +53,7 @@ async function signIn({ email, password }: zod.infer<typeof SignInFormSchema>) {
 export function SignInForm() {
   const router = useRouter();
 
-  const { setAuth } = useAuthContext();
+  const { setToken, setAuth } = useAuthContext();
 
   const form = useForm<zod.infer<typeof SignInFormSchema>>({
     resolver: zodResolver(SignInFormSchema),
@@ -77,6 +77,7 @@ export function SignInForm() {
           );
           break;
         case "Sign In Successfull!":
+          setToken(data.token);
           setAuth(data.user);
 
           sessionStorage.removeItem("token");

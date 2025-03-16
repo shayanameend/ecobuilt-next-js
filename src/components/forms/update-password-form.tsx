@@ -26,7 +26,7 @@ import { cn } from "~/lib/utils";
 
 const UpdatePasswordFormSchema = zod.object({
   password: zod.string({
-    message: "Password must be string",
+    message: "Password must be a string",
   }),
 });
 

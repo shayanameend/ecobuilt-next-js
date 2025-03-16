@@ -28,7 +28,7 @@ import { cn } from "~/lib/utils";
 
 const VerifyOTPFormSchema = zod.object({
   otp: zod.string({
-    message: "OTP must be string",
+    message: "OTP must be a string",
   }),
 });
 
@@ -61,7 +61,7 @@ export function VerifyOTPForm({
 }>) {
   const router = useRouter();
 
-  const { setAuth } = useAuthContext();
+  const { setToken, setAuth } = useAuthContext();
 
   const form = useForm<zod.infer<typeof VerifyOTPFormSchema>>({
     resolver: zodResolver(VerifyOTPFormSchema),
@@ -77,6 +77,7 @@ export function VerifyOTPForm({
 
       switch (type) {
         case OtpType.VERIFY:
+          setToken(data.token);
           setAuth(data.user);
 
           sessionStorage.removeItem("token");
