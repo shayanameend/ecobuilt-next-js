@@ -82,7 +82,15 @@ export function RootHeader() {
           {navLinks.map(({ url, label }) => (
             <li key={url}>
               <Button
-                variant="ghost"
+                variant={
+                  pathname === routes.app.public.root.url() &&
+                  url === routes.app.public.root.url()
+                    ? "secondary"
+                    : pathname.startsWith(url) &&
+                        url !== routes.app.public.root.url()
+                      ? "secondary"
+                      : "ghost"
+                }
                 size="sm"
                 onClick={() => {
                   router.push(url);
@@ -166,6 +174,7 @@ function RootHeaderCTAButton({ className }: { className?: string }) {
         className={className}
         onClick={() => {
           let url: string;
+
           switch (auth.role) {
             case Role.SUPER_ADMIN:
             case Role.ADMIN:
@@ -178,7 +187,7 @@ function RootHeaderCTAButton({ className }: { className?: string }) {
               url = routes.app.user.settings.url();
               break;
             default:
-              url = routes.app.public.root.url();
+              url = routes.app.unspecified.profile.url();
               break;
           }
 
