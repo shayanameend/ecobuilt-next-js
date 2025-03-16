@@ -25,8 +25,8 @@ import {
 } from "~/components/ui/sheet";
 import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
-import { cn } from "~/lib/utils";
 import { Role } from "~/lib/types";
+import { cn } from "~/lib/utils";
 
 const navLinks = [
   {
