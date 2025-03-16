@@ -125,7 +125,7 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
       isUserRoute,
     });
 
-    if (isPublicRoute) {
+    if (!localToken && isPublicRoute) {
       return;
     }
 

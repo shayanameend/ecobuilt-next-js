@@ -82,8 +82,6 @@ export function VerifyOTPForm({
           sessionStorage.removeItem("token");
 
           localStorage.setItem("token", data.token);
-
-          router.push(routes.app.unspecified.profile.url());
           break;
         case OtpType.RESET:
           router.push(routes.app.auth.updatePassword.url());
