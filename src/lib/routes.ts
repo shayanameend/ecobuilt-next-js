@@ -187,18 +187,30 @@ const app = {
     },
   },
   admin: {
+    root: {
+      url: () => "/admin",
+      label: "Dashboard",
+    },
     settings: {
       url: () => "/admin/settings",
       label: "Settings",
     },
   },
   vendor: {
+    root: {
+      url: () => "/vendor",
+      label: "Dashboard",
+    },
     settings: {
       url: () => "/vendor/settings",
       label: "Settings",
     },
   },
   user: {
+    root: {
+      url: () => "/user",
+      label: "Dashboard",
+    },
     settings: {
       url: () => "/user/settings",
       label: "Settings",
@@ -229,8 +241,17 @@ export const publicRoutes = [
   routes.app.public.contact.url(),
 ];
 
-export const adminRoutes = [routes.app.admin.settings.url()];
+export const adminRoutes = [
+  routes.app.admin.root.url(),
+  routes.app.admin.settings.url(),
+];
 
-export const vendorRoutes = [routes.app.vendor.settings.url()];
+export const vendorRoutes = [
+  routes.app.vendor.root.url(),
+  routes.app.vendor.settings.url(),
+];
 
-export const userRoutes = [routes.app.user.settings.url()];
+export const userRoutes = [
+  routes.app.user.root.url(),
+  routes.app.user.settings.url(),
+];

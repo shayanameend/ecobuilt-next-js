@@ -176,13 +176,13 @@ function RootHeaderCTAButton({ className }: { className?: string }) {
           switch (auth.role) {
             case Role.SUPER_ADMIN:
             case Role.ADMIN:
-              url = routes.app.admin.settings.url();
+              url = routes.app.admin.root.url();
               break;
             case Role.VENDOR:
-              url = routes.app.vendor.settings.url();
+              url = routes.app.vendor.root.url();
               break;
             case Role.USER:
-              url = routes.app.user.settings.url();
+              url = routes.app.user.root.url();
               break;
             default:
               url = routes.app.unspecified.profile.url();
