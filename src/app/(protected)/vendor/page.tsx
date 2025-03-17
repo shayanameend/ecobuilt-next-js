@@ -113,15 +113,31 @@ export default function DashboardPage() {
         >
           <Card className={cn("col-span-5")}>
             <CardHeader>
-              <CardTitle></CardTitle>
-              <CardDescription></CardDescription>
+              <CardTitle>
+                <h3 className={cn("text-2xl font-bold", domine.className)}>
+                  Recent Orders
+                </h3>
+              </CardTitle>
+              <CardDescription>
+                <p className={cn("text-muted-foreground text-sm font-medium")}>
+                  You have 12 orders this month.
+                </p>
+              </CardDescription>
             </CardHeader>
             <CardContent></CardContent>
           </Card>
           <Card className={cn("col-span-3")}>
             <CardHeader>
-              <CardTitle></CardTitle>
-              <CardDescription></CardDescription>
+              <CardTitle>
+                <h3 className={cn("text-2xl font-bold", domine.className)}>
+                  Recent Products
+                </h3>
+              </CardTitle>
+              <CardDescription>
+                <p className={cn("text-muted-foreground text-sm font-medium")}>
+                  You added 5 products this month.
+                </p>
+              </CardDescription>
             </CardHeader>
             <CardContent></CardContent>
           </Card>
