@@ -201,6 +201,22 @@ const app = {
       url: () => "/vendor",
       label: "Dashboard",
     },
+    categories: {
+      url: () => "/vendor/categories",
+      label: "Categories",
+    },
+    products: {
+      url: () => "/vendor/products",
+      label: "Products",
+    },
+    orders: {
+      url: () => "/vendor/orders",
+      label: "Orders",
+    },
+    users: {
+      url: () => "/vendor/users",
+      label: "Users",
+    },
     settings: {
       url: () => "/vendor/settings",
       label: "Settings",
@@ -248,6 +264,10 @@ export const adminRoutes = [
 
 export const vendorRoutes = [
   routes.app.vendor.root.url(),
+  routes.app.vendor.categories.url(),
+  routes.app.vendor.products.url(),
+  routes.app.vendor.orders.url(),
+  routes.app.vendor.users.url(),
   routes.app.vendor.settings.url(),
 ];
 
