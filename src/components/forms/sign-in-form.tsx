@@ -69,14 +69,14 @@ export function SignInForm() {
       toast.success(info.message);
 
       switch (info.message) {
-        case "OTP Sent Successfully!":
+        case "OTP Sent Successfully":
           sessionStorage.setItem("token", data.token);
 
           router.push(
             `${routes.app.auth.verifyOtp.url()}?type=${OtpType.VERIFY}`,
           );
           break;
-        case "Sign In Successfull!":
+        case "Sign In Successfull":
           setToken(data.token);
           setAuth(data.user);
 
