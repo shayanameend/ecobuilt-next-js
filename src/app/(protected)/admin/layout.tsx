@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { cn } from "~/lib/utils";
 
-export default function DashbaordLayout({
+export default function DashboardLayout({
   children,
 }: Readonly<PropsWithChildren>) {
   return (
