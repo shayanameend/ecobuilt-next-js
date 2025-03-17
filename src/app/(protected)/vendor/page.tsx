@@ -5,14 +5,20 @@ import {
   UsersIcon,
 } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { domine } from "~/lib/fonts";
 import { cn } from "~/lib/utils";
 
 export default function DashboardPage() {
   return (
     <>
-      <div className={cn("flex-1 space-y-8")}>
+      <section className={cn("flex-1 space-y-8")}>
         <div className={cn("space-y-2")}>
           <h2
             className={cn("text-black/75 text-3xl font-bold", domine.className)}
@@ -102,7 +108,25 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
+        <div
+          className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-8")}
+        >
+          <Card className={cn("col-span-5")}>
+            <CardHeader>
+              <CardTitle></CardTitle>
+              <CardDescription></CardDescription>
+            </CardHeader>
+            <CardContent></CardContent>
+          </Card>
+          <Card className={cn("col-span-3")}>
+            <CardHeader>
+              <CardTitle></CardTitle>
+              <CardDescription></CardDescription>
+            </CardHeader>
+            <CardContent></CardContent>
+          </Card>
+        </div>
+      </section>
     </>
   );
 }
