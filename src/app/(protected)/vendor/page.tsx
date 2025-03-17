@@ -4,7 +4,10 @@ import {
   TrendingUpIcon,
   UsersIcon,
 } from "lucide-react";
+import { Button } from "~/components/ui/button";
 
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -12,6 +15,14 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 import { domine } from "~/lib/fonts";
 import { cn } from "~/lib/utils";
 
@@ -124,7 +135,141 @@ export default function DashboardPage() {
                 </p>
               </CardDescription>
             </CardHeader>
-            <CardContent></CardContent>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Order ID</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>#1234</TableCell>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage src="/avatars/john.png" alt="John Doe" />
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">John Doe</span>
+                        <span className="text-xs text-muted-foreground">
+                          john.doe@example.com
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Completed</Badge>
+                    </TableCell>
+                    <TableCell>$123.45</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>#1235</TableCell>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage src="/avatars/john.png" alt="John Doe" />
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">John Doe</span>
+                        <span className="text-xs text-muted-foreground">
+                          john.doe@example.com
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Completed</Badge>
+                    </TableCell>
+                    <TableCell>$234.56</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>#1236</TableCell>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage src="/avatars/john.png" alt="John Doe" />
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">John Doe</span>
+                        <span className="text-xs text-muted-foreground">
+                          john.doe@example.com
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Completed</Badge>
+                    </TableCell>
+                    <TableCell>$345.67</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>#1237</TableCell>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage src="/avatars/john.png" alt="John Doe" />
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">John Doe</span>
+                        <span className="text-xs text-muted-foreground">
+                          john.doe@example.com
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Completed</Badge>
+                    </TableCell>
+                    <TableCell>$456.78</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>#1238</TableCell>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage src="/avatars/john.png" alt="John Doe" />
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">John Doe</span>
+                        <span className="text-xs text-muted-foreground">
+                          john.doe@example.com
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Completed</Badge>
+                    </TableCell>
+                    <TableCell>$567.89</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
           </Card>
           <Card className={cn("col-span-3")}>
             <CardHeader>
@@ -139,7 +284,158 @@ export default function DashboardPage() {
                 </p>
               </CardDescription>
             </CardHeader>
-            <CardContent></CardContent>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Stock</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage
+                          src="/products/iphone-12.jpg"
+                          alt="iPhone 12"
+                        />
+                        <AvatarFallback>IP</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">iPhone 12</span>
+                        <span className="text-xs text-muted-foreground">
+                          Apple
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>12</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Electronics</Badge>
+                    </TableCell>
+                    <TableCell>$799.99</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage
+                          src="/products/macbook-pro.jpg"
+                          alt="MacBook Pro"
+                        />
+                        <AvatarFallback>MP</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">MacBook Pro</span>
+                        <span className="text-xs text-muted-foreground">
+                          Apple
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>8</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Electronics</Badge>
+                    </TableCell>
+                    <TableCell>$1299.99</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage
+                          src="/products/iphone-12-mini.jpg"
+                          alt="iPhone 12 Mini"
+                        />
+                        <AvatarFallback>IM</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          iPhone 12 Mini
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          Apple
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>15</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Electronics</Badge>
+                    </TableCell>
+                    <TableCell>$399.99</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage
+                          src="/products/airpods-pro.jpg"
+                          alt="AirPods Pro"
+                        />
+                        <AvatarFallback>AP</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">AirPods Pro</span>
+                        <span className="text-xs text-muted-foreground">
+                          Apple
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>20</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Electronics</Badge>
+                    </TableCell>
+                    <TableCell>$199.99</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-8">
+                        <AvatarImage
+                          src="/avatars/ipad-pro.png"
+                          alt="John Doe"
+                        />
+                        <AvatarFallback>IP</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">iPad Pro</span>
+                        <span className="text-xs text-muted-foreground">
+                          Apple
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>10</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Electronics</Badge>
+                    </TableCell>
+                    <TableCell>$999.99</TableCell>
+                    <TableCell>
+                      <Button variant="secondary" size="sm">
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
           </Card>
         </div>
       </section>
