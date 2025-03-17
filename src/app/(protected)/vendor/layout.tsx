@@ -50,7 +50,7 @@ export default function DashboardLayout({
   children,
 }: Readonly<PropsWithChildren>) {
   return (
-    <main className={cn("py-7 px-7 min-h-svh flex")}>
+    <main className={cn("py-7 px-7 min-h-svh w-full flex")}>
       <DashboardSidebar items={items} />
       {children}
     </main>
