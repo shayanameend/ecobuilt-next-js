@@ -104,7 +104,7 @@ async function createProfile({
   token,
   data,
 }: {
-  token: string;
+  token: string | null;
   data: FormData;
 }) {
   const response = await axios.post(routes.api.public.profile.url(), data, {
@@ -190,10 +190,6 @@ export function CreateProfileForm() {
         }
       }
     });
-
-    if (!token) {
-      return;
-    }
 
     createProfileMutation.mutate({
       token,
