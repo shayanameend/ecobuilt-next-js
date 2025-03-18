@@ -64,7 +64,7 @@ export function DashboardSidebar({
       </SidebarContent>
       <SidebarFooter>
         <Link href={routes.app.public.root.url()}>
-          <Button className={cn("w-full")}>
+          <Button className={cn("w-full")} variant="outline" size="default">
             <LogOutIcon />
             <span>Back</span>
           </Button>
