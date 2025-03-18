@@ -8,9 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
 import { domine } from "~/lib/fonts";
 import { cn } from "~/lib/utils";
-import { Input } from "~/components/ui/input";
 
 export default function CategoriesPage() {
   return (
