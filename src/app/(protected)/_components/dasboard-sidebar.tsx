@@ -44,10 +44,10 @@ export function DashboardSidebar({
           className={cn("w-24 object-cover")}
         />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className={cn("px-2")}>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className={cn("space-y-1")}>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
