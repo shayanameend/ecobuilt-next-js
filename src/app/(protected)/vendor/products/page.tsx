@@ -7,6 +7,8 @@ import type {
   VendorProfileType,
 } from "~/lib/types";
 
+import { useRouter } from "next/navigation";
+
 import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
@@ -205,7 +207,13 @@ export default function ProductsPage() {
           </CardContent>
           <CardFooter className={cn("flex items-center gap-8")}>
             <CardDescription>
-              <p>Showing 5 of 20 products</p>
+              <p>
+                Showing{" "}
+                {productsQuery.meta.limit < productsQuery.meta.total
+                  ? productsQuery.meta.limit
+                  : productsQuery.meta.total}{" "}
+                of {productsQuery.meta.total} products
+              </p>
             </CardDescription>
             <Pagination className={cn("flex-1 justify-end")}>
               <PaginationContent>
