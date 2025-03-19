@@ -163,6 +163,48 @@ export default function SettingsPage() {
                   >
                     Address: {data?.data?.profile?.pickupAddress ?? "N/A"}
                   </p>
+                  <p
+                    className={cn("text-muted-foreground text-center text-sm")}
+                  >
+                    Postal Code: {data?.data?.profile?.postalCode ?? "N/A"}
+                  </p>
+                  <p
+                    className={cn("text-muted-foreground text-center text-sm")}
+                  >
+                    City: {data?.data?.profile?.city ?? "N/A"}
+                  </p>
+                  <p
+                    className={cn("text-muted-foreground text-center text-sm")}
+                  >
+                    Status: {data?.data?.profile?.auth?.status ?? "N/A"}
+                  </p>
+                  <p
+                    className={cn("text-muted-foreground text-center text-sm")}
+                  >
+                    Role: {data?.data?.profile?.auth?.role ?? "N/A"}
+                  </p>
+                  <p
+                    className={cn("text-muted-foreground text-center text-sm")}
+                  >
+                    Verified:{" "}
+                    {data?.data?.profile?.auth?.isVerified ? "Yes" : "No"}
+                  </p>
+                  <p
+                    className={cn("text-muted-foreground text-center text-sm")}
+                  >
+                    Deleted:{" "}
+                    {data?.data?.profile?.auth?.isDeleted ? "Yes" : "No"}
+                  </p>
+                  <p
+                    className={cn("text-muted-foreground text-center text-sm")}
+                  >
+                    Created At:{" "}
+                    {data?.data?.profile?.auth?.createdAt
+                      ? new Date(
+                          data.data.profile.auth.createdAt,
+                        ).toLocaleDateString()
+                      : "N/A"}
+                  </p>
                 </div>
               )}
             </CardContent>
