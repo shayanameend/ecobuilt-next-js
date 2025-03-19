@@ -1,3 +1,28 @@
+export enum Role {
+  UNSPECIFIED = "UNSPECIFIED",
+  SUPER_ADMIN = "SUPER_ADMIN",
+  ADMIN = "ADMIN",
+  VENDOR = "VENDOR",
+  USER = "USER",
+}
+
+export enum UserStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
+
+export enum OtpType {
+  VERIFY = "VERIFY",
+  RESET = "RESET",
+}
+
+export enum CategoryStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
+
 export type PublicAuthType = {
   id: string;
   email: string;
@@ -83,27 +108,28 @@ export type PublicReviewType = {
   updatedAt: Date;
 };
 
-export enum Role {
-  UNSPECIFIED = "UNSPECIFIED",
-  SUPER_ADMIN = "SUPER_ADMIN",
-  ADMIN = "ADMIN",
-  VENDOR = "VENDOR",
-  USER = "USER",
-}
+export type SingleResponseType<T> = {
+  data: T;
+  info: {
+    message: string;
+  };
+};
 
-export enum UserStatus {
-  PENDING = "PENDING",
-  APPROVED = "APPROVED",
-  REJECTED = "REJECTED",
-}
+export type MultipleResponseType<T> = {
+  data: T;
+  meta: {
+    total: number;
+    pages: number;
+    limit: number;
+    page: number;
+  };
+  info: {
+    message: string;
+  };
+};
 
-export enum OtpType {
-  VERIFY = "VERIFY",
-  RESET = "RESET",
-}
-
-export enum CategoryStatus {
-  PENDING = "PENDING",
-  APPROVED = "APPROVED",
-  REJECTED = "REJECTED",
-}
+export type ErrorResponseType<T> = {
+  info: {
+    message: string;
+  };
+};

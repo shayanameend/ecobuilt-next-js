@@ -1,5 +1,11 @@
 "use client";
 
+import type { SingleResponseType, VendorProfileType } from "~/lib/types";
+
+import { useQuery } from "@tanstack/react-query";
+
+import axios from "axios";
+
 import {
   FilterIcon,
   MoreHorizontalIcon,
@@ -9,40 +15,46 @@ import {
 import { Button } from "~/components/ui/button";
 
 import { AvatarImage } from "@radix-ui/react-avatar";
+import { UpdateVendorProfileForm } from "~/app/(protected)/vendor/settings/_components/update-vendor-profile-form";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "~/components/ui/pagination";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
-import { domine } from "~/lib/fonts";
-import { cn } from "~/lib/utils";
 import { useAuthContext } from "~/context/auth";
+import { domine } from "~/lib/fonts";
+import { routes } from "~/lib/routes";
+import { cn } from "~/lib/utils";
 
-export default function ProductsPage() {
-  const { setToken, setAuth } = useAuthContext();
+async function getVendorProfile({
+  token,
+}: {
+  token: string | null;
+}) {
+  const response = await axios.get(routes.api.vendor.profile.url(), {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}
+
+export default function SettingsPage() {
+  const { token, setToken, setAuth } = useAuthContext();
+
+  const getVendorProfileQuery = useQuery<
+    SingleResponseType<{
+      profile: VendorProfileType;
+    }>
+  >({
+    queryKey: ["profile"],
+    queryFn: () => getVendorProfile({ token }),
+  });
 
   return (
     <>
@@ -82,7 +94,7 @@ export default function ProductsPage() {
             <CardHeader>
               <CardTitle>
                 <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Vendor Profile
+                  Update Profile
                 </h3>
               </CardTitle>
               <CardDescription>
@@ -91,7 +103,9 @@ export default function ProductsPage() {
                 </p>
               </CardDescription>
             </CardHeader>
-            <CardContent></CardContent>
+            <CardContent>
+              <UpdateVendorProfileForm />
+            </CardContent>
           </Card>
           <Card>
             <CardHeader>
@@ -106,7 +120,9 @@ export default function ProductsPage() {
                 </p>
               </CardDescription>
             </CardHeader>
-            <CardContent></CardContent>
+            <CardContent>
+              <UpdateVendorProfileForm />
+            </CardContent>
           </Card>
         </div>
       </section>
