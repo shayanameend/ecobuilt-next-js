@@ -12,10 +12,12 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {
   AlertCircleIcon,
+  EditIcon,
   FilterIcon,
   Loader2Icon,
   MoreHorizontalIcon,
   SearchIcon,
+  Trash2Icon,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -29,6 +31,20 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
 import {
   Pagination,
@@ -194,9 +210,25 @@ export default function ProductsPage() {
                     </TableCell>
                     <TableCell>{formatPrice(product.price)}</TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontalIcon />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontalIcon />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem>
+                              <EditIcon />
+                              <span>Edit</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Trash2Icon />
+                              <span>Delete</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
