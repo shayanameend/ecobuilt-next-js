@@ -76,6 +76,11 @@ export type PublicCategoryType = {
   name: string;
   createdAt: Date;
   updatedAt: Date;
+  _count: {
+    select: {
+      products: number;
+    };
+  };
 };
 
 export type CategoryType = PublicCategoryType & {
