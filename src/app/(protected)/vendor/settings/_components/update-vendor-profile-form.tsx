@@ -99,7 +99,7 @@ async function updateProfile({
 
 export function UpdateVendorProfileForm({
   profile,
-}: { profile: VendorProfileType | undefined }) {
+}: { profile: VendorProfileType }) {
   const queryClient = useQueryClient();
 
   const { token } = useAuthContext();
@@ -111,16 +111,14 @@ export function UpdateVendorProfileForm({
   useEffect(() => {
     form.setValue("pictureId", undefined);
     form.setValue("picture", undefined);
-    form.setValue("name", profile?.name);
-    form.setValue("description", profile?.description);
-    form.setValue("phone", profile?.phone);
-    form.setValue("postalCode", profile?.postalCode);
-    form.setValue("city", profile?.city);
-    form.setValue("pickupAddress", profile?.pickupAddress);
+    form.setValue("name", profile.name);
+    form.setValue("description", profile.description);
+    form.setValue("phone", profile.phone);
+    form.setValue("postalCode", profile.postalCode);
+    form.setValue("city", profile.city);
+    form.setValue("pickupAddress", profile.pickupAddress);
 
-    setProfileImage(
-      `${process.env.NEXT_PUBLIC_FILE_URL}/${profile?.pictureId}`,
-    );
+    setProfileImage(`${process.env.NEXT_PUBLIC_FILE_URL}/${profile.pictureId}`);
   }, [profile]);
 
   const form = useForm<zod.infer<typeof UpdateVendorProfileFormSchema>>({
@@ -128,12 +126,12 @@ export function UpdateVendorProfileForm({
     defaultValues: {
       pictureId: undefined,
       picture: undefined,
-      name: profile?.name ?? "",
-      description: profile?.description ?? "",
-      phone: profile?.phone ?? "",
-      postalCode: profile?.postalCode ?? "",
-      city: profile?.city ?? "",
-      pickupAddress: profile?.pickupAddress ?? "",
+      name: profile.name,
+      description: profile.description,
+      phone: profile.phone,
+      postalCode: profile.postalCode,
+      city: profile.city,
+      pickupAddress: profile.pickupAddress,
     },
   });
 
@@ -141,7 +139,7 @@ export function UpdateVendorProfileForm({
     const file = event.target.files?.[0];
 
     if (file) {
-      form.setValue("pictureId", profile?.pictureId);
+      form.setValue("pictureId", profile.pictureId);
       form.setValue("picture", file);
 
       const reader = new FileReader();
@@ -168,7 +166,7 @@ export function UpdateVendorProfileForm({
     },
     onSettled: () => {
       setProfileImage(
-        `${process.env.NEXT_PUBLIC_FILE_URL}/${profile?.pictureId}`,
+        `${process.env.NEXT_PUBLIC_FILE_URL}/${profile.pictureId}`,
       );
 
       form.reset();
@@ -210,11 +208,11 @@ export function UpdateVendorProfileForm({
               />
               <AvatarFallback>
                 {form.watch("name")
-                  ? form
+                  ? (form
                       .watch("name")
                       ?.split(" ")
                       ?.map((part) => part.charAt(0).toUpperCase())
-                      ?.join("") || "JD"
+                      ?.join("") ?? "JD")
                   : "JD"}
               </AvatarFallback>
             </Avatar>
