@@ -1,16 +1,13 @@
 "use client";
 
-import type { CategoryType, MultipleResponseType } from "~/lib/types";
+import type { MultipleResponseType, PublicCategoryType } from "~/lib/types";
+
+import { useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
-import {
-  AlertCircleIcon,
-  Loader2Icon,
-  PlusIcon,
-  SearchIcon,
-} from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -26,6 +23,7 @@ import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
+import { NewCategory } from "./_components/new-category";
 
 async function getCategories({
   token,
@@ -44,18 +42,25 @@ async function getCategories({
 export default function CategoriesPage() {
   const { token } = useAuthContext();
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   const {
     data: categoriesQuery,
     isLoading: categoriesQueryIsLoading,
     isError: categoriesQueryIsError,
   } = useQuery<
     MultipleResponseType<{
-      categories: CategoryType[];
+      categories: PublicCategoryType[];
     }>
   >({
     queryKey: ["categories"],
     queryFn: () => getCategories({ token }),
   });
+
+  const filteredCategories =
+    categoriesQuery?.data?.categories?.filter((category) =>
+      category.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    ) || [];
 
   if (categoriesQueryIsLoading) {
     return (
@@ -73,7 +78,7 @@ export default function CategoriesPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <AlertCircleIcon className="size-12 text-destructive mx-auto mb-2" />
-            <CardTitle>Error Loading Profile</CardTitle>
+            <CardTitle>Error Loading Categories</CardTitle>
             <CardDescription>
               We couldn't load your categories information. Please try again
               later.
@@ -109,416 +114,54 @@ export default function CategoriesPage() {
               "absolute top-2.5 left-2.5 size-4 text-muted-foreground",
             )}
           />
-          <Input placeholder="Search Categories..." className={cn("pl-8")} />
-          <Button variant="secondary" size="default">
-            <PlusIcon />
-            <span>New Category</span>
-          </Button>
+          <Input
+            placeholder="Search Categories..."
+            className={cn("pl-8")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <NewCategory />
         </div>
         <div
           className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4")}
         >
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Flooring
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  12 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Lighting
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  8 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Furniture
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  18 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Appliances
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  5 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Flooring
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  12 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Lighting
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  8 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Furniture
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  18 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Appliances
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  5 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Flooring
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  12 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Lighting
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  8 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Furniture
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  18 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Appliances
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  5 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Flooring
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  12 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Lighting
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  8 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Furniture
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  18 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Appliances
-                </h3>
-              </CardTitle>
-              <CardDescription>
-                <p
-                  className={cn("text-muted-foreground text-base font-medium")}
-                >
-                  5 products in this category
-                </p>
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                variant="secondary"
-                size="default"
-                className={cn("w-full")}
-              >
-                <span>View</span>
-              </Button>
-            </CardFooter>
-          </Card>
+          {filteredCategories.length > 0 ? (
+            filteredCategories.map((category) => (
+              <Card key={category.id}>
+                <CardHeader>
+                  <CardTitle>
+                    <h3 className={cn("text-2xl font-bold", domine.className)}>
+                      {category.name}
+                    </h3>
+                  </CardTitle>
+                  <CardDescription>
+                    <p
+                      className={cn(
+                        "text-muted-foreground text-base font-medium",
+                      )}
+                    >
+                      {category._count.products} products in this category
+                    </p>
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter>
+                  <Button
+                    variant="secondary"
+                    size="default"
+                    className={cn("w-full")}
+                  >
+                    <span>View</span>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <p className="text-muted-foreground">
+                No categories found matching "{searchQuery}"
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </>

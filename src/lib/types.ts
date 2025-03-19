@@ -77,9 +77,7 @@ export type PublicCategoryType = {
   createdAt: Date;
   updatedAt: Date;
   _count: {
-    select: {
-      products: number;
-    };
+    products: number;
   };
 };
 
