@@ -74,10 +74,7 @@ export default function SettingsPage() {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
         <div className="text-center space-y-4">
-          <Loader2Icon className="size-12 text-primary animate-spin mx-auto" />
-          <p className="text-muted-foreground text-lg">
-            Loading your profile information...
-          </p>
+          <Loader2Icon className="size-8 text-primary animate-spin mx-auto" />
         </div>
       </section>
     );
