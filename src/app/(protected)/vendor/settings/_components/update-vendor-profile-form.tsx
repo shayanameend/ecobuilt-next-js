@@ -2,15 +2,16 @@
 
 import type { ChangeEvent } from "react";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import type { VendorProfileType } from "~/lib/types";
+
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import axios, { AxiosError } from "axios";
 import { CameraIcon, Loader2Icon } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import zod from "zod";
 
@@ -39,6 +40,18 @@ import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
 const UpdateVendorProfileFormSchema = zod.object({
+  pictureId: zod
+    .string()
+    .length(40, {
+      message: "Picture ID is invalid",
+    })
+    .optional(),
+  picture: zod
+    .any()
+    .refine((file) => file !== undefined, {
+      message: "Picture is required",
+    })
+    .optional(),
   name: zod
     .string({
       message: "Name must be a string",
@@ -65,12 +78,6 @@ const UpdateVendorProfileFormSchema = zod.object({
   postalCode: zod.string().optional(),
   city: zod.string().optional(),
   pickupAddress: zod.string().optional(),
-  picture: zod
-    .any()
-    .refine((file) => file !== undefined, {
-      message: "Picture is required",
-    })
-    .optional(),
 });
 
 async function updateProfile({
@@ -80,7 +87,7 @@ async function updateProfile({
   token: string | null;
   data: FormData;
 }) {
-  const response = await axios.post(routes.api.vendor.profile.url(), data, {
+  const response = await axios.put(routes.api.vendor.profile.url(), data, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "multipart/form-data",
@@ -90,8 +97,10 @@ async function updateProfile({
   return response.data;
 }
 
-export function UpdateVendorProfileForm() {
-  const router = useRouter();
+export function UpdateVendorProfileForm({
+  profile,
+}: { profile: VendorProfileType | undefined }) {
+  const queryClient = useQueryClient();
 
   const { token } = useAuthContext();
 
@@ -99,17 +108,15 @@ export function UpdateVendorProfileForm() {
     undefined,
   );
 
+  useEffect(() => {
+    setProfileImage(
+      `${process.env.NEXT_PUBLIC_FILE_URL}/${profile?.pictureId}`,
+    );
+  }, [profile?.pictureId]);
+
   const form = useForm<zod.infer<typeof UpdateVendorProfileFormSchema>>({
     resolver: zodResolver(UpdateVendorProfileFormSchema),
-    defaultValues: {
-      picture: undefined,
-      name: "",
-      description: "",
-      phone: "",
-      postalCode: "",
-      city: "",
-      pickupAddress: "",
-    },
+    defaultValues: profile,
   });
 
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -132,6 +139,8 @@ export function UpdateVendorProfileForm() {
     mutationFn: updateProfile,
     onSuccess: ({ info }) => {
       toast.success(info.message);
+
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
@@ -139,7 +148,9 @@ export function UpdateVendorProfileForm() {
       }
     },
     onSettled: () => {
-      setProfileImage(undefined);
+      setProfileImage(
+        `${process.env.NEXT_PUBLIC_FILE_URL}/${profile?.pictureId}`,
+      );
 
       form.reset();
     },
@@ -178,11 +189,11 @@ export function UpdateVendorProfileForm() {
               />
               <AvatarFallback>
                 {form.watch("name")
-                  ? form.watch("name") ||
-                    ""
-                      .split(" ")
-                      .map((part) => part.charAt(0).toUpperCase())
-                      .join("")
+                  ? form
+                      .watch("name")
+                      ?.split(" ")
+                      ?.map((part) => part.charAt(0).toUpperCase())
+                      ?.join("") || "JD"
                   : "JD"}
               </AvatarFallback>
             </Avatar>

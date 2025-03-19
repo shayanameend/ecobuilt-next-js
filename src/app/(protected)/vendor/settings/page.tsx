@@ -1,23 +1,19 @@
 "use client";
 
-import type { SingleResponseType, VendorProfileType } from "~/lib/types";
+import type {
+  AuthType,
+  SingleResponseType,
+  VendorProfileType,
+} from "~/lib/types";
 
 import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
 
-import {
-  FilterIcon,
-  MoreHorizontalIcon,
-  PlusIcon,
-  SearchIcon,
-} from "lucide-react";
+import { AlertCircle, Loader2Icon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
-import { AvatarImage } from "@radix-ui/react-avatar";
 import { UpdateVendorProfileForm } from "~/app/(protected)/vendor/settings/_components/update-vendor-profile-form";
-import { Avatar, AvatarFallback } from "~/components/ui/avatar";
-import { Badge } from "~/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -29,6 +25,7 @@ import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 
 async function getVendorProfile({
   token,
@@ -47,9 +44,11 @@ async function getVendorProfile({
 export default function SettingsPage() {
   const { token, setToken, setAuth } = useAuthContext();
 
-  const getVendorProfileQuery = useQuery<
+  const { data, isLoading, isError } = useQuery<
     SingleResponseType<{
-      profile: VendorProfileType;
+      profile: VendorProfileType & {
+        auth: AuthType;
+      };
     }>
   >({
     queryKey: ["profile"],
@@ -89,6 +88,17 @@ export default function SettingsPage() {
             </Button>
           </div>
         </div>
+
+        {isError && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              Failed to load profile information. Please try again later.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className={cn("grid grid-cols-1 gap-4 lg:grid-cols-2")}>
           <Card>
             <CardHeader>
@@ -104,7 +114,15 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <UpdateVendorProfileForm />
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2Icon
+                    className={cn("size-8 text-primary animate-spin")}
+                  />
+                </div>
+              ) : (
+                <UpdateVendorProfileForm profile={data?.data?.profile} />
+              )}
             </CardContent>
           </Card>
           <Card>
@@ -121,7 +139,15 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <UpdateVendorProfileForm />
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2Icon
+                    className={cn("size-8 text-primary animate-spin")}
+                  />
+                </div>
+              ) : (
+                <></>
+              )}
             </CardContent>
           </Card>
         </div>
