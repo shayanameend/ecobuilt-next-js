@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import zod from "zod";
+import * as zod from "zod";
 
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";

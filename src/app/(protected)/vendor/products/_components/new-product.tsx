@@ -2,16 +2,26 @@
 
 import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 
+import { useState } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import axios, { AxiosError } from "axios";
 import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import zod from "zod";
+import * as zod from "zod";
 
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,19 +31,17 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
 import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
-
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
 
 const CreateProductFormSchema = zod.object({
   name: zod
@@ -134,15 +142,6 @@ export function NewProduct() {
 
   const form = useForm<zod.infer<typeof CreateProductFormSchema>>({
     resolver: zodResolver(CreateProductFormSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      sku: "",
-      stock: 0,
-      price: 0,
-      salePrice: 0,
-      categoryId: "",
-    },
   });
 
   const {
@@ -208,6 +207,142 @@ export function NewProduct() {
                     <FormControl>
                       <Input type="text" placeholder="Steel" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className={cn("flex gap-2 items-start")}>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Description"
+                        {...field}
+                        className={cn("resize-none")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className={cn("flex gap-2 items-start")}>
+              <FormField
+                control={form.control}
+                name="sku"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>SKU</FormLabel>
+                    <FormControl>
+                      <Input type="text" placeholder="STL-001" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="stock"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Stock</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="10"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className={cn("flex gap-2 items-start")}>
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="99.99"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="salePrice"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Sale Price (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="79.99"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className={cn("flex gap-2 items-start")}>
+              <FormField
+                control={form.control}
+                name="categoryId"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-[2]")}>
+                    <FormLabel>Category</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={
+                        categoriesQueryIsLoading || categoriesQueryIsError
+                      }
+                    >
+                      <FormControl className={cn("w-full")}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categoriesQueryIsLoading && (
+                          <div className="flex items-center justify-center p-2">
+                            <Loader2Icon className="animate-spin h-4 w-4 mr-2" />
+                            <span>Loading categories...</span>
+                          </div>
+                        )}
+                        {categoriesQueryIsError && (
+                          <div className="text-destructive p-2">
+                            Failed to load categories
+                          </div>
+                        )}
+                        {!categoriesQueryIsLoading &&
+                          !categoriesQueryIsError &&
+                          categoriesQuery?.data?.categories &&
+                          categoriesQuery.data.categories.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

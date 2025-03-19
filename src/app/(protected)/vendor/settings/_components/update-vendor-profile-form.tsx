@@ -13,7 +13,7 @@ import axios, { AxiosError } from "axios";
 import { CameraIcon, Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import zod from "zod";
+import * as zod from "zod";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
