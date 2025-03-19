@@ -1,5 +1,7 @@
 "use client";
 
+import type { ChangeEvent } from "react";
+
 import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 
 import { useState } from "react";
@@ -8,11 +10,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import axios, { AxiosError } from "axios";
-import { Loader2Icon } from "lucide-react";
+import { CameraIcon, Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
 
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -50,7 +53,8 @@ const CreateProductFormSchema = zod.object({
         message: "Picture is required",
       }),
     )
-    .min(1, { message: "At least 1 picture is required" }),
+    .min(1, { message: "At least 1 picture is required" })
+    .max(5, { message: "Maximum 5 pictures are allowed" }),
   name: zod
     .string({
       message: "Name must be a string",
@@ -146,6 +150,7 @@ export function NewProduct() {
   const { token } = useAuthContext();
 
   const [isNewProductOpen, setIsNewProductOpen] = useState(false);
+  const [productImages, setProductImages] = useState<string[]>([]);
 
   const form = useForm<zod.infer<typeof CreateProductFormSchema>>({
     resolver: zodResolver(CreateProductFormSchema),
@@ -160,6 +165,42 @@ export function NewProduct() {
       categoryId: "",
     },
   });
+
+  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+
+    if (files && files.length > 0) {
+      const fileArray = Array.from(files);
+
+      const limitedFileArray = fileArray.slice(0, 5);
+
+      if (fileArray.length > 5) {
+        toast.warning(
+          "Maximum 5 images allowed. Only the first 5 were selected.",
+        );
+      }
+
+      form.setValue("pictures", limitedFileArray);
+
+      const newImagePreviews: string[] = [];
+
+      const totalFiles = limitedFileArray.length;
+
+      for (const file of limitedFileArray) {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          newImagePreviews.push(reader.result as string);
+
+          if (newImagePreviews.length === totalFiles) {
+            setProductImages(newImagePreviews);
+          }
+        };
+
+        reader.readAsDataURL(file);
+      }
+    }
+  };
 
   const {
     data: categoriesQuery,
@@ -187,6 +228,8 @@ export function NewProduct() {
       }
     },
     onSettled: () => {
+      setProductImages([]);
+
       form.reset();
     },
   });
@@ -202,7 +245,7 @@ export function NewProduct() {
           <span>New Product</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[768px]">
         <DialogHeader>
           <DialogTitle>New Product</DialogTitle>
           <DialogDescription>
@@ -215,71 +258,163 @@ export function NewProduct() {
             className={cn("space-y-6")}
           >
             <div className={cn("flex gap-2 items-start")}>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className={cn("flex-1")}>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="Steel" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className={cn("flex gap-2 items-start")}>
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className={cn("flex-1")}>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Description"
-                        {...field}
-                        className={cn("resize-none")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className={cn("flex gap-2 items-start")}>
-              <FormField
-                control={form.control}
-                name="sku"
-                render={({ field }) => (
-                  <FormItem className={cn("flex-1")}>
-                    <FormLabel>SKU</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="STL-001" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="stock"
-                render={({ field }) => (
-                  <FormItem className={cn("flex-1")}>
-                    <FormLabel>Stock</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="10"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex-[2] flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-4 h-64">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {productImages.length > 0 ? (
+                    productImages.map((img, index) => (
+                      <Avatar
+                        key={img}
+                        className={cn(
+                          "rounded-xl size-20 border-2 border-primary/20",
+                        )}
+                      >
+                        <AvatarImage
+                          src={img}
+                          alt={`Product image ${index + 1}`}
+                          width={80}
+                          height={80}
+                          className={cn("object-cover")}
+                        />
+                        <AvatarFallback className={cn("rounded-xl")}>
+                          {index + 1}
+                        </AvatarFallback>
+                      </Avatar>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center">
+                      <CameraIcon className="h-12 w-12 text-gray-400" />
+                      <p className="mt-2 text-sm text-gray-500">
+                        No images selected
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="relative group cursor-pointer mt-4">
+                  <Button type="button" variant="outline">
+                    <CameraIcon className="size-4" />
+                    {productImages.length > 0
+                      ? "Change Images"
+                      : "Upload Images"}
+                  </Button>
+                  <Input
+                    id="profile-image-upload"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="absolute inset-0 w-full opacity-0 cursor-pointer"
+                    onChange={handleImageUpload}
+                  />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="pictures"
+                  render={() => (
+                    <FormItem>
+                      <FormMessage className="text-center" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className={cn("flex-[3] space-y-6")}>
+                <div className={cn("flex gap-2 items-start")}>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem className={cn("flex-1")}>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder="Steel" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="sku"
+                    render={({ field }) => (
+                      <FormItem className={cn("flex-1")}>
+                        <FormLabel>SKU</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder="STL-001" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className={cn("flex gap-2 items-start")}>
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem className={cn("flex-1")}>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Description"
+                            {...field}
+                            className={cn("resize-none")}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className={cn("flex gap-2 items-start")}>
+                  <FormField
+                    control={form.control}
+                    name="categoryId"
+                    render={({ field }) => (
+                      <FormItem className={cn("flex-[2]")}>
+                        <FormLabel>Category</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={
+                            categoriesQueryIsLoading || categoriesQueryIsError
+                          }
+                        >
+                          <FormControl className={cn("w-full")}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {categoriesQueryIsLoading && (
+                              <div className="flex items-center justify-center p-2">
+                                <Loader2Icon className="animate-spin h-4 w-4 mr-2" />
+                                <span>Loading categories...</span>
+                              </div>
+                            )}
+                            {categoriesQueryIsError && (
+                              <div className="text-destructive p-2">
+                                Failed to load categories
+                              </div>
+                            )}
+                            {!categoriesQueryIsLoading &&
+                              !categoriesQueryIsError &&
+                              categoriesQuery?.data?.categories &&
+                              categoriesQuery.data.categories.map(
+                                (category) => (
+                                  <SelectItem
+                                    key={category.id}
+                                    value={category.id}
+                                  >
+                                    {category.name}
+                                  </SelectItem>
+                                ),
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
             </div>
             <div className={cn("flex gap-2 items-start")}>
               <FormField
@@ -318,48 +453,20 @@ export function NewProduct() {
                   </FormItem>
                 )}
               />
-            </div>
-            <div className={cn("flex gap-2 items-start")}>
               <FormField
                 control={form.control}
-                name="categoryId"
+                name="stock"
                 render={({ field }) => (
-                  <FormItem className={cn("flex-[2]")}>
-                    <FormLabel>Category</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={
-                        categoriesQueryIsLoading || categoriesQueryIsError
-                      }
-                    >
-                      <FormControl className={cn("w-full")}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categoriesQueryIsLoading && (
-                          <div className="flex items-center justify-center p-2">
-                            <Loader2Icon className="animate-spin h-4 w-4 mr-2" />
-                            <span>Loading categories...</span>
-                          </div>
-                        )}
-                        {categoriesQueryIsError && (
-                          <div className="text-destructive p-2">
-                            Failed to load categories
-                          </div>
-                        )}
-                        {!categoriesQueryIsLoading &&
-                          !categoriesQueryIsError &&
-                          categoriesQuery?.data?.categories &&
-                          categoriesQuery.data.categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Stock</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="10"
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
