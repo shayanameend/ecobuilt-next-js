@@ -67,6 +67,7 @@ import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn, formatPrice } from "~/lib/utils";
+import { NewProduct } from "./_components/new-product";
 
 async function getProducts({
   token,
@@ -152,9 +153,7 @@ export default function ProductsPage() {
             </p>
           </div>
           <div>
-            <Button variant="secondary" size="default">
-              <span>New Product</span>
-            </Button>
+            <NewProduct />
           </div>
         </div>
         <div className={cn("relative flex items-center justify-between gap-2")}>
