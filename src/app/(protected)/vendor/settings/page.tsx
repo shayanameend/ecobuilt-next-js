@@ -9,10 +9,18 @@ import type {
 import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
-import { Calendar, Mail, MapPin, Phone, Shield, Tag } from "lucide-react";
+import {
+  CalendarIcon,
+  MailIcon,
+  MapPinIcon,
+  PhoneIcon,
+  ShieldIcon,
+  TagIcon,
+} from "lucide-react";
 
 import { UpdateVendorProfileForm } from "~/app/(protected)/vendor/settings/_components/update-vendor-profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -27,7 +35,6 @@ import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { UserStatus } from "~/lib/types";
 import { cn } from "~/lib/utils";
-import { Badge } from "~/components/ui/badge";
 
 async function getVendorProfile({
   token,
@@ -140,22 +147,22 @@ export default function SettingsPage() {
                 <div className="space-y-3">
                   <h4 className="text-base font-semibold">Contact Details</h4>
                   <div className="grid grid-cols-1 gap-2">
-                    <div className="flex items-center gap-2">
-                      <Mail className="size-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2 text-sm">
+                      <MailIcon className="size-4 text-muted-foreground" />
                       <span className="font-medium">Email:</span>
                       <span className="text-muted-foreground">
                         {data?.data?.profile?.auth?.email ?? "N/A"}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="size-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2 text-sm">
+                      <PhoneIcon className="size-4 text-muted-foreground" />
                       <span className="font-medium">Phone:</span>
                       <span className="text-muted-foreground">
                         {data?.data?.profile?.phone ?? "N/A"}
                       </span>
                     </div>
-                    <div className="flex items-start gap-2">
-                      <MapPin className="size-4 text-muted-foreground mt-0.5" />
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPinIcon className="size-4 text-muted-foreground mt-0.5" />
                       <span className="font-medium">Location:</span>
                       <span className="text-muted-foreground">
                         {[
@@ -173,15 +180,15 @@ export default function SettingsPage() {
                 <div className="space-y-3">
                   <h4 className="text-base font-semibold">Account Status</h4>
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2">
-                      <Tag className="size-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2 text-sm">
+                      <TagIcon className="size-4 text-muted-foreground" />
                       <span className="font-medium">Role:</span>
                       <Badge variant="outline">
                         {data?.data?.profile?.auth?.role ?? "N/A"}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Shield className="size-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2 text-sm">
+                      <ShieldIcon className="size-4 text-muted-foreground" />
                       <span className="font-medium">Status:</span>
                       <Badge
                         variant={
@@ -194,9 +201,9 @@ export default function SettingsPage() {
                         {data?.data?.profile?.auth?.status ?? "N/A"}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-2 col-span-2">
-                      <Calendar className="size-4 text-muted-foreground" />
-                      <span className="font-medium">Created:</span>
+                    <div className="flex items-center gap-2 col-span-2 text-sm">
+                      <CalendarIcon className="size-4 text-muted-foreground" />
+                      <span className="font-medium">Registered:</span>
                       <span className="text-muted-foreground">
                         {data?.data?.profile?.auth?.createdAt
                           ? new Date(
