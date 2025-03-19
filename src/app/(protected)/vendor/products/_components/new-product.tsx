@@ -44,6 +44,13 @@ import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
 const CreateProductFormSchema = zod.object({
+  pictures: zod
+    .array(
+      zod.any().refine((file) => file !== undefined, {
+        message: "Picture is required",
+      }),
+    )
+    .min(1, { message: "At least 1 picture is required" }),
   name: zod
     .string({
       message: "Name must be a string",
@@ -142,6 +149,16 @@ export function NewProduct() {
 
   const form = useForm<zod.infer<typeof CreateProductFormSchema>>({
     resolver: zodResolver(CreateProductFormSchema),
+    defaultValues: {
+      pictures: [],
+      name: "",
+      description: "",
+      sku: "",
+      stock: 0,
+      price: 0,
+      salePrice: 0,
+      categoryId: "",
+    },
   });
 
   const {
@@ -288,7 +305,7 @@ export function NewProduct() {
                 name="salePrice"
                 render={({ field }) => (
                   <FormItem className={cn("flex-1")}>
-                    <FormLabel>Sale Price (Optional)</FormLabel>
+                    <FormLabel>Sale Price</FormLabel>
                     <FormControl>
                       <Input
                         type="number"

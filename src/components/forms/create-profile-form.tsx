@@ -41,6 +41,9 @@ import { cn } from "~/lib/utils";
 
 const CreateProfileFormSchema = zod
   .object({
+    picture: zod.any().refine((file) => file !== undefined, {
+      message: "Picture is required",
+    }),
     name: zod
       .string({
         message: "Name must be a string",
@@ -69,9 +72,6 @@ const CreateProfileFormSchema = zod
     city: zod.string().optional(),
     deliveryAddress: zod.string().optional(),
     pickupAddress: zod.string().optional(),
-    picture: zod.any().refine((file) => file !== undefined, {
-      message: "Picture is required",
-    }),
   })
   .superRefine((data, ctx) => {
     if (data.role === "USER") {
