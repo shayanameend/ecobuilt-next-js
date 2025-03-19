@@ -142,7 +142,25 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
 
     if (!isLoading && auth) {
       if (isAuthRoute) {
-        return router.push(routes.app.public.root.url());
+        let url: string;
+
+        switch (auth.role) {
+          case Role.SUPER_ADMIN:
+          case Role.ADMIN:
+            url = routes.app.admin.root.url();
+            break;
+          case Role.VENDOR:
+            url = routes.app.vendor.root.url();
+            break;
+          case Role.USER:
+            url = routes.app.user.root.url();
+            break;
+          default:
+            url = routes.app.unspecified.profile.url();
+            break;
+        }
+
+        router.push(url);
       }
 
       if (!isProfileRoute && auth.role === Role.UNSPECIFIED) {
