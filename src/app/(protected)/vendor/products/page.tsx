@@ -7,8 +7,6 @@ import type {
   VendorProfileType,
 } from "~/lib/types";
 
-import { useRouter } from "next/navigation";
-
 import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
