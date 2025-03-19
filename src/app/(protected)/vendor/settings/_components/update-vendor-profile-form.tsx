@@ -109,10 +109,19 @@ export function UpdateVendorProfileForm({
   );
 
   useEffect(() => {
+    form.setValue("pictureId", undefined);
+    form.setValue("picture", undefined);
+    form.setValue("name", profile?.name);
+    form.setValue("description", profile?.description);
+    form.setValue("phone", profile?.phone);
+    form.setValue("postalCode", profile?.postalCode);
+    form.setValue("city", profile?.city);
+    form.setValue("pickupAddress", profile?.pickupAddress);
+
     setProfileImage(
       `${process.env.NEXT_PUBLIC_FILE_URL}/${profile?.pictureId}`,
     );
-  }, [profile?.pictureId]);
+  }, [profile]);
 
   const form = useForm<zod.infer<typeof UpdateVendorProfileFormSchema>>({
     resolver: zodResolver(UpdateVendorProfileFormSchema),
@@ -156,7 +165,8 @@ export function UpdateVendorProfileForm({
       if (error instanceof AxiosError) {
         toast.error(error.response?.data.info.message);
       }
-
+    },
+    onSettled: () => {
       setProfileImage(
         `${process.env.NEXT_PUBLIC_FILE_URL}/${profile?.pictureId}`,
       );

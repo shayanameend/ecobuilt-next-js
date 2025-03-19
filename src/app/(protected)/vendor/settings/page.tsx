@@ -9,11 +9,11 @@ import type {
 import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
-
-import { AlertCircle, Loader2Icon, Upload } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Calendar, Mail, MapPin, Phone, Shield, Tag } from "lucide-react";
 
 import { UpdateVendorProfileForm } from "~/app/(protected)/vendor/settings/_components/update-vendor-profile-form";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -21,12 +21,13 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Separator } from "~/components/ui/separator";
 import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
+import { UserStatus } from "~/lib/types";
 import { cn } from "~/lib/utils";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 
 async function getVendorProfile({
   token,
@@ -89,17 +90,6 @@ export default function SettingsPage() {
             </Button>
           </div>
         </div>
-
-        {isError && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
-              Failed to load profile information. Please try again later.
-            </AlertDescription>
-          </Alert>
-        )}
-
         <div className={cn("grid grid-cols-1 gap-4 lg:grid-cols-2")}>
           <Card className={cn("hidden lg:flex")}>
             <CardHeader>
@@ -115,14 +105,8 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2Icon
-                    className={cn("size-8 text-primary animate-spin")}
-                  />
-                </div>
-              ) : (
-                <div className="flex flex-col items-center space-y-4">
+              <div className="flex flex-col space-y-6">
+                <div className="flex flex-col items-center space-y-3">
                   <Avatar className={cn("size-32 border-2 border-primary/20")}>
                     <AvatarImage
                       src={`${process.env.NEXT_PUBLIC_FILE_URL}/${data?.data?.profile?.pictureId}`}
@@ -144,69 +128,90 @@ export default function SettingsPage() {
                     {data?.data?.profile?.name ?? ""}
                   </h3>
                   <p
-                    className={cn("text-muted-foreground text-center text-sm")}
+                    className={cn(
+                      "text-muted-foreground text-center text-sm max-w-md",
+                    )}
                   >
-                    {data?.data?.profile?.auth?.email ?? ""}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    {data?.data?.profile?.description ?? ""}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    Phone: {data?.data?.profile?.phone ?? "N/A"}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    Address: {data?.data?.profile?.pickupAddress ?? "N/A"}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    Postal Code: {data?.data?.profile?.postalCode ?? "N/A"}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    City: {data?.data?.profile?.city ?? "N/A"}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    Status: {data?.data?.profile?.auth?.status ?? "N/A"}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    Role: {data?.data?.profile?.auth?.role ?? "N/A"}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    Verified:{" "}
-                    {data?.data?.profile?.auth?.isVerified ? "Yes" : "No"}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    Deleted:{" "}
-                    {data?.data?.profile?.auth?.isDeleted ? "Yes" : "No"}
-                  </p>
-                  <p
-                    className={cn("text-muted-foreground text-center text-sm")}
-                  >
-                    Created At:{" "}
-                    {data?.data?.profile?.auth?.createdAt
-                      ? new Date(
-                          data.data.profile.auth.createdAt,
-                        ).toLocaleDateString()
-                      : "N/A"}
+                    {data?.data?.profile?.description ??
+                      "No description provided"}
                   </p>
                 </div>
-              )}
+                <Separator />
+                <div className="space-y-3">
+                  <h4 className="text-base font-semibold">Contact Details</h4>
+                  <div className="grid grid-cols-1 gap-2">
+                    <div className="flex items-center gap-2">
+                      <Mail className="size-4 text-muted-foreground" />
+                      <span className="font-medium">Email:</span>
+                      <span className="text-muted-foreground">
+                        {data?.data?.profile?.auth?.email ?? "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="size-4 text-muted-foreground" />
+                      <span className="font-medium">Phone:</span>
+                      <span className="text-muted-foreground">
+                        {data?.data?.profile?.phone ?? "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <MapPin className="size-4 text-muted-foreground mt-0.5" />
+                      <span className="font-medium">Location:</span>
+                      <span className="text-muted-foreground">
+                        {[
+                          data?.data?.profile?.pickupAddress,
+                          data?.data?.profile?.city,
+                          data?.data?.profile?.postalCode,
+                        ]
+                          .filter(Boolean)
+                          .join(", ") || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <Separator />
+                <div className="space-y-3">
+                  <h4 className="text-base font-semibold">Account Status</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center gap-2">
+                      <Tag className="size-4 text-muted-foreground" />
+                      <span className="font-medium">Role:</span>
+                      <Badge variant="outline">
+                        {data?.data?.profile?.auth?.role ?? "N/A"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Shield className="size-4 text-muted-foreground" />
+                      <span className="font-medium">Status:</span>
+                      <Badge
+                        variant={
+                          data?.data?.profile?.auth?.status ===
+                          UserStatus.APPROVED
+                            ? "default"
+                            : "outline"
+                        }
+                      >
+                        {data?.data?.profile?.auth?.status ?? "N/A"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2 col-span-2">
+                      <Calendar className="size-4 text-muted-foreground" />
+                      <span className="font-medium">Created:</span>
+                      <span className="text-muted-foreground">
+                        {data?.data?.profile?.auth?.createdAt
+                          ? new Date(
+                              data.data.profile.auth.createdAt,
+                            ).toLocaleDateString(undefined, {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })
+                          : "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
           <Card>
@@ -223,15 +228,7 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2Icon
-                    className={cn("size-8 text-primary animate-spin")}
-                  />
-                </div>
-              ) : (
-                <UpdateVendorProfileForm profile={data?.data?.profile} />
-              )}
+              <UpdateVendorProfileForm profile={data?.data?.profile} />
             </CardContent>
           </Card>
         </div>
