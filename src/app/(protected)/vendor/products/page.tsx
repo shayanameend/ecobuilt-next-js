@@ -50,7 +50,7 @@ import {
 import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
-import { cn } from "~/lib/utils";
+import { cn, formatPrice } from "~/lib/utils";
 
 async function getProducts({
   token,
@@ -192,7 +192,7 @@ export default function ProductsPage() {
                     <TableCell>
                       <Badge variant="outline">{product.category.name}</Badge>
                     </TableCell>
-                    <TableCell>{product.price}</TableCell>
+                    <TableCell>{formatPrice(product.price)}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon">
                         <MoreHorizontalIcon />
