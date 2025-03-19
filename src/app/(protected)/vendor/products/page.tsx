@@ -1,9 +1,4 @@
-import {
-  FilterIcon,
-  MoreHorizontalIcon,
-  PlusIcon,
-  SearchIcon,
-} from "lucide-react";
+import { FilterIcon, MoreHorizontalIcon, SearchIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 import { AvatarImage } from "@radix-ui/react-avatar";
@@ -57,20 +52,21 @@ export default function ProductsPage() {
           </div>
           <div>
             <Button variant="secondary" size="default">
-              <PlusIcon />
               <span>New Product</span>
             </Button>
           </div>
         </div>
-        <div className={cn("relative flex items-center justify-between gap-4")}>
-          <SearchIcon
-            className={cn(
-              "absolute top-2.5 left-2.5 size-4 text-muted-foreground",
-            )}
-          />
-          <Input placeholder="Search Products..." className={cn("pl-8")} />
+        <div className={cn("relative flex items-center justify-between gap-2")}>
           <Button variant="secondary" size="icon">
             <FilterIcon />
+          </Button>
+          <Input placeholder="Search Products..." className={cn("pr-10")} />
+          <Button
+            variant="secondary"
+            size="icon"
+            className={cn("absolute right-0.5 size-8")}
+          >
+            <SearchIcon />
           </Button>
         </div>
         <Card>

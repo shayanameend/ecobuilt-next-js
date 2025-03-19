@@ -108,7 +108,7 @@ export default function CategoriesPage() {
             efficiently, and suggest new categories.
           </p>
         </div>
-        <div className={cn("relative flex items-center justify-between gap-6")}>
+        <div className={cn("relative flex items-center justify-between gap-2")}>
           <SearchIcon
             className={cn(
               "absolute top-2.5 left-2.5 size-4 text-muted-foreground",
