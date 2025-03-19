@@ -1,14 +1,33 @@
-import { FilterIcon, MoreHorizontalIcon, SearchIcon } from "lucide-react";
-import { Button } from "~/components/ui/button";
+"use client";
 
-import { AvatarImage } from "@radix-ui/react-avatar";
-import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import type {
+  MultipleResponseType,
+  ProductType,
+  PublicCategoryType,
+  VendorProfileType,
+} from "~/lib/types";
+
+import { useQuery } from "@tanstack/react-query";
+
+import axios from "axios";
+import {
+  AlertCircleIcon,
+  FilterIcon,
+  Loader2Icon,
+  MoreHorizontalIcon,
+  SearchIcon,
+} from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import {
@@ -28,10 +47,76 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
+import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
+async function getProducts({
+  token,
+}: {
+  token: string | null;
+}) {
+  const response = await axios.get(routes.api.vendor.products.url(), {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}
+
 export default function ProductsPage() {
+  const { token } = useAuthContext();
+
+  const {
+    data: productsQuery,
+    isLoading: productsQueryIsLoading,
+    isError: productsQueryIsError,
+  } = useQuery<
+    MultipleResponseType<{
+      products: (ProductType & {
+        category: PublicCategoryType;
+        vendor: VendorProfileType;
+      })[];
+    }>
+  >({
+    queryKey: ["products"],
+    queryFn: () => getProducts({ token }),
+  });
+
+  if (productsQueryIsLoading) {
+    return (
+      <section className="flex-1 flex items-center justify-center p-8">
+        <div className="text-center space-y-4">
+          <Loader2Icon className="size-8 text-primary animate-spin mx-auto" />
+        </div>
+      </section>
+    );
+  }
+
+  if (productsQueryIsError || !productsQuery?.data?.products) {
+    return (
+      <section className="flex-1 flex items-center justify-center p-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <AlertCircleIcon className="size-12 text-destructive mx-auto mb-2" />
+            <CardTitle>Error Loading Products</CardTitle>
+            <CardDescription>
+              We couldn't load your products information. Please try again
+              later.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </section>
+    );
+  }
+
   return (
     <>
       <section className={cn("flex-1 space-y-8")}>
@@ -47,7 +132,7 @@ export default function ProductsPage() {
             </h2>
             <p className={cn("text-muted-foreground text-base font-medium")}>
               Manage your products inventory here. Add new products, update
-              existing ones, and organize them by categories.
+              existing ones, and organize them.
             </p>
           </div>
           <div>
@@ -82,150 +167,39 @@ export default function ProductsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-10 rounded-md">
-                      <AvatarImage
-                        src="/products/iphone-12.jpg"
-                        alt="iPhone 12"
-                      />
-                      <AvatarFallback className={cn("rounded-md")}>
-                        IP
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">iPhone 12</span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>12</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>$799.99</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontalIcon />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-10 rounded-md">
-                      <AvatarImage
-                        src="/products/macbook-pro.jpg"
-                        alt="MacBook Pro"
-                      />
-                      <AvatarFallback className={cn("rounded-md")}>
-                        MP
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">MacBook Pro</span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>8</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>$1299.99</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontalIcon />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-10 rounded-md">
-                      <AvatarImage
-                        src="/products/iphone-12-mini.jpg"
-                        alt="iPhone 12 Mini"
-                      />
-                      <AvatarFallback className={cn("rounded-md")}>
-                        IM
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">
-                        iPhone 12 Mini
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>15</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>$399.99</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontalIcon />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-10 rounded-md">
-                      <AvatarImage
-                        src="/products/airpods-pro.jpg"
-                        alt="AirPods Pro"
-                      />
-                      <AvatarFallback className={cn("rounded-md")}>
-                        AP
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">AirPods Pro</span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>20</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>$199.99</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontalIcon />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-10 rounded-md">
-                      <AvatarImage src="/avatars/ipad-pro.png" alt="John Doe" />
-                      <AvatarFallback className={cn("rounded-md")}>
-                        IP
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">iPad Pro</span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>10</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>$999.99</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontalIcon />
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                {productsQuery.data.products.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell className={cn("flex items-center gap-2")}>
+                      <Avatar className="size-10 rounded-md">
+                        <AvatarImage
+                          src={`${process.env.NEXT_PUBLIC_FILE_URL}/${product.pictureIds[0]}`}
+                          alt={product.name}
+                        />
+                        <AvatarFallback className={cn("rounded-md")}>
+                          IP
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          {product.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {product.description}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{product.stock}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{product.category.name}</Badge>
+                    </TableCell>
+                    <TableCell>{product.price}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontalIcon />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </CardContent>

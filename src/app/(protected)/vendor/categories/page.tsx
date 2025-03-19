@@ -1,6 +1,6 @@
 "use client";
 
-import type { MultipleResponseType, PublicCategoryType } from "~/lib/types";
+import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 
 import { useState } from "react";
 
@@ -49,7 +49,7 @@ export default function CategoriesPage() {
     isLoading: categoriesQueryIsLoading,
     isError: categoriesQueryIsError,
   } = useQuery<
-    MultipleResponseType<{
+    SingleResponseType<{
       categories: PublicCategoryType[];
     }>
   >({
