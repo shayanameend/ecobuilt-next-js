@@ -210,6 +210,8 @@ export function CreateProfileForm() {
               <AvatarImage
                 src={profileImage}
                 alt={form.getValues("name")}
+                width={128}
+                height={128}
                 className={cn("object-cover")}
               />
               <AvatarFallback>

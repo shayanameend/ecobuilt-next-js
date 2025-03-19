@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import axios, { AxiosError } from "axios";
 import { CameraIcon, Loader2Icon } from "lucide-react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import zod from "zod";
 
@@ -42,7 +42,7 @@ import { cn } from "~/lib/utils";
 const UpdateVendorProfileFormSchema = zod.object({
   pictureId: zod
     .string()
-    .length(40, {
+    .min(36, {
       message: "Picture ID is invalid",
     })
     .optional(),
@@ -116,13 +116,23 @@ export function UpdateVendorProfileForm({
 
   const form = useForm<zod.infer<typeof UpdateVendorProfileFormSchema>>({
     resolver: zodResolver(UpdateVendorProfileFormSchema),
-    defaultValues: profile,
+    defaultValues: {
+      pictureId: undefined,
+      picture: undefined,
+      name: profile?.name ?? "",
+      description: profile?.description ?? "",
+      phone: profile?.phone ?? "",
+      postalCode: profile?.postalCode ?? "",
+      city: profile?.city ?? "",
+      pickupAddress: profile?.pickupAddress ?? "",
+    },
   });
 
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
     if (file) {
+      form.setValue("pictureId", profile?.pictureId);
       form.setValue("picture", file);
 
       const reader = new FileReader();
@@ -146,8 +156,7 @@ export function UpdateVendorProfileForm({
       if (error instanceof AxiosError) {
         toast.error(error.response?.data.info.message);
       }
-    },
-    onSettled: () => {
+
       setProfileImage(
         `${process.env.NEXT_PUBLIC_FILE_URL}/${profile?.pictureId}`,
       );
@@ -185,6 +194,8 @@ export function UpdateVendorProfileForm({
               <AvatarImage
                 src={profileImage}
                 alt={form.getValues("name")}
+                width={128}
+                height={128}
                 className={cn("object-cover")}
               />
               <AvatarFallback>
