@@ -196,6 +196,7 @@ export default function ProductsPage() {
     params.delete("page");
 
     const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+
     router.push(newUrl);
   };
 

@@ -3,6 +3,7 @@
 import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -40,9 +41,11 @@ async function getCategories({
 }
 
 export default function CategoriesPage() {
+  const router = useRouter();
+
   const { token } = useAuthContext();
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [queryTerm, setQueryTerm] = useState("");
 
   const {
     data: categoriesQuery,
@@ -59,7 +62,7 @@ export default function CategoriesPage() {
 
   const filteredCategories =
     categoriesQuery?.data?.categories?.filter((category) =>
-      category.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      category.name.toLowerCase().includes(queryTerm.toLowerCase()),
     ) || [];
 
   if (categoriesQueryIsLoading) {
@@ -117,8 +120,8 @@ export default function CategoriesPage() {
           <Input
             placeholder="Search Categories..."
             className={cn("pl-8")}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={queryTerm}
+            onChange={(event) => setQueryTerm(event.target.value)}
           />
           <NewCategory />
         </div>
@@ -134,7 +137,17 @@ export default function CategoriesPage() {
                       {category.name}
                     </h3>
                   </CardTitle>
-                  <Button variant="secondary" size="default">
+                  <Button
+                    variant="secondary"
+                    size="default"
+                    onClick={() => {
+                      console.log("Viewing category", category);
+
+                      router.push(
+                        `${routes.app.vendor.products.url()}?categoryId=${category.id}`,
+                      );
+                    }}
+                  >
                     <span>View</span>
                   </Button>
                 </CardFooter>
@@ -143,7 +156,7 @@ export default function CategoriesPage() {
           ) : (
             <div className="col-span-full text-center py-8">
               <p className="text-muted-foreground">
-                No categories found matching "{searchQuery}"
+                No categories found matching "{queryTerm}"
               </p>
             </div>
           )}
