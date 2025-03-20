@@ -91,7 +91,7 @@ export type PublicProductType = {
   sku: string;
   stock: number;
   price: number;
-  salePrice: number;
+  salePrice?: number;
   createdAt: Date;
   updatedAt: Date;
 };
