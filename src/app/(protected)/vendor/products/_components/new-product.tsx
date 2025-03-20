@@ -102,14 +102,17 @@ const CreateProductFormSchema = zod.object({
     .min(1, {
       message: "Price must be a positive number",
     }),
-  salePrice: zod.coerce
-    .number({
-      message: "Sale price must be a number",
-    })
-    .min(1, {
-      message: "Sale price must be a positive number",
-    })
-    .optional(),
+  salePrice: zod.preprocess(
+    (val) => (val === "" || val === 0 ? undefined : val),
+    zod.coerce
+      .number({
+        message: "Sale price must be a number",
+      })
+      .min(0, {
+        message: "Sale price must be a non-negative number",
+      })
+      .optional(),
+  ),
   categoryId: zod
     .string({
       message: "Category ID must be a string",
@@ -150,7 +153,7 @@ async function createProduct({
   formData.append("sku", data.sku);
   formData.append("stock", data.stock.toString());
   formData.append("price", data.price.toString());
-  if (data.salePrice && data.salePrice > 0) {
+  if (data.salePrice !== undefined) {
     formData.append("salePrice", data.salePrice.toString());
   }
   formData.append("categoryId", data.categoryId);
@@ -262,7 +265,7 @@ export function NewProduct() {
 
       setIsNewProductOpen(false);
 
-      queryClient.invalidateQueries({ queryKey: ["categories", "products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
@@ -479,12 +482,7 @@ export function NewProduct() {
                   <FormItem className={cn("flex-1")}>
                     <FormLabel>Stock</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="10"
-                        {...field}
-                      />
+                      <Input type="number" placeholder="10" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -497,12 +495,7 @@ export function NewProduct() {
                   <FormItem className={cn("flex-1")}>
                     <FormLabel>Price</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        placeholder="99.99"
-                        {...field}
-                      />
+                      <Input type="number" placeholder="99.99" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -515,12 +508,7 @@ export function NewProduct() {
                   <FormItem className={cn("flex-1")}>
                     <FormLabel>Sale Price (Optional)</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        placeholder="79.99"
-                        {...field}
-                      />
+                      <Input type="number" placeholder="79.99" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

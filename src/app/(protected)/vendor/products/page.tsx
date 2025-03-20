@@ -191,7 +191,10 @@ export default function ProductsPage() {
                           alt={product.name}
                         />
                         <AvatarFallback className={cn("rounded-md")}>
-                          IP
+                          {product.name
+                            .split(" ")
+                            .map((part) => part.charAt(0).toUpperCase())
+                            .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
