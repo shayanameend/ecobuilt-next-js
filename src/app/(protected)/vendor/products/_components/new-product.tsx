@@ -142,10 +142,8 @@ async function createProduct({
 }: { token: string | null; data: zod.infer<typeof CreateProductFormSchema> }) {
   const formData = new FormData();
 
-  if (data.pictures && data.pictures.length > 0) {
-    for (const file of data.pictures) {
-      formData.append("pictures", file);
-    }
+  for (const file of data.pictures) {
+    formData.append("pictures", file);
   }
 
   formData.append("name", data.name);
