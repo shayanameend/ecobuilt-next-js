@@ -128,28 +128,13 @@ export default function CategoriesPage() {
           {filteredCategories.length > 0 ? (
             filteredCategories.map((category) => (
               <Card key={category.id}>
-                <CardHeader>
+                <CardFooter className={cn("justify-between gap-4 ")}>
                   <CardTitle>
                     <h3 className={cn("text-2xl font-bold", domine.className)}>
                       {category.name}
                     </h3>
                   </CardTitle>
-                  <CardDescription>
-                    <p
-                      className={cn(
-                        "text-muted-foreground text-base font-medium",
-                      )}
-                    >
-                      {category._count.products} products in this category
-                    </p>
-                  </CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <Button
-                    variant="secondary"
-                    size="default"
-                    className={cn("w-full")}
-                  >
+                  <Button variant="secondary" size="default">
                     <span>View</span>
                   </Button>
                 </CardFooter>
