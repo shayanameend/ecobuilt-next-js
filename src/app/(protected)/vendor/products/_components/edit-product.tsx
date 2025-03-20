@@ -222,7 +222,9 @@ export function EditProduct({
 
   const [formResetKey, setFormResetKey] = useState(0);
   const [isEditProductOpen, setIsEditProductOpen] = useState(false);
-  const [productImages, setProductImages] = useState<string[]>([]);
+  const [productImages, setProductImages] = useState<
+    { url: string; isNew: boolean }[]
+  >([]);
 
   const form = useForm<zod.infer<typeof UpdateProductFormSchema>>({
     resolver: zodResolver(UpdateProductFormSchema),
@@ -252,7 +254,7 @@ export function EditProduct({
       (pictureId) => `${process.env.NEXT_PUBLIC_FILE_URL}/${pictureId}`,
     );
 
-    setProductImages(imageUrls);
+    setProductImages(imageUrls.map((url) => ({ url, isNew: false })));
   }, [form.setValue, product]);
 
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -261,11 +263,13 @@ export function EditProduct({
     if (files && files.length > 0) {
       const fileArray = Array.from(files);
 
-      const limitedFileArray = fileArray.slice(0, 5);
+      const availableSlots = 5 - productImages.length;
 
-      if (fileArray.length > 5) {
+      const limitedFileArray = fileArray.slice(0, availableSlots);
+
+      if (fileArray.length > availableSlots) {
         toast.warning(
-          "Maximum 5 images allowed. Only the first 5 were selected.",
+          `Maximum ${availableSlots} slots were available. Only the first ${availableSlots} were selected.`,
         );
       }
 
@@ -282,7 +286,10 @@ export function EditProduct({
           newImagePreviews.push(reader.result as string);
 
           if (newImagePreviews.length === totalFiles) {
-            setProductImages(newImagePreviews);
+            setProductImages([
+              ...productImages,
+              ...newImagePreviews.map((url) => ({ url, isNew: true })),
+            ]);
           }
         };
 
@@ -370,14 +377,14 @@ export function EditProduct({
                 <div className="flex flex-wrap gap-2 justify-center">
                   {productImages.length > 0 ? (
                     productImages.map((img, index) => (
-                      <div key={img} className="relative">
+                      <div key={img.url} className="relative">
                         <Avatar
                           className={cn(
                             "rounded-xl size-20 border-2 border-primary/20",
                           )}
                         >
                           <AvatarImage
-                            src={img}
+                            src={img.url}
                             alt={`Product image ${index + 1}`}
                             width={80}
                             height={80}
