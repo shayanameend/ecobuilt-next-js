@@ -2,7 +2,12 @@
 
 import type { ChangeEvent } from "react";
 
-import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
+import type {
+  ProductType,
+  PublicCategoryType,
+  SingleResponseType,
+  VendorProfileType,
+} from "~/lib/types";
 
 import { useState } from "react";
 
@@ -13,8 +18,8 @@ import axios, { AxiosError } from "axios";
 import { CameraIcon, EditIcon, Loader2Icon, XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
-
 import { toast } from "sonner";
+
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
@@ -47,13 +52,19 @@ import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
 const CreateProductFormSchema = zod.object({
+  pictureIds: zod
+    .array(
+      zod.string().min(36, {
+        message: "Picture ID is invalid",
+      }),
+    )
+    .max(5, { message: "Maximum 5 pictures ids are allowed" }),
   pictures: zod
     .array(
       zod.any().refine((file) => file !== undefined, {
         message: "Picture is required",
       }),
     )
-    .min(1, { message: "At least 1 picture is required" })
     .max(5, { message: "Maximum 5 pictures are allowed" }),
   name: zod
     .string({
@@ -64,7 +75,8 @@ const CreateProductFormSchema = zod.object({
     })
     .max(255, {
       message: "Name must be at most 255 characters long",
-    }),
+    })
+    .optional(),
   description: zod
     .string({
       message: "Description must be a string",
@@ -74,7 +86,8 @@ const CreateProductFormSchema = zod.object({
     })
     .max(255, {
       message: "Description must be at most 255 characters long",
-    }),
+    })
+    .optional(),
   sku: zod
     .string({
       message: "SKU must be a string",
@@ -84,7 +97,8 @@ const CreateProductFormSchema = zod.object({
     })
     .max(255, {
       message: "SKU must be at most 255 characters long",
-    }),
+    })
+    .optional(),
   stock: zod.coerce
     .number({
       message: "Stock must be a number",
@@ -94,14 +108,16 @@ const CreateProductFormSchema = zod.object({
     })
     .min(0, {
       message: "Stock must be a non-negative number",
-    }),
+    })
+    .optional(),
   price: zod.coerce
     .number({
       message: "Price must be a number",
     })
     .min(1, {
       message: "Price must be a positive number",
-    }),
+    })
+    .optional(),
   salePrice: zod.preprocess(
     (val) => (val === "" || val === 0 ? undefined : val),
     zod.coerce
@@ -119,7 +135,8 @@ const CreateProductFormSchema = zod.object({
     })
     .length(24, {
       message: "Category ID must be a 24-character string",
-    }),
+    })
+    .optional(),
 });
 
 async function getCategories({
@@ -136,10 +153,15 @@ async function getCategories({
   return response.data;
 }
 
-async function createProduct({
+async function updateProduct({
   token,
+  id,
   data,
-}: { token: string | null; data: zod.infer<typeof CreateProductFormSchema> }) {
+}: {
+  token: string | null;
+  id: string;
+  data: zod.infer<typeof CreateProductFormSchema>;
+}) {
   const formData = new FormData();
 
   if (data.pictures && data.pictures.length > 0) {
@@ -158,8 +180,8 @@ async function createProduct({
   }
   formData.append("categoryId", data.categoryId);
 
-  const response = await axios.post(
-    routes.api.vendor.products.url(),
+  const response = await axios.put(
+    routes.api.vendor.products.url(id),
     formData,
     {
       headers: {
@@ -172,7 +194,14 @@ async function createProduct({
   return response.data;
 }
 
-export function EditProduct() {
+export function EditProduct({
+  product,
+}: {
+  product: ProductType & {
+    category: PublicCategoryType;
+    vendor: VendorProfileType;
+  };
+}) {
   const queryClient = useQueryClient();
 
   const { token } = useAuthContext();
@@ -184,6 +213,7 @@ export function EditProduct() {
   const form = useForm<zod.infer<typeof CreateProductFormSchema>>({
     resolver: zodResolver(CreateProductFormSchema),
     defaultValues: {
+      pictureIds: [],
       pictures: [],
       name: "",
       description: "",
@@ -258,8 +288,8 @@ export function EditProduct() {
     queryFn: () => getCategories({ token }),
   });
 
-  const createProductMutation = useMutation({
-    mutationFn: createProduct,
+  const updateProductMutation = useMutation({
+    mutationFn: updateProduct,
     onSuccess: ({ info }) => {
       toast.success(info.message);
 
@@ -282,7 +312,7 @@ export function EditProduct() {
   });
 
   const onSubmit = (data: zod.infer<typeof CreateProductFormSchema>) => {
-    createProductMutation.mutate({ token, data });
+    updateProductMutation.mutate({ token, data });
   };
 
   return (
@@ -522,9 +552,9 @@ export function EditProduct() {
                 size="lg"
                 className={cn("w-full")}
                 type="submit"
-                disabled={createProductMutation.isPending}
+                disabled={updateProductMutation.isPending}
               >
-                {createProductMutation.isPending && (
+                {updateProductMutation.isPending && (
                   <Loader2Icon className={cn("animate-spin")} />
                 )}
                 <span>Create Product</span>

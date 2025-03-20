@@ -12,7 +12,6 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {
   AlertCircleIcon,
-  EditIcon,
   FilterIcon,
   Loader2Icon,
   SearchIcon,
@@ -198,7 +197,7 @@ export default function ProductsPage() {
                     </TableCell>
                     <TableCell>{formatPrice(product.price)}</TableCell>
                     <TableCell className={cn("space-x-2")}>
-                      <EditProduct />
+                      <EditProduct product={product} />
                       <Button
                         variant="outline"
                         size="icon"
