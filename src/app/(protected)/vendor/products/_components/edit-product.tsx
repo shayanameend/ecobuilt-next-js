@@ -51,7 +51,7 @@ import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
-const CreateProductFormSchema = zod.object({
+const UpdateProductFormSchema = zod.object({
   pictureIds: zod
     .array(
       zod.string().min(36, {
@@ -160,7 +160,7 @@ async function updateProduct({
 }: {
   token: string | null;
   id: string;
-  data: zod.infer<typeof CreateProductFormSchema>;
+  data: zod.infer<typeof UpdateProductFormSchema>;
 }) {
   const formData = new FormData();
 
@@ -224,8 +224,8 @@ export function EditProduct({
   const [isEditProductOpen, setIsEditProductOpen] = useState(false);
   const [productImages, setProductImages] = useState<string[]>([]);
 
-  const form = useForm<zod.infer<typeof CreateProductFormSchema>>({
-    resolver: zodResolver(CreateProductFormSchema),
+  const form = useForm<zod.infer<typeof UpdateProductFormSchema>>({
+    resolver: zodResolver(UpdateProductFormSchema),
     defaultValues: {
       pictureIds: [],
       pictures: [],
@@ -341,7 +341,7 @@ export function EditProduct({
     },
   });
 
-  const onSubmit = (data: zod.infer<typeof CreateProductFormSchema>) => {
+  const onSubmit = (data: zod.infer<typeof UpdateProductFormSchema>) => {
     updateProductMutation.mutate({ token, id: product.id, data });
   };
 
@@ -587,7 +587,7 @@ export function EditProduct({
                 {updateProductMutation.isPending && (
                   <Loader2Icon className={cn("animate-spin")} />
                 )}
-                <span>Create Product</span>
+                <span>Update Product</span>
               </Button>
             </div>
           </form>
