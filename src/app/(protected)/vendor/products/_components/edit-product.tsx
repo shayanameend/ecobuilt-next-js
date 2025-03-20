@@ -9,7 +9,7 @@ import type {
   VendorProfileType,
 } from "~/lib/types";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -170,15 +170,27 @@ async function updateProduct({
     }
   }
 
-  formData.append("name", data.name);
-  formData.append("description", data.description);
-  formData.append("sku", data.sku);
-  formData.append("stock", data.stock.toString());
-  formData.append("price", data.price.toString());
+  if (data.name) {
+    formData.append("name", data.name);
+  }
+  if (data.description) {
+    formData.append("description", data.description);
+  }
+  if (data.sku) {
+    formData.append("sku", data.sku);
+  }
+  if (data.stock !== undefined) {
+    formData.append("stock", data.stock.toString());
+  }
+  if (data.price !== undefined) {
+    formData.append("price", data.price.toString());
+  }
   if (data.salePrice !== undefined) {
     formData.append("salePrice", data.salePrice.toString());
   }
-  formData.append("categoryId", data.categoryId);
+  if (data.categoryId) {
+    formData.append("categoryId", data.categoryId);
+  }
 
   const response = await axios.put(
     routes.api.vendor.products.url(id),
@@ -207,7 +219,7 @@ export function EditProduct({
   const { token } = useAuthContext();
 
   const [formResetKey, setFormResetKey] = useState(0);
-  const [isNewProductOpen, setIsNewProductOpen] = useState(false);
+  const [isEditProductOpen, setIsEditProductOpen] = useState(false);
   const [productImages, setProductImages] = useState<string[]>([]);
 
   const form = useForm<zod.infer<typeof CreateProductFormSchema>>({
@@ -224,6 +236,22 @@ export function EditProduct({
       categoryId: "",
     },
   });
+
+  useEffect(() => {
+    form.setValue("name", product.name);
+    form.setValue("description", product.description);
+    form.setValue("sku", product.sku);
+    form.setValue("stock", product.stock);
+    form.setValue("price", product.price);
+    form.setValue("salePrice", product.salePrice);
+    form.setValue("categoryId", product.category.id);
+
+    const imageUrls = product.pictureIds.map(
+      (pictureId) => `${process.env.NEXT_PUBLIC_FILE_URL}/${pictureId}`,
+    );
+
+    setProductImages(imageUrls);
+  }, [form.setValue, product]);
 
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -293,7 +321,7 @@ export function EditProduct({
     onSuccess: ({ info }) => {
       toast.success(info.message);
 
-      setIsNewProductOpen(false);
+      setIsEditProductOpen(false);
 
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -312,11 +340,11 @@ export function EditProduct({
   });
 
   const onSubmit = (data: zod.infer<typeof CreateProductFormSchema>) => {
-    updateProductMutation.mutate({ token, data });
+    updateProductMutation.mutate({ token, id: product.id, data });
   };
 
   return (
-    <Dialog open={isNewProductOpen} onOpenChange={setIsNewProductOpen}>
+    <Dialog open={isEditProductOpen} onOpenChange={setIsEditProductOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <EditIcon />
