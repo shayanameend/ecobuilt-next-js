@@ -273,7 +273,11 @@ export function EditProduct({
         );
       }
 
-      form.setValue("pictures", limitedFileArray, { shouldValidate: true });
+      const currentPictures = form.getValues("pictures") || [];
+
+      form.setValue("pictures", [...currentPictures, ...limitedFileArray], {
+        shouldValidate: true,
+      });
 
       const newImagePreviews: string[] = [];
 
@@ -299,17 +303,36 @@ export function EditProduct({
   };
 
   const handleImageRemove = (indexToRemove: number) => {
-    const currentPictures = form.getValues("pictures");
+    const updatedProductImages = productImages.filter((image, index) => {
+      if (index === indexToRemove) {
+        if (!image.isNew) {
+          const picturesToBeDeleted = form.getValues("pictureIds");
+          picturesToBeDeleted.push(image.url);
 
-    const updatedPictures = currentPictures.filter(
-      (_, index) => index !== indexToRemove,
-    );
+          form.setValue("pictureIds", picturesToBeDeleted, {
+            shouldValidate: true,
+          });
+        } else {
+          const currentPicturesToBeUploaded = form.getValues("pictures");
 
-    form.setValue("pictures", updatedPictures, { shouldValidate: true });
+          const updatedPicturesToBeUploaded =
+            currentPicturesToBeUploaded.filter(
+              (picture) =>
+                `${process.env.NEXT_PUBLIC_FILE_URL}/${picture}` !== image.url,
+            );
 
-    setProductImages(
-      productImages.filter((_, index) => index !== indexToRemove),
-    );
+          form.setValue("pictures", updatedPicturesToBeUploaded, {
+            shouldValidate: true,
+          });
+        }
+
+        return false;
+      }
+
+      return true;
+    });
+
+    setProductImages(updatedProductImages);
   };
 
   const {
