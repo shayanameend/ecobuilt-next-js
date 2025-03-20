@@ -1,5 +1,7 @@
 "use client";
 
+import type { FormEvent } from "react";
+
 import type {
   MultipleResponseType,
   ProductType,
@@ -97,7 +99,7 @@ export default function ProductsPage() {
   const currentPage = Number(nameParams.get("page") || "1");
   const currentName = nameParams.get("name") || "";
 
-  const [nameTerm, setSearchTerm] = useState(currentName);
+  const [queryTerm, setQueryTerm] = useState(currentName);
 
   const {
     data: productsQuery,
@@ -120,26 +122,27 @@ export default function ProductsPage() {
       }),
   });
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateUrlParams(1, nameTerm);
+  const handleSearch = (event: FormEvent) => {
+    event.preventDefault();
+
+    updateUrlParams(1, queryTerm);
   };
 
   const handlePageChange = (page: number) => {
     updateUrlParams(page, currentName);
   };
 
-  const updateUrlParams = (page: number, name: string) => {
+  const updateUrlParams = (page: number, query: string) => {
     const params = new URLSearchParams();
     if (page > 1) params.set("page", page.toString());
-    if (name) params.set("name", name);
+    if (query) params.set("name", query);
 
     const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
     router.push(newUrl);
   };
 
   useEffect(() => {
-    setSearchTerm(currentName);
+    setQueryTerm(currentName);
   }, [currentName]);
 
   if (productsQueryIsLoading) {
@@ -207,8 +210,8 @@ export default function ProductsPage() {
             <Input
               placeholder="Search Products..."
               className={cn("pr-10")}
-              value={nameTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={queryTerm}
+              onChange={(e) => setQueryTerm(e.target.value)}
             />
             <Button
               type="submit"
