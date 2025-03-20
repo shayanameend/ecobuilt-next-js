@@ -2,7 +2,8 @@
 
 import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
@@ -121,19 +122,50 @@ async function getCategories({
 
 export function FilterProducts() {
   const { token } = useAuthContext();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [isFilterProductsOpen, setIsFilterProductsOpen] = useState(false);
+
+  const currentCategoryId = searchParams.get("categoryId") || "";
+  const currentSku = searchParams.get("sku") || "";
+  const currentMinStock = searchParams.get("minStock")
+    ? Number(searchParams.get("minStock"))
+    : 0;
+  const currentMinPrice = searchParams.get("minPrice")
+    ? Number(searchParams.get("minPrice"))
+    : 0;
+  const currentMaxPrice = searchParams.get("maxPrice")
+    ? Number(searchParams.get("maxPrice"))
+    : 0;
 
   const form = useForm<zod.infer<typeof CreateProductFormSchema>>({
     resolver: zodResolver(CreateProductFormSchema),
     defaultValues: {
-      categoryId: "",
-      sku: "",
-      minStock: 0,
-      minPrice: 0,
-      maxPrice: 0,
+      categoryId: currentCategoryId,
+      sku: currentSku,
+      minStock: currentMinStock,
+      minPrice: currentMinPrice,
+      maxPrice: currentMaxPrice,
     },
   });
+
+  useEffect(() => {
+    form.reset({
+      categoryId: currentCategoryId,
+      sku: currentSku,
+      minStock: currentMinStock,
+      minPrice: currentMinPrice,
+      maxPrice: currentMaxPrice,
+    });
+  }, [
+    form.reset,
+    currentCategoryId,
+    currentSku,
+    currentMinStock,
+    currentMinPrice,
+    currentMaxPrice,
+  ]);
 
   const {
     data: categoriesQuery,
@@ -149,13 +181,64 @@ export function FilterProducts() {
   });
 
   const onSubmit = (data: zod.infer<typeof CreateProductFormSchema>) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (data.categoryId) {
+      params.set("categoryId", data.categoryId);
+    } else {
+      params.delete("categoryId");
+    }
+
+    if (data.sku) {
+      params.set("sku", data.sku);
+    } else {
+      params.delete("sku");
+    }
+
+    if (data.minStock && data.minStock > 0) {
+      params.set("minStock", data.minStock.toString());
+    } else {
+      params.delete("minStock");
+    }
+
+    if (data.minPrice && data.minPrice > 0) {
+      params.set("minPrice", data.minPrice.toString());
+    } else {
+      params.delete("minPrice");
+    }
+
+    if (data.maxPrice && data.maxPrice > 0) {
+      params.set("maxPrice", data.maxPrice.toString());
+    } else {
+      params.delete("maxPrice");
+    }
+
+    params.delete("page");
+
+    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    router.push(newUrl);
+
     setIsFilterProductsOpen(false);
   };
 
   return (
     <Dialog open={isFilterProductsOpen} onOpenChange={setIsFilterProductsOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="icon">
+        <Button
+          variant="secondary"
+          size="icon"
+          className={
+            Object.entries({
+              categoryId: currentCategoryId,
+              sku: currentSku,
+              minStock: currentMinStock,
+              minPrice: currentMinPrice,
+              maxPrice: currentMaxPrice,
+            }).some(([_, value]) => value)
+              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+              : ""
+          }
+        >
           <FilterIcon />
         </Button>
       </DialogTrigger>

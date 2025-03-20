@@ -59,11 +59,21 @@ async function getProducts({
   name = "",
   page = 1,
   limit = 10,
+  categoryId = "",
+  sku = "",
+  minStock,
+  minPrice,
+  maxPrice,
 }: {
   token: string | null;
   name?: string;
   page?: number;
   limit?: number;
+  categoryId?: string;
+  sku?: string;
+  minStock?: number;
+  minPrice?: number;
+  maxPrice?: number;
 }) {
   const params = new URLSearchParams({
     isDeleted: "false",
@@ -73,6 +83,26 @@ async function getProducts({
 
   if (name) {
     params.append("name", name);
+  }
+
+  if (categoryId) {
+    params.append("categoryId", categoryId);
+  }
+
+  if (sku) {
+    params.append("sku", sku);
+  }
+
+  if (minStock !== undefined && minStock > 0) {
+    params.append("minStock", minStock.toString());
+  }
+
+  if (minPrice !== undefined && minPrice > 0) {
+    params.append("minPrice", minPrice.toString());
+  }
+
+  if (maxPrice !== undefined && maxPrice > 0) {
+    params.append("maxPrice", maxPrice.toString());
   }
 
   const url = `${routes.api.vendor.products.url()}?${params.toString()}`;
@@ -88,12 +118,25 @@ async function getProducts({
 
 export default function ProductsPage() {
   const router = useRouter();
-  const nameParams = useSearchParams();
+  const searchParams = useSearchParams();
 
   const { token } = useAuthContext();
 
-  const currentPage = Number(nameParams.get("page") || "1");
-  const currentName = nameParams.get("name") || "";
+  const currentPage = Number(searchParams.get("page") || "1");
+  const currentName = searchParams.get("name") || "";
+
+  // Get filter values from URL
+  const currentCategoryId = searchParams.get("categoryId") || "";
+  const currentSku = searchParams.get("sku") || "";
+  const currentMinStock = searchParams.get("minStock")
+    ? Number(searchParams.get("minStock"))
+    : undefined;
+  const currentMinPrice = searchParams.get("minPrice")
+    ? Number(searchParams.get("minPrice"))
+    : undefined;
+  const currentMaxPrice = searchParams.get("maxPrice")
+    ? Number(searchParams.get("maxPrice"))
+    : undefined;
 
   const [queryTerm, setQueryTerm] = useState(currentName);
 
@@ -109,29 +152,57 @@ export default function ProductsPage() {
       })[];
     }>
   >({
-    queryKey: ["products", currentPage, currentName],
+    queryKey: [
+      "products",
+      currentPage,
+      currentName,
+      currentCategoryId,
+      currentSku,
+      currentMinStock,
+      currentMinPrice,
+      currentMaxPrice,
+    ],
     queryFn: () =>
       getProducts({
         token,
         page: currentPage,
         name: currentName,
+        categoryId: currentCategoryId,
+        sku: currentSku,
+        minStock: currentMinStock,
+        minPrice: currentMinPrice,
+        maxPrice: currentMaxPrice,
       }),
   });
 
   const handleSearch = (event: FormEvent) => {
     event.preventDefault();
 
-    updateUrlParams(1, queryTerm);
+    // Preserve existing filter params
+    const params = new URLSearchParams(searchParams.toString());
+
+    // Update name parameter and reset to page 1
+    if (queryTerm) {
+      params.set("name", queryTerm);
+    } else {
+      params.delete("name");
+    }
+
+    params.delete("page");
+
+    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    router.push(newUrl);
   };
 
   const handlePageChange = (page: number) => {
-    updateUrlParams(page, currentName);
-  };
+    // Update only the page parameter, preserving all other params
+    const params = new URLSearchParams(searchParams.toString());
 
-  const updateUrlParams = (page: number, query: string) => {
-    const params = new URLSearchParams();
-    if (page > 1) params.set("page", page.toString());
-    if (query) params.set("name", query);
+    if (page > 1) {
+      params.set("page", page.toString());
+    } else {
+      params.delete("page");
+    }
 
     const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
     router.push(newUrl);
