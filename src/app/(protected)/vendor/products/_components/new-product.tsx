@@ -7,7 +7,7 @@ import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import axios, { AxiosError } from "axios";
 import { CameraIcon, Loader2Icon } from "lucide-react";
@@ -137,16 +137,39 @@ async function createProduct({
   token,
   data,
 }: { token: string | null; data: zod.infer<typeof CreateProductFormSchema> }) {
-  const response = await axios.post(routes.api.vendor.products.url(), data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const formData = new FormData();
+
+  if (data.pictures && data.pictures.length > 0) {
+    for (const file of data.pictures) {
+      formData.append("pictures", file);
+    }
+  }
+
+  formData.append("name", data.name);
+  formData.append("description", data.description);
+  formData.append("sku", data.sku);
+  formData.append("stock", data.stock.toString());
+  formData.append("price", data.price.toString());
+  if (data.salePrice) formData.append("salePrice", data.salePrice.toString());
+  formData.append("categoryId", data.categoryId);
+
+  const response = await axios.post(
+    routes.api.vendor.products.url(),
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
     },
-  });
+  );
 
   return response.data;
 }
 
 export function NewProduct() {
+  const queryClient = useQueryClient();
+
   const { token } = useAuthContext();
 
   const [formResetKey, setFormResetKey] = useState(0);
@@ -222,6 +245,8 @@ export function NewProduct() {
       toast.success(info.message);
 
       setIsNewProductOpen(false);
+
+      queryClient.invalidateQueries({ queryKey: ["categories", "products"] });
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
