@@ -2,8 +2,8 @@
 
 import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 
-import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
