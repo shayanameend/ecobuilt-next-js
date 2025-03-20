@@ -37,53 +37,72 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Textarea } from "~/components/ui/textarea";
 import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
 const CreateProductFormSchema = zod.object({
-  categoryId: zod
-    .string({
-      message: "Category ID must be a string",
-    })
-    .length(24, {
-      message: "Category ID must be a 24-character string",
-    }),
-  sku: zod
-    .string({
-      message: "SKU must be a string",
-    })
-    .min(3, {
-      message: "SKU must be at least 3 characters long",
-    })
-    .max(255, {
-      message: "SKU must be at most 255 characters long",
-    }),
-  minStock: zod.coerce
-    .number({
-      message: "Min Stock must be a number",
-    })
-    .int({
-      message: "Min Stock must be an integer",
-    })
-    .min(0, {
-      message: "Min Stock must be a non-negative number",
-    }),
-  minPrice: zod.coerce
-    .number({
-      message: "Min Price must be a number",
-    })
-    .min(1, {
-      message: "Min Price must be a positive number",
-    }),
-  maxPrice: zod.coerce
-    .number({
-      message: "Max Price must be a number",
-    })
-    .min(1, {
-      message: "Max Price must be a positive number",
-    }),
+  categoryId: zod.preprocess(
+    (val) => (val === "" ? undefined : val),
+    zod
+      .string({
+        message: "Category ID must be a string",
+      })
+      .length(24, {
+        message: "Category ID must be a 24-character string",
+      })
+      .optional(),
+  ),
+  sku: zod.preprocess(
+    (val) => (val === "" ? undefined : val),
+    zod
+      .string({
+        message: "SKU must be a string",
+      })
+      .min(3, {
+        message: "SKU must be at least 3 characters long",
+      })
+      .max(255, {
+        message: "SKU must be at most 255 characters long",
+      })
+      .optional(),
+  ),
+  minStock: zod.preprocess(
+    (val) => (val === "" || val === 0 ? undefined : val),
+    zod.coerce
+      .number({
+        message: "Min Stock must be a number",
+      })
+      .int({
+        message: "Min Stock must be an integer",
+      })
+      .min(0, {
+        message: "Min Stock must be a non-negative number",
+      })
+      .optional(),
+  ),
+  minPrice: zod.preprocess(
+    (val) => (val === "" || val === 0 ? undefined : val),
+    zod.coerce
+      .number({
+        message: "Min Price must be a number",
+      })
+      .min(1, {
+        message: "Min Price must be a positive number",
+      })
+      .optional(),
+  ),
+  maxPrice: zod.preprocess(
+    (val) => (val === "" || val === 0 ? undefined : val),
+    zod.coerce
+      .number({
+        message: "Max Price must be a number",
+      })
+      .min(1, {
+        message: "Max Price must be a positive number",
+      })
+      .optional(),
+  ),
 });
 
 async function getCategories({
@@ -129,7 +148,9 @@ export function FilterProducts() {
     queryFn: () => getCategories({ token }),
   });
 
-  const onSubmit = (data: zod.infer<typeof CreateProductFormSchema>) => {};
+  const onSubmit = (data: zod.infer<typeof CreateProductFormSchema>) => {
+    setIsFilterProductsOpen(false);
+  };
 
   return (
     <Dialog open={isFilterProductsOpen} onOpenChange={setIsFilterProductsOpen}>

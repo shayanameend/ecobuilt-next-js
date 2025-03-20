@@ -106,10 +106,10 @@ const CreateProductFormSchema = zod.object({
     (val) => (val === "" || val === 0 ? undefined : val),
     zod.coerce
       .number({
-        message: "Sale price must be a number",
+        message: "Sale Price must be a number",
       })
       .min(0, {
-        message: "Sale price must be a non-negative number",
+        message: "Sale Price must be a non-negative number",
       })
       .optional(),
   ),
