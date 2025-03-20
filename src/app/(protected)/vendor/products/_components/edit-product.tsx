@@ -355,9 +355,9 @@ export function EditProduct({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[768px]">
         <DialogHeader>
-          <DialogTitle>New Product</DialogTitle>
+          <DialogTitle>Edit Product</DialogTitle>
           <DialogDescription>
-            Add a new product for your inventory.
+            Update the details of your existing product.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
