@@ -15,7 +15,6 @@ import {
   EditIcon,
   FilterIcon,
   Loader2Icon,
-  MoreHorizontalIcon,
   SearchIcon,
   Trash2Icon,
 } from "lucide-react";
@@ -31,20 +30,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
 import {
   Pagination,
@@ -67,6 +52,7 @@ import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn, formatPrice } from "~/lib/utils";
+import { EditProduct } from "./_components/edit-product";
 import { NewProduct } from "./_components/new-product";
 
 async function getProducts({
@@ -211,26 +197,15 @@ export default function ProductsPage() {
                       <Badge variant="outline">{product.category.name}</Badge>
                     </TableCell>
                     <TableCell>{formatPrice(product.price)}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontalIcon />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                              <EditIcon />
-                              <span>Edit</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Trash2Icon />
-                              <span>Delete</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <TableCell className={cn("space-x-2")}>
+                      <EditProduct />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className={cn("size-8")}
+                      >
+                        <Trash2Icon />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
