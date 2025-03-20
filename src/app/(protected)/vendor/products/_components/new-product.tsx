@@ -204,7 +204,7 @@ export function NewProduct() {
         );
       }
 
-      form.setValue("pictures", limitedFileArray);
+      form.setValue("pictures", limitedFileArray, { shouldValidate: true });
 
       const newImagePreviews: string[] = [];
 
@@ -227,18 +227,14 @@ export function NewProduct() {
   };
 
   const handleImageRemove = (indexToRemove: number) => {
-    // Get current pictures array from form
     const currentPictures = form.getValues("pictures");
 
-    // Remove the image at the specified index
     const updatedPictures = currentPictures.filter(
       (_, index) => index !== indexToRemove,
     );
 
-    // Update form values
     form.setValue("pictures", updatedPictures, { shouldValidate: true });
 
-    // Update image previews
     setProductImages(
       productImages.filter((_, index) => index !== indexToRemove),
     );
