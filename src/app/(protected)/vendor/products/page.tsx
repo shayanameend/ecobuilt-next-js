@@ -177,6 +177,7 @@ export default function ProductsPage() {
                         <AvatarImage
                           src={`${process.env.NEXT_PUBLIC_FILE_URL}/${product.pictureIds[0]}`}
                           alt={product.name}
+                          className={cn("object-cover")}
                         />
                         <AvatarFallback className={cn("rounded-md")}>
                           {product.name
