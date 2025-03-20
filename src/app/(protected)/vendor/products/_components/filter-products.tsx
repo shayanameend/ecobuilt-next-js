@@ -54,20 +54,22 @@ const CreateProductFormSchema = zod.object({
       })
       .optional(),
   ),
-  sku: zod.preprocess(
+  sort: zod.preprocess(
     (val) => (val === "" ? undefined : val),
     zod
-      .string({
-        message: "SKU must be a string",
-      })
-      .min(3, {
-        message: "SKU must be at least 3 characters long",
-      })
-      .max(255, {
-        message: "SKU must be at most 255 characters long",
+      .enum(["RELEVANCE", "LATEST", "OLDEST"], {
+        message: "Sort must be one of 'RELEVANCE', 'LATEST', 'OLDEST'",
       })
       .optional(),
   ),
+  isDeleted: zod
+    .preprocess(
+      (val) => (val === "true" ? true : val === "false" ? false : val),
+      zod.boolean({
+        message: "isDeleted must be a boolean",
+      }),
+    )
+    .optional(),
   minStock: zod.preprocess(
     (val) => (val === "" || val === 0 ? undefined : val),
     zod.coerce
@@ -128,7 +130,8 @@ export function FilterProducts() {
   const [isFilterProductsOpen, setIsFilterProductsOpen] = useState(false);
 
   const currentCategoryId = searchParams.get("categoryId") || "";
-  const currentSku = searchParams.get("sku") || "";
+  const currentSort = searchParams.get("sort") || "";
+  const currentIsDeleted = searchParams.get("isDeleted") || "false";
   const currentMinStock = searchParams.get("minStock")
     ? Number(searchParams.get("minStock"))
     : 0;
@@ -143,7 +146,8 @@ export function FilterProducts() {
     resolver: zodResolver(CreateProductFormSchema),
     defaultValues: {
       categoryId: currentCategoryId,
-      sku: currentSku,
+      sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
+      isDeleted: currentIsDeleted === "true",
       minStock: currentMinStock,
       minPrice: currentMinPrice,
       maxPrice: currentMaxPrice,
@@ -153,7 +157,8 @@ export function FilterProducts() {
   useEffect(() => {
     form.reset({
       categoryId: currentCategoryId,
-      sku: currentSku,
+      sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
+      isDeleted: currentIsDeleted === "true",
       minStock: currentMinStock,
       minPrice: currentMinPrice,
       maxPrice: currentMaxPrice,
@@ -161,7 +166,8 @@ export function FilterProducts() {
   }, [
     form.reset,
     currentCategoryId,
-    currentSku,
+    currentSort,
+    currentIsDeleted,
     currentMinStock,
     currentMinPrice,
     currentMaxPrice,
@@ -189,10 +195,16 @@ export function FilterProducts() {
       params.delete("categoryId");
     }
 
-    if (data.sku) {
-      params.set("sku", data.sku);
+    if (data.sort) {
+      params.set("sort", data.sort);
     } else {
-      params.delete("sku");
+      params.delete("sort");
+    }
+
+    if (data.isDeleted !== undefined) {
+      params.set("isDeleted", data.isDeleted.toString());
+    } else {
+      params.delete("isDeleted");
     }
 
     if (data.minStock && data.minStock > 0) {
@@ -221,6 +233,23 @@ export function FilterProducts() {
     setIsFilterProductsOpen(false);
   };
 
+  const resetFilters = () => {
+    form.reset({
+      categoryId: "",
+      sort: undefined,
+      isDeleted: false,
+      minStock: undefined,
+      minPrice: undefined,
+      maxPrice: undefined,
+    });
+
+    const newUrl = window.location.pathname;
+
+    router.push(newUrl);
+
+    setIsFilterProductsOpen(false);
+  };
+
   return (
     <Dialog open={isFilterProductsOpen} onOpenChange={setIsFilterProductsOpen}>
       <DialogTrigger asChild>
@@ -230,7 +259,8 @@ export function FilterProducts() {
           className={
             Object.entries({
               categoryId: currentCategoryId,
-              sku: currentSku,
+              sort: currentSort,
+              isDeleted: currentIsDeleted !== "false",
               minStock: currentMinStock,
               minPrice: currentMinPrice,
               maxPrice: currentMaxPrice,
@@ -303,13 +333,22 @@ export function FilterProducts() {
             <div className={cn("flex gap-2 items-start")}>
               <FormField
                 control={form.control}
-                name="sku"
+                name="sort"
                 render={({ field }) => (
                   <FormItem className={cn("flex-1")}>
-                    <FormLabel>SKU</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="STL-001" {...field} />
-                    </FormControl>
+                    <FormLabel>Sort by</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl className={cn("w-full")}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sort order" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="RELEVANCE">Relevance</SelectItem>
+                        <SelectItem value="LATEST">Latest</SelectItem>
+                        <SelectItem value="OLDEST">Oldest</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -356,11 +395,39 @@ export function FilterProducts() {
                 )}
               />
             </div>
-            <div>
+            <FormField
+              control={form.control}
+              name="isDeleted"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="size-4"
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Show Deleted Products</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="lg"
+                className={cn("w-1/3")}
+                type="button"
+                onClick={resetFilters}
+              >
+                <span>Reset</span>
+              </Button>
               <Button
                 variant="default"
                 size="lg"
-                className={cn("w-full")}
+                className={cn("w-2/3")}
                 type="submit"
               >
                 <span>Apply Filters</span>

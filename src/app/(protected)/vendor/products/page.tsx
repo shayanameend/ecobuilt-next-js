@@ -60,7 +60,8 @@ async function getProducts({
   page = 1,
   limit = 10,
   categoryId = "",
-  sku = "",
+  sort = "",
+  isDeleted = false,
   minStock,
   minPrice,
   maxPrice,
@@ -70,13 +71,14 @@ async function getProducts({
   page?: number;
   limit?: number;
   categoryId?: string;
-  sku?: string;
+  sort?: string;
+  isDeleted?: boolean;
   minStock?: number;
   minPrice?: number;
   maxPrice?: number;
 }) {
   const params = new URLSearchParams({
-    isDeleted: "false",
+    isDeleted: isDeleted.toString(),
     page: page.toString(),
     limit: limit.toString(),
   });
@@ -89,8 +91,8 @@ async function getProducts({
     params.append("categoryId", categoryId);
   }
 
-  if (sku) {
-    params.append("sku", sku);
+  if (sort) {
+    params.append("sort", sort);
   }
 
   if (minStock !== undefined && minStock > 0) {
@@ -127,7 +129,8 @@ export default function ProductsPage() {
 
   // Get filter values from URL
   const currentCategoryId = searchParams.get("categoryId") || "";
-  const currentSku = searchParams.get("sku") || "";
+  const currentSort = searchParams.get("sort") || "";
+  const currentIsDeleted = searchParams.get("isDeleted") === "true";
   const currentMinStock = searchParams.get("minStock")
     ? Number(searchParams.get("minStock"))
     : undefined;
@@ -157,7 +160,8 @@ export default function ProductsPage() {
       currentPage,
       currentName,
       currentCategoryId,
-      currentSku,
+      currentSort,
+      currentIsDeleted,
       currentMinStock,
       currentMinPrice,
       currentMaxPrice,
@@ -168,7 +172,8 @@ export default function ProductsPage() {
         page: currentPage,
         name: currentName,
         categoryId: currentCategoryId,
-        sku: currentSku,
+        sort: currentSort,
+        isDeleted: currentIsDeleted,
         minStock: currentMinStock,
         minPrice: currentMinPrice,
         maxPrice: currentMaxPrice,
