@@ -150,7 +150,9 @@ async function createProduct({
   formData.append("sku", data.sku);
   formData.append("stock", data.stock.toString());
   formData.append("price", data.price.toString());
-  if (data.salePrice) formData.append("salePrice", data.salePrice.toString());
+  if (data.salePrice && data.salePrice > 0) {
+    formData.append("salePrice", data.salePrice.toString());
+  }
   formData.append("categoryId", data.categoryId);
 
   const response = await axios.post(
@@ -511,7 +513,7 @@ export function NewProduct() {
                 name="salePrice"
                 render={({ field }) => (
                   <FormItem className={cn("flex-1")}>
-                    <FormLabel>Sale Price</FormLabel>
+                    <FormLabel>Sale Price (Optional)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
