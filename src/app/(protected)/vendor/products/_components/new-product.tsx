@@ -149,6 +149,7 @@ async function createProduct({
 export function NewProduct() {
   const { token } = useAuthContext();
 
+  const [formResetKey, setFormResetKey] = useState(0);
   const [isNewProductOpen, setIsNewProductOpen] = useState(false);
   const [productImages, setProductImages] = useState<string[]>([]);
 
@@ -231,6 +232,8 @@ export function NewProduct() {
       setProductImages([]);
 
       form.reset();
+
+      setFormResetKey((prev) => prev + 1);
     },
   });
 
@@ -371,8 +374,9 @@ export function NewProduct() {
                       <FormItem className={cn("flex-[2]")}>
                         <FormLabel>Category</FormLabel>
                         <Select
+                          key={formResetKey}
                           onValueChange={field.onChange}
-                          defaultValue={field.value}
+                          value={field.value}
                           disabled={
                             categoriesQueryIsLoading || categoriesQueryIsError
                           }
@@ -419,6 +423,24 @@ export function NewProduct() {
             <div className={cn("flex gap-2 items-start")}>
               <FormField
                 control={form.control}
+                name="stock"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Stock</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="10"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="price"
                 render={({ field }) => (
                   <FormItem className={cn("flex-1")}>
@@ -446,24 +468,6 @@ export function NewProduct() {
                         type="number"
                         min="1"
                         placeholder="79.99"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="stock"
-                render={({ field }) => (
-                  <FormItem className={cn("flex-1")}>
-                    <FormLabel>Stock</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="10"
                         {...field}
                       />
                     </FormControl>
