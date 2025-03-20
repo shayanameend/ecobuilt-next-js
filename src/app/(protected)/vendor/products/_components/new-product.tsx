@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import axios, { AxiosError } from "axios";
-import { CameraIcon, Loader2Icon } from "lucide-react";
+import { CameraIcon, Loader2Icon, XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
 
@@ -226,6 +226,24 @@ export function NewProduct() {
     }
   };
 
+  const handleImageRemove = (indexToRemove: number) => {
+    // Get current pictures array from form
+    const currentPictures = form.getValues("pictures");
+
+    // Remove the image at the specified index
+    const updatedPictures = currentPictures.filter(
+      (_, index) => index !== indexToRemove,
+    );
+
+    // Update form values
+    form.setValue("pictures", updatedPictures, { shouldValidate: true });
+
+    // Update image previews
+    setProductImages(
+      productImages.filter((_, index) => index !== indexToRemove),
+    );
+  };
+
   const {
     data: categoriesQuery,
     isLoading: categoriesQueryIsLoading,
@@ -290,23 +308,33 @@ export function NewProduct() {
                 <div className="flex flex-wrap gap-2 justify-center">
                   {productImages.length > 0 ? (
                     productImages.map((img, index) => (
-                      <Avatar
-                        key={img}
-                        className={cn(
-                          "rounded-xl size-20 border-2 border-primary/20",
-                        )}
-                      >
-                        <AvatarImage
-                          src={img}
-                          alt={`Product image ${index + 1}`}
-                          width={80}
-                          height={80}
-                          className={cn("object-cover")}
-                        />
-                        <AvatarFallback className={cn("rounded-xl")}>
-                          {index + 1}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div key={img} className="relative">
+                        <Avatar
+                          className={cn(
+                            "rounded-xl size-20 border-2 border-primary/20",
+                          )}
+                        >
+                          <AvatarImage
+                            src={img}
+                            alt={`Product image ${index + 1}`}
+                            width={80}
+                            height={80}
+                            className={cn("object-cover")}
+                          />
+                          <AvatarFallback className={cn("rounded-xl")}>
+                            {index + 1}
+                          </AvatarFallback>
+                        </Avatar>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="absolute -top-1 -right-1 size-4 rounded-full"
+                          onClick={() => handleImageRemove(index)}
+                        >
+                          <XIcon className="size-3" />
+                        </Button>
+                      </div>
                     ))
                   ) : (
                     <div className="flex flex-col items-center justify-center">
