@@ -245,7 +245,7 @@ export function EditProduct({
     form.setValue("sku", product.sku);
     form.setValue("stock", product.stock);
     form.setValue("price", product.price);
-    form.setValue("salePrice", product.salePrice);
+    form.setValue("salePrice", product.salePrice ?? 0);
     form.setValue("categoryId", product.category.id);
 
     const imageUrls = product.pictureIds.map(
