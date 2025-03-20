@@ -8,6 +8,8 @@ import type {
 } from "~/lib/types";
 
 import { useQuery } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import axios from "axios";
 import {
@@ -15,7 +17,6 @@ import {
   FilterIcon,
   Loader2Icon,
   SearchIcon,
-  Trash2Icon,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -57,10 +58,26 @@ import { NewProduct } from "./_components/new-product";
 
 async function getProducts({
   token,
+  name = "",
+  page = 1,
+  limit = 10,
 }: {
   token: string | null;
+  name?: string;
+  page?: number;
+  limit?: number;
 }) {
-  const url = `${routes.api.vendor.products.url()}?isDeleted=false`;
+  const params = new URLSearchParams({
+    isDeleted: "false",
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  if (name) {
+    params.append("name", name);
+  }
+
+  const url = `${routes.api.vendor.products.url()}?${params.toString()}`;
 
   const response = await axios.get(url, {
     headers: {
@@ -72,7 +89,15 @@ async function getProducts({
 }
 
 export default function ProductsPage() {
+  const router = useRouter();
+  const nameParams = useSearchParams();
+
   const { token } = useAuthContext();
+
+  const currentPage = Number(nameParams.get("page") || "1");
+  const currentName = nameParams.get("name") || "";
+
+  const [nameTerm, setSearchTerm] = useState(currentName);
 
   const {
     data: productsQuery,
@@ -86,9 +111,36 @@ export default function ProductsPage() {
       })[];
     }>
   >({
-    queryKey: ["products"],
-    queryFn: () => getProducts({ token }),
+    queryKey: ["products", currentPage, currentName],
+    queryFn: () =>
+      getProducts({
+        token,
+        page: currentPage,
+        name: currentName,
+      }),
   });
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateUrlParams(1, nameTerm);
+  };
+
+  const handlePageChange = (page: number) => {
+    updateUrlParams(page, currentName);
+  };
+
+  const updateUrlParams = (page: number, name: string) => {
+    const params = new URLSearchParams();
+    if (page > 1) params.set("page", page.toString());
+    if (name) params.set("name", name);
+
+    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    router.push(newUrl);
+  };
+
+  useEffect(() => {
+    setSearchTerm(currentName);
+  }, [currentName]);
 
   if (productsQueryIsLoading) {
     return (
@@ -148,14 +200,25 @@ export default function ProductsPage() {
           <Button variant="secondary" size="icon">
             <FilterIcon />
           </Button>
-          <Input placeholder="Search Products..." className={cn("pr-10")} />
-          <Button
-            variant="secondary"
-            size="icon"
-            className={cn("absolute right-0.5 size-8")}
+          <form
+            onSubmit={handleSearch}
+            className="flex-1 flex items-center relative"
           >
-            <SearchIcon />
-          </Button>
+            <Input
+              placeholder="Search Products..."
+              className={cn("pr-10")}
+              value={nameTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Button
+              type="submit"
+              variant="secondary"
+              size="icon"
+              className={cn("absolute right-0.5 size-8")}
+            >
+              <SearchIcon />
+            </Button>
+          </form>
         </div>
         <Card>
           <CardContent>
@@ -222,24 +285,70 @@ export default function ProductsPage() {
             <Pagination className={cn("flex-1 justify-end")}>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious href="#" />
+                  <PaginationPrevious
+                    onClick={() =>
+                      currentPage > 1 && handlePageChange(currentPage - 1)
+                    }
+                    className={
+                      currentPage <= 1
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
                 </PaginationItem>
+                {Array.from(
+                  {
+                    length: Math.min(
+                      5,
+                      Math.ceil(
+                        (productsQuery.meta.total || 0) /
+                          (productsQuery.meta.limit || 10),
+                      ),
+                    ),
+                  },
+                  (_, i) => {
+                    const pageNumber = i + 1;
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(pageNumber)}
+                          isActive={currentPage === pageNumber}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  },
+                )}
+
+                {Math.ceil(
+                  (productsQuery.meta.total || 0) /
+                    (productsQuery.meta.limit || 10),
+                ) > 5 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+
                 <PaginationItem>
-                  <PaginationLink href="#">1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#" isActive>
-                    2
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">3</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href="#" />
+                  <PaginationNext
+                    onClick={() =>
+                      currentPage <
+                        Math.ceil(
+                          (productsQuery.meta.total || 0) /
+                            (productsQuery.meta.limit || 10),
+                        ) && handlePageChange(currentPage + 1)
+                    }
+                    className={
+                      currentPage >=
+                      Math.ceil(
+                        (productsQuery.meta.total || 0) /
+                          (productsQuery.meta.limit || 10),
+                      )
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
