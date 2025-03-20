@@ -164,10 +164,12 @@ async function updateProduct({
 }) {
   const formData = new FormData();
 
-  if (data.pictures && data.pictures.length > 0) {
-    for (const file of data.pictures) {
-      formData.append("pictures", file);
-    }
+  for (const pictureId of data.pictureIds) {
+    formData.append("pictureIds", pictureId);
+  }
+
+  for (const file of data.pictures) {
+    formData.append("pictures", file);
   }
 
   if (data.name) {
