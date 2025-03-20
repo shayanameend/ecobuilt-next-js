@@ -108,6 +108,18 @@ export function UpdateVendorProfileForm({
     undefined,
   );
 
+  const form = useForm<zod.infer<typeof UpdateVendorProfileFormSchema>>({
+    resolver: zodResolver(UpdateVendorProfileFormSchema),
+    defaultValues: {
+      name: profile.name,
+      description: profile.description,
+      phone: profile.phone,
+      postalCode: profile.postalCode,
+      city: profile.city,
+      pickupAddress: profile.pickupAddress,
+    },
+  });
+
   useEffect(() => {
     form.setValue("pictureId", undefined);
     form.setValue("picture", undefined);
@@ -119,21 +131,7 @@ export function UpdateVendorProfileForm({
     form.setValue("pickupAddress", profile.pickupAddress);
 
     setProfileImage(`${process.env.NEXT_PUBLIC_FILE_URL}/${profile.pictureId}`);
-  }, [profile]);
-
-  const form = useForm<zod.infer<typeof UpdateVendorProfileFormSchema>>({
-    resolver: zodResolver(UpdateVendorProfileFormSchema),
-    defaultValues: {
-      pictureId: undefined,
-      picture: undefined,
-      name: profile.name,
-      description: profile.description,
-      phone: profile.phone,
-      postalCode: profile.postalCode,
-      city: profile.city,
-      pickupAddress: profile.pickupAddress,
-    },
-  });
+  }, [form.setValue, profile]);
 
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
