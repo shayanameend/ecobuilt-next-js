@@ -141,7 +141,7 @@ export function SignInForm() {
             )}
           />
         </div>
-        <div className={cn("space-x-4")}>
+        <div>
           <Button
             variant="default"
             size="lg"

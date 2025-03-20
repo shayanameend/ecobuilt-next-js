@@ -14,12 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import {
-  AlertCircleIcon,
-  FilterIcon,
-  Loader2Icon,
-  SearchIcon,
-} from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -56,6 +51,7 @@ import { routes } from "~/lib/routes";
 import { cn, formatPrice } from "~/lib/utils";
 import { DeleteProduct } from "./_components/delete-product";
 import { EditProduct } from "./_components/edit-product";
+import { FilterProducts } from "./_components/filter-products";
 import { NewProduct } from "./_components/new-product";
 
 async function getProducts({
@@ -200,9 +196,7 @@ export default function ProductsPage() {
           </div>
         </div>
         <div className={cn("relative flex items-center justify-between gap-2")}>
-          <Button variant="secondary" size="icon">
-            <FilterIcon />
-          </Button>
+          <FilterProducts />
           <form
             onSubmit={handleSearch}
             className="flex-1 flex items-center relative"
