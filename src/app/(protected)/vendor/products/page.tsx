@@ -53,13 +53,16 @@ import { routes } from "~/lib/routes";
 import { cn, formatPrice } from "~/lib/utils";
 import { EditProduct } from "./_components/edit-product";
 import { NewProduct } from "./_components/new-product";
+import { DeleteProduct } from "./_components/delete-product";
 
 async function getProducts({
   token,
 }: {
   token: string | null;
 }) {
-  const response = await axios.get(routes.api.vendor.products.url(), {
+  const url = `${routes.api.vendor.products.url()}?isDeleted=false`;
+
+  const response = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -198,13 +201,7 @@ export default function ProductsPage() {
                     <TableCell>{formatPrice(product.price)}</TableCell>
                     <TableCell className={cn("space-x-2")}>
                       <EditProduct product={product} />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className={cn("size-8")}
-                      >
-                        <Trash2Icon />
-                      </Button>
+                      <DeleteProduct id={product.id} />
                     </TableCell>
                   </TableRow>
                 ))}
