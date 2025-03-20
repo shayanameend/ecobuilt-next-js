@@ -51,9 +51,9 @@ import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn, formatPrice } from "~/lib/utils";
+import { DeleteProduct } from "./_components/delete-product";
 import { EditProduct } from "./_components/edit-product";
 import { NewProduct } from "./_components/new-product";
-import { DeleteProduct } from "./_components/delete-product";
 
 async function getProducts({
   token,

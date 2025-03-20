@@ -17,8 +17,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { CameraIcon, EditIcon, Loader2Icon, XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import * as zod from "zod";
 import { toast } from "sonner";
+import * as zod from "zod";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -164,6 +164,8 @@ async function updateProduct({
 }) {
   const formData = new FormData();
 
+  console.log({ data });
+
   for (const pictureId of data.pictureIds) {
     formData.append("pictureIds", pictureId);
   }
@@ -193,6 +195,9 @@ async function updateProduct({
   if (data.categoryId) {
     formData.append("categoryId", data.categoryId);
   }
+
+  console.log({ formData: formData.getAll("pictures") });
+  console.log({ formData: formData.getAll("pictureIds") });
 
   const response = await axios.put(
     routes.api.vendor.products.url(id),
@@ -307,7 +312,15 @@ export function EditProduct({
       if (index === indexToRemove) {
         if (!image.isNew) {
           const picturesToBeDeleted = form.getValues("pictureIds");
-          picturesToBeDeleted.push(image.url);
+
+          const pictureIdToRemove = product.pictureIds.find(
+            (pictureId) =>
+              `${process.env.NEXT_PUBLIC_FILE_URL}/${pictureId}` === image.url,
+          );
+
+          if (pictureIdToRemove) {
+            picturesToBeDeleted.push(pictureIdToRemove);
+          }
 
           form.setValue("pictureIds", picturesToBeDeleted, {
             shouldValidate: true,
@@ -316,10 +329,18 @@ export function EditProduct({
           const currentPicturesToBeUploaded = form.getValues("pictures");
 
           const updatedPicturesToBeUploaded =
-            currentPicturesToBeUploaded.filter(
-              (picture) =>
-                `${process.env.NEXT_PUBLIC_FILE_URL}/${picture}` !== image.url,
-            );
+            currentPicturesToBeUploaded.filter((_, i) => {
+              const newImagesBeforeIndex = productImages
+                .slice(0, indexToRemove)
+                .filter((img) => img.isNew).length;
+
+              return (
+                i !==
+                indexToRemove -
+                  (productImages.length - currentPicturesToBeUploaded.length) -
+                  newImagesBeforeIndex
+              );
+            });
 
           form.setValue("pictures", updatedPicturesToBeUploaded, {
             shouldValidate: true,
