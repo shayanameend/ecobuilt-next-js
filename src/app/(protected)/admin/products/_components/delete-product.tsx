@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import axios, { AxiosError } from "axios";
-import { Loader2Icon, Trash2Icon } from "lucide-react";
+import { Loader2Icon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
@@ -25,13 +25,14 @@ import { cn } from "~/lib/utils";
 async function deleteProduct({
   token,
   id,
+  isDeleted,
 }: {
   token: string | null;
   id: string;
+  isDeleted: boolean;
 }) {
   const response = await axios.delete(
-    routes.api.vendor.products.url(id),
-    {},
+    `${routes.api.admin.products.url(id)}?isDeleted=${isDeleted}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -43,23 +44,26 @@ async function deleteProduct({
   return response.data;
 }
 
-export function DeleteProduct({
+export function ToggleDeleteProduct({
   id,
+  isDeleted,
 }: {
   id: string;
+  isDeleted: boolean;
 }) {
   const queryClient = useQueryClient();
 
   const { token } = useAuthContext();
 
-  const [isDeleteProductOpen, setIsDeleteProductOpen] = useState(false);
+  const [isToggleDeleteProductOpen, setIsToggleDeleteProductOpen] =
+    useState(false);
 
   const deleteProductMutation = useMutation({
     mutationFn: deleteProduct,
     onSuccess: ({ info }) => {
       toast.success(info.message);
 
-      setIsDeleteProductOpen(false);
+      setIsToggleDeleteProductOpen(false);
 
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -71,10 +75,17 @@ export function DeleteProduct({
   });
 
   return (
-    <Dialog open={isDeleteProductOpen} onOpenChange={setIsDeleteProductOpen}>
+    <Dialog
+      open={isToggleDeleteProductOpen}
+      onOpenChange={setIsToggleDeleteProductOpen}
+    >
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className={cn("size-8")}>
-          <Trash2Icon />
+          {isDeleted ? (
+            <RotateCcwIcon className="text-green-500" />
+          ) : (
+            <Trash2Icon className="text-red-500" />
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
@@ -91,22 +102,28 @@ export function DeleteProduct({
             size="lg"
             className={cn("flex-1")}
             type="submit"
-            onClick={() => setIsDeleteProductOpen(false)}
+            onClick={() => setIsToggleDeleteProductOpen(false)}
           >
             <span>Cancel</span>
           </Button>
           <Button
-            variant="destructive"
+            variant={isDeleted ? "default" : "destructive"}
             size="lg"
             className={cn("flex-1")}
             type="submit"
             disabled={deleteProductMutation.isPending}
-            onClick={() => deleteProductMutation.mutate({ token, id: id })}
+            onClick={() =>
+              deleteProductMutation.mutate({
+                token,
+                id: id,
+                isDeleted: !isDeleted,
+              })
+            }
           >
             {deleteProductMutation.isPending && (
               <Loader2Icon className={cn("animate-spin")} />
             )}
-            <span>Delete</span>
+            <span>{isDeleted ? "Restore" : "Delete"}</span>
           </Button>
         </DialogFooter>
       </DialogContent>
