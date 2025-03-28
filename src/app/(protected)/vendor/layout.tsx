@@ -15,9 +15,9 @@ import { DashboardSidebar } from "../_components/dasboard-sidebar";
 
 const items = [
   {
-    title: routes.app.vendor.root.label,
+    title: routes.app.vendor.dashboard.label,
     icon: LayoutDashboardIcon,
-    url: routes.app.vendor.root.url(),
+    url: routes.app.vendor.dashboard.url(),
   },
   {
     title: routes.app.vendor.categories.label,

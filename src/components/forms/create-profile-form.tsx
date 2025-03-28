@@ -163,7 +163,7 @@ export function CreateProfileForm() {
     onSuccess: ({ info }) => {
       toast.success(info.message);
 
-      router.push(routes.app.public.root.url());
+      router.push(routes.app.public.home.url());
     },
     onError: (error) => {
       if (error instanceof AxiosError) {

@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from "react";
 
 import {
   FolderTreeIcon,
@@ -7,17 +7,17 @@ import {
   SettingsIcon,
   ShoppingCartIcon,
   UsersIcon,
-} from 'lucide-react';
+} from "lucide-react";
 
-import { routes } from '~/lib/routes';
-import { cn } from '~/lib/utils';
-import { DashboardSidebar } from '../_components/dasboard-sidebar';
+import { routes } from "~/lib/routes";
+import { cn } from "~/lib/utils";
+import { DashboardSidebar } from "../_components/dasboard-sidebar";
 
 const items = [
   {
-    title: routes.app.admin.root.label,
+    title: routes.app.admin.dashboard.label,
     icon: LayoutDashboardIcon,
-    url: routes.app.admin.root.url(),
+    url: routes.app.admin.dashboard.url(),
   },
   {
     title: routes.app.admin.categories.label,
@@ -50,7 +50,7 @@ export default function DashboardLayout({
   children,
 }: Readonly<PropsWithChildren>) {
   return (
-    <main className={cn('py-7 px-7 min-h-svh w-full flex')}>
+    <main className={cn("py-7 px-7 min-h-svh w-full flex")}>
       <DashboardSidebar items={items} />
       {children}
     </main>

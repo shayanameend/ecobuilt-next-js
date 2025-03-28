@@ -30,8 +30,8 @@ import { cn } from "~/lib/utils";
 
 const navLinks = [
   {
-    label: routes.app.public.root.label,
-    url: routes.app.public.root.url(),
+    label: routes.app.public.home.label,
+    url: routes.app.public.home.url(),
   },
   {
     label: routes.app.public.products.label,
@@ -85,7 +85,7 @@ export function RootHeader() {
                 variant={
                   pathname === url ||
                   (pathname.startsWith(url) &&
-                    url !== routes.app.public.root.url())
+                    url !== routes.app.public.home.url())
                     ? "secondary"
                     : "ghost"
                 }
@@ -176,13 +176,13 @@ function RootHeaderCTAButton({ className }: { className?: string }) {
           switch (auth.role) {
             case Role.SUPER_ADMIN:
             case Role.ADMIN:
-              url = routes.app.admin.root.url();
+              url = routes.app.admin.dashboard.url();
               break;
             case Role.VENDOR:
-              url = routes.app.vendor.root.url();
+              url = routes.app.vendor.dashboard.url();
               break;
             case Role.USER:
-              url = routes.app.user.root.url();
+              url = routes.app.user.dashboard.url();
               break;
             default:
               url = routes.app.unspecified.profile.url();

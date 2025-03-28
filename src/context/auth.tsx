@@ -107,7 +107,7 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
     const isPublicRoute = publicRoutes.some(
       (route) =>
         pathname === route ||
-        (pathname.startsWith(route) && route !== routes.app.public.root.url()),
+        (pathname.startsWith(route) && route !== routes.app.public.home.url()),
     );
     const isProfileRoute = pathname.startsWith(
       routes.app.unspecified.profile.url(),
@@ -147,13 +147,13 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
         switch (auth.role) {
           case Role.SUPER_ADMIN:
           case Role.ADMIN:
-            url = routes.app.admin.root.url();
+            url = routes.app.admin.dashboard.url();
             break;
           case Role.VENDOR:
-            url = routes.app.vendor.root.url();
+            url = routes.app.vendor.dashboard.url();
             break;
           case Role.USER:
-            url = routes.app.user.root.url();
+            url = routes.app.user.dashboard.url();
             break;
           default:
             url = routes.app.unspecified.profile.url();
@@ -168,7 +168,7 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
       }
 
       if (isProfileRoute && auth.role !== Role.UNSPECIFIED) {
-        return router.push(routes.app.public.root.url());
+        return router.push(routes.app.public.home.url());
       }
 
       if (
@@ -176,15 +176,15 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
         auth.role !== Role.SUPER_ADMIN &&
         auth.role !== Role.ADMIN
       ) {
-        return router.push(routes.app.public.root.url());
+        return router.push(routes.app.public.home.url());
       }
 
       if (isVendorRoute && auth.role !== Role.VENDOR) {
-        return router.push(routes.app.public.root.url());
+        return router.push(routes.app.public.home.url());
       }
 
       if (isUserRoute && auth.role !== Role.USER) {
-        return router.push(routes.app.public.root.url());
+        return router.push(routes.app.public.home.url());
       }
     }
   }, [pathname, router.push, isLoading, auth]);
