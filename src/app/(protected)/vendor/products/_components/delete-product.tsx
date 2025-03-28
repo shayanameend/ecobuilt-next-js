@@ -29,16 +29,12 @@ async function deleteProduct({
   token: string | null;
   id: string;
 }) {
-  const response = await axios.delete(
-    routes.api.vendor.products.url(id),
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
+  const response = await axios.delete(routes.api.vendor.products.url(id), {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
     },
-  );
+  });
 
   return response.data;
 }
