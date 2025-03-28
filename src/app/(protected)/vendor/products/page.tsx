@@ -14,7 +14,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
+import {
+  AlertCircleIcon,
+  Loader2Icon,
+  MessageSquareIcon,
+  SearchIcon,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -323,7 +328,7 @@ export default function ProductsPage() {
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex flex-col">
+                      <div className="flex flex-col text-wrap">
                         <span className="text-sm font-medium">
                           {product.name}
                         </span>
@@ -339,7 +344,7 @@ export default function ProductsPage() {
                     <TableCell>{formatPrice(product.price)}</TableCell>
                     <TableCell className={cn("space-x-2")}>
                       <EditProduct product={product} />
-                      <DeleteProduct id={product.id} />
+                      {!product.isDeleted && <DeleteProduct id={product.id} />}
                     </TableCell>
                   </TableRow>
                 ))}

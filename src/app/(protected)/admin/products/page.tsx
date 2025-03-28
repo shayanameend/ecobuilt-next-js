@@ -318,7 +318,7 @@ export default function ProductsPage() {
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex flex-col">
+                      <div className="flex flex-col text-wrap">
                         <span className="text-sm font-medium">
                           {product.name}
                         </span>
