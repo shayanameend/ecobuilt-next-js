@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import axios, { AxiosError } from "axios";
 import { Loader2Icon } from "lucide-react";
@@ -60,6 +60,8 @@ async function createCategory({
 }
 
 export function NewCategory() {
+  const queryClient = useQueryClient();
+
   const { token } = useAuthContext();
 
   const [isNewCategoryOpen, setIsNewCategoryOpen] = useState(false);
@@ -77,6 +79,8 @@ export function NewCategory() {
       toast.success(info.message);
 
       setIsNewCategoryOpen(false);
+
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
