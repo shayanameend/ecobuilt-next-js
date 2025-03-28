@@ -130,106 +130,122 @@ const api = {
 const app = {
   auth: {
     signUp: {
-      url: () => "/auth/sign-up",
-      label: "Sign Up",
+      url: () => '/auth/sign-up',
+      label: 'Sign Up',
     },
     signIn: {
-      url: () => "/auth/sign-in",
-      label: "Sign In",
+      url: () => '/auth/sign-in',
+      label: 'Sign In',
     },
     forgotPassword: {
-      url: () => "/auth/forgot-password",
-      label: "Forgot Password",
+      url: () => '/auth/forgot-password',
+      label: 'Forgot Password',
     },
     resendOtp: {
-      url: () => "/auth/resend-otp",
-      label: "Resend OTP",
+      url: () => '/auth/resend-otp',
+      label: 'Resend OTP',
     },
     verifyOtp: {
-      url: () => "/auth/verify-otp",
-      label: "Verify OTP",
+      url: () => '/auth/verify-otp',
+      label: 'Verify OTP',
     },
     updatePassword: {
-      url: () => "/auth/update-password",
-      label: "Update Password",
+      url: () => '/auth/update-password',
+      label: 'Update Password',
     },
     refresh: {
-      url: () => "/auth/refresh",
-      label: "Refresh",
+      url: () => '/auth/refresh',
+      label: 'Refresh',
     },
   },
   public: {
     root: {
-      url: () => "/",
-      label: "Home",
+      url: () => '/',
+      label: 'Home',
     },
     products: {
-      url: (id?: string) => (id ? `/products/${id}` : "/products"),
-      label: "Marketplace",
+      url: (id?: string) => (id ? `/products/${id}` : '/products'),
+      label: 'Marketplace',
     },
     vendors: {
-      url: (id?: string) => (id ? `/vendors/${id}` : "/vendors"),
-      label: "Vendors",
+      url: (id?: string) => (id ? `/vendors/${id}` : '/vendors'),
+      label: 'Vendors',
     },
     community: {
-      url: () => "/community",
-      label: "Community",
+      url: () => '/community',
+      label: 'Community',
     },
     contact: {
-      url: () => "/contact",
-      label: "Contact",
+      url: () => '/contact',
+      label: 'Contact',
     },
   },
   unspecified: {
     profile: {
-      url: () => "/profile",
-      label: "Profile",
+      url: () => '/profile',
+      label: 'Profile',
     },
   },
   admin: {
     root: {
-      url: () => "/admin",
-      label: "Dashboard",
+      url: () => '/admin',
+      label: 'Dashboard',
+    },
+    categories: {
+      url: () => '/admin/categories',
+      label: 'Categories',
+    },
+    products: {
+      url: () => '/admin/products',
+      label: 'Products',
+    },
+    orders: {
+      url: () => '/admin/orders',
+      label: 'Orders',
+    },
+    users: {
+      url: () => '/admin/users',
+      label: 'Users',
     },
     settings: {
-      url: () => "/admin/settings",
-      label: "Settings",
+      url: () => '/admin/settings',
+      label: 'Settings',
     },
   },
   vendor: {
     root: {
-      url: () => "/vendor",
-      label: "Dashboard",
+      url: () => '/vendor',
+      label: 'Dashboard',
     },
     categories: {
-      url: () => "/vendor/categories",
-      label: "Categories",
+      url: () => '/vendor/categories',
+      label: 'Categories',
     },
     products: {
-      url: () => "/vendor/products",
-      label: "Products",
+      url: () => '/vendor/products',
+      label: 'Products',
     },
     orders: {
-      url: () => "/vendor/orders",
-      label: "Orders",
+      url: () => '/vendor/orders',
+      label: 'Orders',
     },
     users: {
-      url: () => "/vendor/users",
-      label: "Users",
+      url: () => '/vendor/users',
+      label: 'Users',
     },
     settings: {
-      url: () => "/vendor/settings",
-      label: "Settings",
+      url: () => '/vendor/settings',
+      label: 'Settings',
     },
   },
   user: {
     root: {
-      url: () => "/user",
-      label: "Dashboard",
+      url: () => '/user',
+      label: 'Dashboard',
     },
     settings: {
-      url: () => "/user/settings",
-      label: "Settings",
+      url: () => '/user/settings',
+      label: 'Settings',
     },
   },
 };
@@ -259,6 +275,10 @@ export const publicRoutes = [
 
 export const adminRoutes = [
   routes.app.admin.root.url(),
+  routes.app.admin.categories.url(),
+  routes.app.admin.products.url(),
+  routes.app.admin.orders.url(),
+  routes.app.admin.users.url(),
   routes.app.admin.settings.url(),
 ];
 
