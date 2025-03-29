@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import axios, { AxiosError } from "axios";
-import { Loader2Icon, Trash2Icon } from "lucide-react";
+import { Loader2Icon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
@@ -25,24 +25,35 @@ import { cn } from "~/lib/utils";
 async function deleteUser({
   token,
   id,
+  isDeleted,
 }: {
   token: string | null;
   id: string;
+  isDeleted: boolean;
 }) {
-  const response = await axios.delete(routes.api.admin.users.url(id), {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
+  console.log({ isDeleted });
+
+  const response = await axios.put(
+    routes.api.admin.users.url(id),
+    {
+      isDeleted,
     },
-  });
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
 
   return response.data;
 }
 
-export function DeleteUser({
+export function ToggleDeleteUser({
   id,
+  isDeleted,
 }: {
   id: string;
+  isDeleted: boolean;
 }) {
   const queryClient = useQueryClient();
 
@@ -70,7 +81,11 @@ export function DeleteUser({
     <Dialog open={isDeleteUserOpen} onOpenChange={setIsDeleteUserOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className={cn("size-8")}>
-          <Trash2Icon />
+          {isDeleted ? (
+            <RotateCcwIcon className="text-green-500" />
+          ) : (
+            <Trash2Icon className="text-red-500" />
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
@@ -92,17 +107,23 @@ export function DeleteUser({
             <span>Cancel</span>
           </Button>
           <Button
-            variant="destructive"
+            variant={isDeleted ? "default" : "destructive"}
             size="lg"
             className={cn("flex-1")}
             type="submit"
             disabled={deleteUserMutation.isPending}
-            onClick={() => deleteUserMutation.mutate({ token, id: id })}
+            onClick={() =>
+              deleteUserMutation.mutate({
+                token,
+                id: id,
+                isDeleted: !isDeleted,
+              })
+            }
           >
             {deleteUserMutation.isPending && (
               <Loader2Icon className={cn("animate-spin")} />
             )}
-            <span>Delete</span>
+            <span>{isDeleted ? "Restore" : "Delete"}</span>
           </Button>
         </DialogFooter>
       </DialogContent>

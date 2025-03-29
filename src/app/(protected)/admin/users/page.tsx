@@ -48,8 +48,7 @@ import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
-import { DeleteUser } from "./_components/delete-user";
-// import { EditUser } from "./_components/edit-user";
+import { ToggleDeleteUser } from "./_components/delete-user";
 import { FilterUsers } from "./_components/filter-users";
 
 async function getUsers({
@@ -259,7 +258,6 @@ export default function UsersPage() {
               organize them.
             </p>
           </div>
-          <div>{/* <NewUser /> */}</div>
         </div>
         <div className={cn("relative flex items-center justify-between gap-2")}>
           <FilterUsers />
@@ -352,8 +350,10 @@ export default function UsersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className={cn("space-x-2")}>
-                      {/* <EditUser user={user} /> */}
-                      {!user.auth.isDeleted && <DeleteUser id={user.id} />}
+                      <ToggleDeleteUser
+                        id={user.id}
+                        isDeleted={user.auth.isDeleted}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
