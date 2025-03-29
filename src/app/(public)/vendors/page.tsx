@@ -13,16 +13,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
+import { AlertCircleIcon, Loader2Icon } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
@@ -36,23 +33,12 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "~/components/ui/pagination";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
 import { useAuthContext } from "~/context/auth";
-import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import Link from "next/link";
 import { Vendor } from "./_components/vendor";
-// import { ToggleDeleteVendor } from "./_components/delete-vendor";
-// import { FilterVendors } from "./_components/filter-vendors";
-// import { VendorStatusSwitcher } from "./_components/vendor-status-switcher";
+import { FilterVendors } from "./_components/filter-vendors";
 
 async function getVendors({
   token,
@@ -60,30 +46,16 @@ async function getVendors({
   limit = 10,
   sort = "",
   name = "",
-  phone = "",
-  postalCode = "",
-  city = "",
-  status,
-  isVerified = true,
-  isDeleted = false,
 }: {
   token: string | null;
   page?: number;
   limit?: number;
   sort?: string;
   name?: string;
-  phone?: string;
-  postalCode?: string;
-  city?: string;
-  status?: string;
-  isVerified?: boolean;
-  isDeleted?: boolean;
 }) {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
-    isVerified: isVerified.toString(),
-    isDeleted: isDeleted.toString(),
   });
 
   if (sort) {
@@ -208,7 +180,6 @@ export default function VendorsPage() {
     <>
       <section className={cn("flex-1 space-y-8 py-8 px-4")}>
         <div className={cn("relative flex items-center justify-between gap-2")}>
-          {/* <FilterVendors /> */}
           <form
             onSubmit={handleSearch}
             className="flex-1 flex items-center relative"
@@ -228,6 +199,7 @@ export default function VendorsPage() {
               Search
             </Button>
           </form>
+          <FilterVendors />
         </div>
         <div>
           <ul
