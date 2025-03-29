@@ -125,7 +125,6 @@ export default function ProductsPage() {
   const currentPage = Number(searchParams.get("page") || "1");
   const currentName = searchParams.get("name") || "";
 
-  // Get filter values from URL
   const currentCategoryId = searchParams.get("categoryId") || "";
   const currentSort = searchParams.get("sort") || "";
   const currentIsDeleted = searchParams.get("isDeleted") === "true";
@@ -181,10 +180,8 @@ export default function ProductsPage() {
   const handleSearch = (event: FormEvent) => {
     event.preventDefault();
 
-    // Preserve existing filter params
     const params = new URLSearchParams(searchParams.toString());
 
-    // Update name parameter and reset to page 1
     if (queryTerm) {
       params.set("name", queryTerm);
     } else {
@@ -199,7 +196,6 @@ export default function ProductsPage() {
   };
 
   const handlePageChange = (page: number) => {
-    // Update only the page parameter, preserving all other params
     const params = new URLSearchParams(searchParams.toString());
 
     if (page > 1) {
