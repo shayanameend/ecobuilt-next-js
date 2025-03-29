@@ -214,7 +214,7 @@ export function FilterCategories() {
                 className={cn("w-2/3")}
                 type="submit"
               >
-                <span>Apply Filters</span>
+                <span>Apply</span>
               </Button>
             </div>
           </form>
