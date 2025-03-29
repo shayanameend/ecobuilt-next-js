@@ -1,6 +1,6 @@
 "use client";
 
-import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
+import type { CategoryType, SingleResponseType } from "~/lib/types";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -25,13 +25,14 @@ import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { NewCategory } from "./_components/new-category";
+import { ToggleDeleteCategory } from "./_components/toggle-delete-category";
 
 async function getCategories({
   token,
 }: {
   token: string | null;
 }) {
-  const response = await axios.get(routes.api.public.categories.url(), {
+  const response = await axios.get(routes.api.admin.categories.url(), {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -53,7 +54,7 @@ export default function CategoriesPage() {
     isError: categoriesQueryIsError,
   } = useQuery<
     SingleResponseType<{
-      categories: PublicCategoryType[];
+      categories: CategoryType[];
     }>
   >({
     queryKey: ["categories"],
@@ -131,24 +132,40 @@ export default function CategoriesPage() {
           {filteredCategories.length > 0 ? (
             filteredCategories.map((category) => (
               <Card key={category.id}>
-                <CardFooter className={cn("justify-between gap-4 ")}>
+                <CardContent className={cn("flex justify-between gap-3")}>
                   <CardTitle>
                     <h3 className={cn("text-2xl font-bold", domine.className)}>
                       {category.name}
                     </h3>
                   </CardTitle>
+                  <ToggleDeleteCategory
+                    id={category.id}
+                    isDeleted={category.isDeleted}
+                  />
+                </CardContent>
+                <CardFooter className={cn("justify-between gap-3")}>
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="default"
                     onClick={() => {
-                      console.log("Viewing category", category);
-
                       router.push(
                         `${routes.app.admin.products.url()}?categoryId=${category.id}`,
                       );
                     }}
                   >
-                    <span>View</span>
+                    <span>Products</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="default"
+                    className={cn("flex-1")}
+                    onClick={() => {
+                      router.push(
+                        `${routes.app.admin.products.url()}?categoryId=${category.id}`,
+                      );
+                    }}
+                  >
+                    <span>View Products</span>
                   </Button>
                 </CardFooter>
               </Card>

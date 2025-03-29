@@ -31,8 +31,6 @@ async function deleteUser({
   id: string;
   isDeleted: boolean;
 }) {
-  console.log({ isDeleted });
-
   const response = await axios.put(
     routes.api.admin.users.url(id),
     {

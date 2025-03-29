@@ -32,6 +32,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 const CreateCategoryFormSchema = zod.object({
   name: zod
@@ -107,7 +114,7 @@ export function NewCategory() {
         <DialogHeader>
           <DialogTitle>New Category</DialogTitle>
           <DialogDescription>
-            Add a new product category for your inventory.
+            Add a new product category for inventory.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -130,6 +137,30 @@ export function NewCategory() {
                 )}
               />
             </div>
+            {/* <div>
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl className={cn("w-full")}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="PENDING">Pending</SelectItem>
+                        <SelectItem value="REJECTED">Rejected</SelectItem>
+                        <SelectItem value="APPROVED">Approved</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div> */}
             <div>
               <Button
                 variant="default"
@@ -141,7 +172,7 @@ export function NewCategory() {
                 {createCategoryMutation.isPending && (
                   <Loader2Icon className={cn("animate-spin")} />
                 )}
-                <span>Add</span>
+                <span>Create</span>
               </Button>
             </div>
           </form>

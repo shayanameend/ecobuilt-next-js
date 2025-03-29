@@ -32,7 +32,6 @@ async function deleteProduct({
   const response = await axios.delete(routes.api.vendor.products.url(id), {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
     },
   });
 

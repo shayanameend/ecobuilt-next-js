@@ -164,8 +164,6 @@ async function updateProduct({
 }) {
   const formData = new FormData();
 
-  console.log({ data });
-
   for (const pictureId of data.pictureIds) {
     formData.append("pictureIds", pictureId);
   }
@@ -195,9 +193,6 @@ async function updateProduct({
   if (data.categoryId) {
     formData.append("categoryId", data.categoryId);
   }
-
-  console.log({ formData: formData.getAll("pictures") });
-  console.log({ formData: formData.getAll("pictureIds") });
 
   const response = await axios.put(
     routes.api.vendor.products.url(id),

@@ -22,7 +22,7 @@ import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
-async function deleteProduct({
+async function deleteCategory({
   token,
   id,
   isDeleted,
@@ -32,7 +32,7 @@ async function deleteProduct({
   isDeleted: boolean;
 }) {
   const response = await axios.delete(
-    `${routes.api.admin.products.url(id)}?isDeleted=${isDeleted}`,
+    `${routes.api.admin.categories.url(id)}?isDeleted=${isDeleted}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -43,7 +43,7 @@ async function deleteProduct({
   return response.data;
 }
 
-export function ToggleDeleteProduct({
+export function ToggleDeleteCategory({
   id,
   isDeleted,
 }: {
@@ -54,17 +54,17 @@ export function ToggleDeleteProduct({
 
   const { token } = useAuthContext();
 
-  const [isToggleDeleteProductOpen, setIsToggleDeleteProductOpen] =
+  const [isToggleDeleteCategoryOpen, setIsToggleDeleteCategoryOpen] =
     useState(false);
 
-  const deleteProductMutation = useMutation({
-    mutationFn: deleteProduct,
+  const deleteCategoryMutation = useMutation({
+    mutationFn: deleteCategory,
     onSuccess: ({ info }) => {
       toast.success(info.message);
 
-      setIsToggleDeleteProductOpen(false);
+      setIsToggleDeleteCategoryOpen(false);
 
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
@@ -75,11 +75,11 @@ export function ToggleDeleteProduct({
 
   return (
     <Dialog
-      open={isToggleDeleteProductOpen}
-      onOpenChange={setIsToggleDeleteProductOpen}
+      open={isToggleDeleteCategoryOpen}
+      onOpenChange={setIsToggleDeleteCategoryOpen}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className={cn("size-8")}>
+        <Button variant="outline" size="icon">
           {isDeleted ? (
             <RotateCcwIcon className="text-green-500" />
           ) : (
@@ -89,9 +89,9 @@ export function ToggleDeleteProduct({
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Delete Product</DialogTitle>
+          <DialogTitle>Delete Category</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this product? This action cannot be
+            Are you sure you want to delete this category? This action cannot be
             undone.
           </DialogDescription>
         </DialogHeader>
@@ -101,7 +101,7 @@ export function ToggleDeleteProduct({
             size="lg"
             className={cn("flex-1")}
             type="submit"
-            onClick={() => setIsToggleDeleteProductOpen(false)}
+            onClick={() => setIsToggleDeleteCategoryOpen(false)}
           >
             <span>Cancel</span>
           </Button>
@@ -110,16 +110,16 @@ export function ToggleDeleteProduct({
             size="lg"
             className={cn("flex-1")}
             type="submit"
-            disabled={deleteProductMutation.isPending}
+            disabled={deleteCategoryMutation.isPending}
             onClick={() =>
-              deleteProductMutation.mutate({
+              deleteCategoryMutation.mutate({
                 token,
                 id: id,
                 isDeleted: !isDeleted,
               })
             }
           >
-            {deleteProductMutation.isPending && (
+            {deleteCategoryMutation.isPending && (
               <Loader2Icon className={cn("animate-spin")} />
             )}
             <span>{isDeleted ? "Restore" : "Delete"}</span>

@@ -141,8 +141,6 @@ export default function CategoriesPage() {
                     variant="secondary"
                     size="default"
                     onClick={() => {
-                      console.log("Viewing category", category);
-
                       router.push(
                         `${routes.app.vendor.products.url()}?categoryId=${category.id}`,
                       );
