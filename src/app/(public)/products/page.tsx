@@ -14,16 +14,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
+import { AlertCircleIcon, Loader2Icon } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
@@ -37,18 +34,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "~/components/ui/pagination";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
 import { useAuthContext } from "~/context/auth";
-import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
-import { cn, formatPrice } from "~/lib/utils";
+import { cn } from "~/lib/utils";
 import { FilterProducts } from "./_components/filter-products";
 import { Product } from "./_components/product";
 
@@ -59,7 +47,6 @@ async function getProducts({
   limit = 10,
   categoryId = "",
   sort = "",
-  isDeleted = false,
   minStock,
   minPrice,
   maxPrice,
@@ -70,13 +57,11 @@ async function getProducts({
   limit?: number;
   categoryId?: string;
   sort?: string;
-  isDeleted?: boolean;
   minStock?: number;
   minPrice?: number;
   maxPrice?: number;
 }) {
   const params = new URLSearchParams({
-    isDeleted: isDeleted.toString(),
     page: page.toString(),
     limit: limit.toString(),
   });
@@ -105,7 +90,7 @@ async function getProducts({
     params.append("maxPrice", maxPrice.toString());
   }
 
-  const url = `${routes.api.admin.products.url()}?${params.toString()}`;
+  const url = `${routes.api.public.products.url()}?${params.toString()}`;
 
   const response = await axios.get(url, {
     headers: {
@@ -127,7 +112,6 @@ export default function ProductsPage() {
 
   const currentCategoryId = searchParams.get("categoryId") || "";
   const currentSort = searchParams.get("sort") || "";
-  const currentIsDeleted = searchParams.get("isDeleted") === "true";
   const currentMinStock = searchParams.get("minStock")
     ? Number(searchParams.get("minStock"))
     : undefined;
@@ -158,7 +142,6 @@ export default function ProductsPage() {
       currentName,
       currentCategoryId,
       currentSort,
-      currentIsDeleted,
       currentMinStock,
       currentMinPrice,
       currentMaxPrice,
@@ -170,7 +153,6 @@ export default function ProductsPage() {
         name: currentName,
         categoryId: currentCategoryId,
         sort: currentSort,
-        isDeleted: currentIsDeleted,
         minStock: currentMinStock,
         minPrice: currentMinPrice,
         maxPrice: currentMaxPrice,
@@ -214,44 +196,39 @@ export default function ProductsPage() {
 
   if (productsQueryIsLoading) {
     return (
-      <main className="flex-1 flex items-center justify-center p-8">
-        <section className="text-center space-y-4">
+      <section className="flex-1 flex items-center justify-center p-8">
+        <div className="text-center space-y-4">
           <Loader2Icon className="size-8 text-primary animate-spin mx-auto" />
-        </section>
-      </main>
+        </div>
+      </section>
     );
   }
 
   if (productsQueryIsError || !productsQuery?.data?.products) {
     return (
-      <main>
-        <section className="flex-1 flex items-center justify-center p-8">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <AlertCircleIcon className="size-12 text-destructive mx-auto mb-2" />
-              <CardTitle>Error Loading Products</CardTitle>
-              <CardDescription>
-                We couldn't load your products information. Please try again
-                later.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-center">
-              <Button
-                onClick={() => window.location.reload()}
-                variant="outline"
-              >
-                Retry
-              </Button>
-            </CardContent>
-          </Card>
-        </section>
-      </main>
+      <section className="flex-1 flex items-center justify-center p-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <AlertCircleIcon className="size-12 text-destructive mx-auto mb-2" />
+            <CardTitle>Error Loading Products</CardTitle>
+            <CardDescription>
+              We couldn't load your products information. Please try again
+              later.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </section>
     );
   }
 
   return (
     <>
-      <main className={cn("flex-1 space-y-8 py-8 px-4")}>
+      <section className={cn("flex-1 space-y-8 py-8 px-4")}>
         <div className={cn("relative flex items-center justify-between gap-2")}>
           <FilterProducts />
           <form
@@ -274,101 +251,105 @@ export default function ProductsPage() {
             </Button>
           </form>
         </div>
-        <section className={cn("py-2 px-4")}>
-          <ul
-            className={cn(
-              "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4",
-            )}
-          >
-            {productsQuery.data.products.map((product) => (
-              <li key={product.id}>
-                <Product product={product} />
-              </li>
-            ))}
-          </ul>
-        </section>
-        <footer className={cn("flex items-center gap-8")}>
-          <CardDescription>
-            <p>
-              Showing{" "}
-              {productsQuery.meta.limit < productsQuery.meta.total
-                ? productsQuery.meta.limit
-                : productsQuery.meta.total}{" "}
-              of {productsQuery.meta.total} products
-            </p>
-          </CardDescription>
-          <Pagination className={cn("flex-1 justify-end")}>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    currentPage > 1 && handlePageChange(currentPage - 1)
-                  }
-                  className={
-                    currentPage <= 1
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
-              {Array.from(
-                {
-                  length: Math.min(
-                    5,
-                    Math.ceil(
-                      (productsQuery.meta.total || 0) /
-                        (productsQuery.meta.limit || 10),
-                    ),
-                  ),
-                },
-                (_, i) => {
-                  const pageNumber = i + 1;
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink
-                        onClick={() => handlePageChange(pageNumber)}
-                        isActive={currentPage === pageNumber}
-                      >
-                        {pageNumber}
-                      </PaginationLink>
+        {productsQuery.data.products.length > 0 && (
+          <>
+            <div className={cn("py-2 px-4")}>
+              <ul
+                className={cn(
+                  "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4",
+                )}
+              >
+                {productsQuery.data.products.map((product) => (
+                  <li key={product.id}>
+                    <Product product={product} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className={cn("flex items-center gap-8")}>
+              <CardDescription>
+                <p>
+                  Showing{" "}
+                  {productsQuery.meta.limit < productsQuery.meta.total
+                    ? productsQuery.meta.limit
+                    : productsQuery.meta.total}{" "}
+                  of {productsQuery.meta.total} products
+                </p>
+              </CardDescription>
+              <Pagination className={cn("flex-1 justify-end")}>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() =>
+                        currentPage > 1 && handlePageChange(currentPage - 1)
+                      }
+                      className={
+                        currentPage <= 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                  {Array.from(
+                    {
+                      length: Math.min(
+                        5,
+                        Math.ceil(
+                          (productsQuery.meta.total || 0) /
+                            (productsQuery.meta.limit || 10),
+                        ),
+                      ),
+                    },
+                    (_, i) => {
+                      const pageNumber = i + 1;
+                      return (
+                        <PaginationItem key={pageNumber}>
+                          <PaginationLink
+                            onClick={() => handlePageChange(pageNumber)}
+                            isActive={currentPage === pageNumber}
+                          >
+                            {pageNumber}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    },
+                  )}
+
+                  {Math.ceil(
+                    (productsQuery.meta.total || 0) /
+                      (productsQuery.meta.limit || 10),
+                  ) > 5 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
                     </PaginationItem>
-                  );
-                },
-              )}
+                  )}
 
-              {Math.ceil(
-                (productsQuery.meta.total || 0) /
-                  (productsQuery.meta.limit || 10),
-              ) > 5 && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    currentPage <
-                      Math.ceil(
-                        (productsQuery.meta.total || 0) /
-                          (productsQuery.meta.limit || 10),
-                      ) && handlePageChange(currentPage + 1)
-                  }
-                  className={
-                    currentPage >=
-                    Math.ceil(
-                      (productsQuery.meta.total || 0) /
-                        (productsQuery.meta.limit || 10),
-                    )
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </footer>
-      </main>
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        currentPage <
+                          Math.ceil(
+                            (productsQuery.meta.total || 0) /
+                              (productsQuery.meta.limit || 10),
+                          ) && handlePageChange(currentPage + 1)
+                      }
+                      className={
+                        currentPage >=
+                        Math.ceil(
+                          (productsQuery.meta.total || 0) /
+                            (productsQuery.meta.limit || 10),
+                        )
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          </>
+        )}
+      </section>
     </>
   );
 }

@@ -131,7 +131,6 @@ export function FilterProducts() {
 
   const currentCategoryId = searchParams.get("categoryId") || "";
   const currentSort = searchParams.get("sort") || "";
-  const currentIsDeleted = searchParams.get("isDeleted") || "false";
   const currentMinStock = searchParams.get("minStock")
     ? Number(searchParams.get("minStock"))
     : 0;
@@ -147,7 +146,6 @@ export function FilterProducts() {
     defaultValues: {
       categoryId: currentCategoryId,
       sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
-      isDeleted: currentIsDeleted === "true",
       minStock: currentMinStock,
       minPrice: currentMinPrice,
       maxPrice: currentMaxPrice,
@@ -158,7 +156,6 @@ export function FilterProducts() {
     form.reset({
       categoryId: currentCategoryId,
       sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
-      isDeleted: currentIsDeleted === "true",
       minStock: currentMinStock,
       minPrice: currentMinPrice,
       maxPrice: currentMaxPrice,
@@ -167,7 +164,6 @@ export function FilterProducts() {
     form.reset,
     currentCategoryId,
     currentSort,
-    currentIsDeleted,
     currentMinStock,
     currentMinPrice,
     currentMaxPrice,
@@ -237,7 +233,6 @@ export function FilterProducts() {
     form.reset({
       categoryId: "",
       sort: undefined,
-      isDeleted: false,
       minStock: undefined,
       minPrice: undefined,
       maxPrice: undefined,
@@ -260,7 +255,6 @@ export function FilterProducts() {
             Object.entries({
               categoryId: currentCategoryId,
               sort: currentSort,
-              isDeleted: currentIsDeleted !== "false",
               minStock: currentMinStock,
               minPrice: currentMinPrice,
               maxPrice: currentMaxPrice,
@@ -395,25 +389,6 @@ export function FilterProducts() {
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="isDeleted"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <input
-                      type="checkbox"
-                      checked={field.value}
-                      onChange={field.onChange}
-                      className="size-4"
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Show Deleted Products</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
             <div className="flex gap-2">
               <Button
                 variant="outline"

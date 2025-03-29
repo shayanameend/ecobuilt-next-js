@@ -3,9 +3,9 @@
 import type { FormEvent } from "react";
 
 import type {
+  AdminProfileType,
   AuthType,
   MultipleResponseType,
-  AdminProfileType,
 } from "~/lib/types";
 
 import { useQuery } from "@tanstack/react-query";
@@ -48,9 +48,9 @@ import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
+import { AdminStatusSwitcher } from "./_components/admin-status-switcher";
 import { ToggleDeleteAdmin } from "./_components/delete-admin";
 import { FilterAdmins } from "./_components/filter-admins";
-import { AdminStatusSwitcher } from "./_components/admin-status-switcher";
 
 async function getAdmins({
   token,

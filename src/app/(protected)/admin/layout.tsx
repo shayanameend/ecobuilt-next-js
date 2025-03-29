@@ -11,10 +11,10 @@ import {
   UsersIcon,
 } from "lucide-react";
 
+import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { DashboardSidebar } from "../_components/dasboard-sidebar";
-import { useAuthContext } from "~/context/auth";
 
 const items = [
   {
