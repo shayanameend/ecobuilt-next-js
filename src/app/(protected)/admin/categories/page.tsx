@@ -147,17 +147,6 @@ export default function CategoriesPage() {
                   <Button
                     variant="outline"
                     size="default"
-                    onClick={() => {
-                      router.push(
-                        `${routes.app.admin.products.url()}?categoryId=${category.id}`,
-                      );
-                    }}
-                  >
-                    <span>Products</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="default"
                     className={cn("flex-1")}
                     onClick={() => {
                       router.push(
@@ -167,6 +156,10 @@ export default function CategoriesPage() {
                   >
                     <span>View Products</span>
                   </Button>
+                  <ToggleDeleteCategory
+                    id={category.id}
+                    isDeleted={category.isDeleted}
+                  />
                 </CardFooter>
               </Card>
             ))
