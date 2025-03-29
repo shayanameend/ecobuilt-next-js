@@ -97,7 +97,7 @@ export function UserStatusSwitcher({
 
   const getStatusVariant = () => {
     switch (currentStatus) {
-      case "APPROVED":
+      case "PENDING":
         return "default";
       case "REJECTED":
         return "destructive";
