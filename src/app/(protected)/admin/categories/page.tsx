@@ -24,6 +24,7 @@ import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
+import { EditCategory } from "./_components/edit-category";
 import { NewCategory } from "./_components/new-category";
 import { ToggleDeleteCategory } from "./_components/toggle-delete-category";
 
@@ -138,10 +139,7 @@ export default function CategoriesPage() {
                       {category.name}
                     </h3>
                   </CardTitle>
-                  <ToggleDeleteCategory
-                    id={category.id}
-                    isDeleted={category.isDeleted}
-                  />
+                  <EditCategory category={category} />
                 </CardContent>
                 <CardFooter className={cn("justify-between gap-3")}>
                   <Button
