@@ -2,7 +2,7 @@
 
 import type { CategoryType, SingleResponseType } from "~/lib/types";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
@@ -25,15 +25,38 @@ import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { EditCategory } from "./_components/edit-category";
+import { FilterCategories } from "./_components/filter-categories";
 import { NewCategory } from "./_components/new-category";
 import { ToggleDeleteCategory } from "./_components/toggle-delete-category";
 
 async function getCategories({
   token,
+  name,
+  status,
+  isDeleted,
 }: {
   token: string | null;
+  name?: string;
+  status?: string;
+  isDeleted?: boolean;
 }) {
-  const response = await axios.get(routes.api.admin.categories.url(), {
+  const params = new URLSearchParams();
+
+  if (name) {
+    params.append("name", name);
+  }
+
+  if (status) {
+    params.append("status", status);
+  }
+
+  if (isDeleted !== undefined) {
+    params.append("isDeleted", isDeleted.toString());
+  }
+
+  const url = `${routes.api.admin.categories.url()}${params.toString() ? `?${params.toString()}` : ""}`;
+
+  const response = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -44,10 +67,15 @@ async function getCategories({
 
 export default function CategoriesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { token } = useAuthContext();
 
-  const [queryTerm, setQueryTerm] = useState("");
+  const currentName = searchParams.get("name") || "";
+  const currentStatus = searchParams.get("status") || "";
+  const currentIsDeleted = searchParams.get("isDeleted") === "true";
+
+  const [queryTerm, setQueryTerm] = useState(currentName);
 
   const {
     data: categoriesQuery,
@@ -58,14 +86,32 @@ export default function CategoriesPage() {
       categories: CategoryType[];
     }>
   >({
-    queryKey: ["categories"],
-    queryFn: () => getCategories({ token }),
+    queryKey: ["categories", currentName, currentStatus, currentIsDeleted],
+    queryFn: () =>
+      getCategories({
+        token,
+        name: currentName,
+        status: currentStatus,
+        isDeleted: currentIsDeleted,
+      }),
   });
 
-  const filteredCategories =
-    categoriesQuery?.data?.categories?.filter((category) =>
-      category.name.toLowerCase().includes(queryTerm.toLowerCase()),
-    ) || [];
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (queryTerm) {
+      params.set("name", queryTerm);
+    } else {
+      params.delete("name");
+    }
+
+    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    router.push(newUrl);
+  };
+
+  const categories = categoriesQuery?.data?.categories || [];
 
   if (categoriesQueryIsLoading) {
     return (
@@ -114,24 +160,38 @@ export default function CategoriesPage() {
           </p>
         </div>
         <div className={cn("relative flex items-center justify-between gap-2")}>
-          <SearchIcon
-            className={cn(
-              "absolute top-2.5 left-2.5 size-4 text-muted-foreground",
-            )}
-          />
-          <Input
-            placeholder="Search Categories..."
-            className={cn("pl-8")}
-            value={queryTerm}
-            onChange={(event) => setQueryTerm(event.target.value)}
-          />
+          <FilterCategories />
+          <form
+            onSubmit={handleSearch}
+            className="flex-1 flex items-center relative"
+          >
+            <SearchIcon
+              className={cn(
+                "absolute top-2.5 left-2.5 size-4 text-muted-foreground",
+              )}
+            />
+            <Input
+              placeholder="Search Categories..."
+              className={cn("pl-8")}
+              value={queryTerm}
+              onChange={(event) => setQueryTerm(event.target.value)}
+            />
+            <Button
+              type="submit"
+              variant="secondary"
+              size="icon"
+              className={cn("absolute right-0.5 size-8")}
+            >
+              <SearchIcon className="size-4" />
+            </Button>
+          </form>
           <NewCategory />
         </div>
         <div
           className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4")}
         >
-          {filteredCategories.length > 0 ? (
-            filteredCategories.map((category) => (
+          {categories.length > 0 ? (
+            categories.map((category) => (
               <Card key={category.id}>
                 <CardContent className={cn("flex justify-between gap-3")}>
                   <CardTitle>
@@ -164,7 +224,7 @@ export default function CategoriesPage() {
           ) : (
             <div className="col-span-full text-center py-8">
               <p className="text-muted-foreground">
-                No categories found matching "{queryTerm}"
+                No categories found matching your criteria
               </p>
             </div>
           )}
