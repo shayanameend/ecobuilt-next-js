@@ -333,9 +333,7 @@ export default function UsersPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={user.auth.isVerified ? "default" : "outline"}
-                      >
+                      <Badge variant="outline">
                         {user.auth.isVerified ? "Verified" : "Not Verified"}
                       </Badge>
                     </TableCell>
