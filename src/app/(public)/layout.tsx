@@ -8,7 +8,7 @@ export default function PublicLayout({
   return (
     <>
       <RootHeader />
-      {children}
+      <main>{children}</main>
     </>
   );
 }
