@@ -203,6 +203,10 @@ const app = {
       url: () => "/admin/orders",
       label: "Orders",
     },
+    vendors: {
+      url: () => "/admin/vendors",
+      label: "Vendors",
+    },
     users: {
       url: () => "/admin/users",
       label: "Users",

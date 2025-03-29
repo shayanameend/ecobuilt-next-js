@@ -8,6 +8,7 @@ import {
   PackageIcon,
   SettingsIcon,
   ShoppingCartIcon,
+  TrendingUpIcon,
   UsersIcon,
 } from "lucide-react";
 
@@ -35,6 +36,11 @@ const items = [
     title: routes.app.admin.orders.label,
     icon: ShoppingCartIcon,
     url: routes.app.admin.orders.url(),
+  },
+  {
+    title: routes.app.admin.vendors.label,
+    icon: TrendingUpIcon,
+    url: routes.app.admin.vendors.url(),
   },
   {
     title: routes.app.admin.users.label,
