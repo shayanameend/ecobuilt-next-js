@@ -37,8 +37,8 @@ import {
 import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
-import { FilterProducts } from "./_components/filter-products";
-import { Product } from "./_components/product";
+import { FilterProducts } from "../_components/filter-products";
+import { Product } from "../_components/product";
 
 async function getProducts({
   token,
