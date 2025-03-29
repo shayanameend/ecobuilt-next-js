@@ -1,12 +1,15 @@
+"use client";
+
 import type { FC } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { LogOutIcon } from "lucide-react";
 
 import { assets } from "~/assets";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -32,6 +35,8 @@ export function DashboardSidebar({
 }: {
   items: Item[];
 }) {
+  const pathname = usePathname();
+
   return (
     <Sidebar>
       <SidebarHeader className={cn("flex items-center justify-center p-6")}>
@@ -51,7 +56,19 @@ export function DashboardSidebar({
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+                    <Link
+                      href={item.url}
+                      className={cn(
+                        buttonVariants({
+                          className: cn("justify-baseline"),
+                          variant:
+                            pathname === item.url ||
+                            pathname.startsWith(item.url)
+                              ? "secondary"
+                              : "ghost",
+                        }),
+                      )}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
