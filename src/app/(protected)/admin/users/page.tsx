@@ -50,6 +50,7 @@ import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { ToggleDeleteUser } from "./_components/delete-user";
 import { FilterUsers } from "./_components/filter-users";
+import { UserStatusSwitcher } from "./_components/user-status-switcher";
 
 async function getUsers({
   token,
@@ -339,15 +340,15 @@ export default function UsersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={
-                          user.auth.status === "APPROVED"
-                            ? "default"
-                            : "outline"
+                      <UserStatusSwitcher
+                        id={user.id}
+                        currentStatus={
+                          user.auth.status as
+                            | "PENDING"
+                            | "APPROVED"
+                            | "REJECTED"
                         }
-                      >
-                        {user.auth.status}
-                      </Badge>
+                      />
                     </TableCell>
                     <TableCell className={cn("space-x-2")}>
                       <ToggleDeleteUser
