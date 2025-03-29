@@ -51,7 +51,6 @@ import { cn } from "~/lib/utils";
 import { DeleteUser } from "./_components/delete-user";
 // import { EditUser } from "./_components/edit-user";
 import { FilterUsers } from "./_components/filter-users";
-// import { NewUser } from "./_components/new-user";
 
 async function getUsers({
   token,
@@ -292,6 +291,7 @@ export default function UsersPage() {
                   <TableHead>User</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Delivery Address</TableHead>
+                  <TableHead>Verification</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -334,7 +334,22 @@ export default function UsersPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{user.auth.status}</Badge>
+                      <Badge
+                        variant={user.auth.isVerified ? "default" : "outline"}
+                      >
+                        {user.auth.isVerified ? "Verified" : "Not Verified"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          user.auth.status === "APPROVED"
+                            ? "default"
+                            : "outline"
+                        }
+                      >
+                        {user.auth.status}
+                      </Badge>
                     </TableCell>
                     <TableCell className={cn("space-x-2")}>
                       {/* <EditUser user={user} /> */}
