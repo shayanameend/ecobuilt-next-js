@@ -3,9 +3,9 @@
 import type { FormEvent } from "react";
 
 import type {
+  AuthType,
   MultipleResponseType,
   UserProfileType,
-  AuthType,
 } from "~/lib/types";
 
 import { useQuery } from "@tanstack/react-query";

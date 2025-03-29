@@ -1,9 +1,9 @@
 "use client";
 
 import type {
+  AdminProfileType,
   AuthType,
   SingleResponseType,
-  AdminProfileType,
 } from "~/lib/types";
 
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +20,6 @@ import {
   TagIcon,
 } from "lucide-react";
 
-import { UpdateAdminProfileForm } from "./_components/update-admin-profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -37,6 +36,7 @@ import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { UserStatus } from "~/lib/types";
 import { cn } from "~/lib/utils";
+import { UpdateAdminProfileForm } from "./_components/update-admin-profile-form";
 
 async function getAdminProfile({
   token,

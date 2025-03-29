@@ -2,8 +2,8 @@
 
 import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
