@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { AlertCircleIcon, Loader2Icon } from "lucide-react";
 
+import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -36,9 +37,8 @@ import {
 import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
-import Link from "next/link";
-import { Vendor } from "../_components/vendor";
 import { FilterVendors } from "../_components/filter-vendors";
+import { Vendor } from "../_components/vendor";
 
 async function getVendors({
   token,

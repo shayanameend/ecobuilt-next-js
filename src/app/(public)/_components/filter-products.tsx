@@ -334,7 +334,7 @@ export function FilterProducts() {
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl className={cn("w-full")}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Sort order" />
+                          <SelectValue placeholder="Sort By" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

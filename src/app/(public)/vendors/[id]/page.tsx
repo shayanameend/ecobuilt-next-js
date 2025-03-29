@@ -4,13 +4,14 @@ import type { FormEvent } from "react";
 
 import type {
   MultipleResponseType,
-  ProductType,
+  PublicAuthType,
   PublicCategoryType,
+  PublicProductType,
   VendorProfileType,
 } from "~/lib/types";
 
 import { useQuery } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
@@ -40,8 +41,9 @@ import { cn } from "~/lib/utils";
 import { FilterProducts } from "../../_components/filter-products";
 import { Product } from "../../_components/product";
 
-async function getProducts({
+async function getVendor({
   token,
+  vendorId,
   name = "",
   page = 1,
   limit = 10,
@@ -52,6 +54,7 @@ async function getProducts({
   maxPrice,
 }: {
   token: string | null;
+  vendorId?: string;
   name?: string;
   page?: number;
   limit?: number;
@@ -90,7 +93,7 @@ async function getProducts({
     params.append("maxPrice", maxPrice.toString());
   }
 
-  const url = `${routes.api.public.products.url()}?${params.toString()}`;
+  const url = `${routes.api.public.vendors.url(vendorId)}?${params.toString()}`;
 
   const response = await axios.get(url, {
     headers: {
@@ -101,8 +104,9 @@ async function getProducts({
   return response.data;
 }
 
-export default function ProductsPage() {
+export default function VendorsPage() {
   const router = useRouter();
+  const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
 
   const { token } = useAuthContext();
@@ -125,19 +129,23 @@ export default function ProductsPage() {
   const [queryTerm, setQueryTerm] = useState(currentName);
 
   const {
-    data: productsQuery,
-    isLoading: productsQueryIsLoading,
-    isError: productsQueryIsError,
+    data: vendorQuery,
+    isLoading: vendorQueryIsLoading,
+    isError: vendorQueryIsError,
   } = useQuery<
     MultipleResponseType<{
-      products: (ProductType & {
-        category: PublicCategoryType;
-        vendor: VendorProfileType;
-      })[];
+      vendor: VendorProfileType & {
+        auth: PublicAuthType;
+        products: (PublicProductType & {
+          category: PublicCategoryType;
+          vendor: VendorProfileType;
+        })[];
+      };
     }>
   >({
     queryKey: [
-      "products",
+      "vendor",
+      params.id,
       currentPage,
       currentName,
       currentCategoryId,
@@ -147,8 +155,9 @@ export default function ProductsPage() {
       currentMaxPrice,
     ],
     queryFn: () =>
-      getProducts({
+      getVendor({
         token,
+        vendorId: params.id,
         page: currentPage,
         name: currentName,
         categoryId: currentCategoryId,
@@ -194,7 +203,7 @@ export default function ProductsPage() {
     setQueryTerm(currentName);
   }, [currentName]);
 
-  if (productsQueryIsLoading) {
+  if (vendorQueryIsLoading) {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
         <div className="text-center space-y-4">
@@ -204,16 +213,15 @@ export default function ProductsPage() {
     );
   }
 
-  if (productsQueryIsError || !productsQuery?.data?.products) {
+  if (vendorQueryIsError || !vendorQuery?.data?.vendor) {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <AlertCircleIcon className="size-12 text-destructive mx-auto mb-2" />
-            <CardTitle>Error Loading Products</CardTitle>
+            <CardTitle>Error Loading Vendor</CardTitle>
             <CardDescription>
-              We couldn't load your products information. Please try again
-              later.
+              We couldn't load your vendor information. Please try again later.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center">
@@ -251,7 +259,7 @@ export default function ProductsPage() {
             </Button>
           </form>
         </div>
-        {productsQuery.data.products.length > 0 && (
+        {vendorQuery.data.vendor.products.length > 0 && (
           <>
             <div>
               <ul
@@ -259,7 +267,7 @@ export default function ProductsPage() {
                   "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4",
                 )}
               >
-                {productsQuery.data.products.map((product) => (
+                {vendorQuery.data.vendor.products.map((product) => (
                   <li key={product.id}>
                     <Product product={product} />
                   </li>
@@ -270,10 +278,10 @@ export default function ProductsPage() {
               <div>
                 <p>
                   Showing{" "}
-                  {productsQuery.meta.limit < productsQuery.meta.total
-                    ? productsQuery.meta.limit
-                    : productsQuery.meta.total}{" "}
-                  of {productsQuery.meta.total} products
+                  {vendorQuery.meta.limit < vendorQuery.meta.total
+                    ? vendorQuery.meta.limit
+                    : vendorQuery.meta.total}{" "}
+                  of {vendorQuery.meta.total} products
                 </p>
               </div>
               <Pagination className={cn("flex-1 justify-end")}>
@@ -295,8 +303,8 @@ export default function ProductsPage() {
                       length: Math.min(
                         5,
                         Math.ceil(
-                          (productsQuery.meta.total || 0) /
-                            (productsQuery.meta.limit || 10),
+                          (vendorQuery.meta.total || 0) /
+                            (vendorQuery.meta.limit || 10),
                         ),
                       ),
                     },
@@ -316,8 +324,8 @@ export default function ProductsPage() {
                   )}
 
                   {Math.ceil(
-                    (productsQuery.meta.total || 0) /
-                      (productsQuery.meta.limit || 10),
+                    (vendorQuery.meta.total || 0) /
+                      (vendorQuery.meta.limit || 10),
                   ) > 5 && (
                     <PaginationItem>
                       <PaginationEllipsis />
@@ -329,15 +337,15 @@ export default function ProductsPage() {
                       onClick={() =>
                         currentPage <
                           Math.ceil(
-                            (productsQuery.meta.total || 0) /
-                              (productsQuery.meta.limit || 10),
+                            (vendorQuery.meta.total || 0) /
+                              (vendorQuery.meta.limit || 10),
                           ) && handlePageChange(currentPage + 1)
                       }
                       className={
                         currentPage >=
                         Math.ceil(
-                          (productsQuery.meta.total || 0) /
-                            (productsQuery.meta.limit || 10),
+                          (vendorQuery.meta.total || 0) /
+                            (vendorQuery.meta.limit || 10),
                         )
                           ? "pointer-events-none opacity-50"
                           : "cursor-pointer"
