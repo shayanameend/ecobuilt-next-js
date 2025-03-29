@@ -8,13 +8,13 @@ import {
   PackageIcon,
   SettingsIcon,
   ShoppingCartIcon,
-  TrendingUpIcon,
   UsersIcon,
 } from "lucide-react";
 
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { DashboardSidebar } from "../_components/dasboard-sidebar";
+import { useAuthContext } from "~/context/auth";
 
 const items = [
   {
@@ -38,14 +38,14 @@ const items = [
     url: routes.app.admin.orders.url(),
   },
   {
-    title: routes.app.admin.vendors.label,
-    icon: TrendingUpIcon,
-    url: routes.app.admin.vendors.url(),
-  },
-  {
     title: routes.app.admin.users.label,
     icon: UsersIcon,
     url: routes.app.admin.users.url(),
+  },
+  {
+    title: routes.app.admin.vendors.label,
+    icon: UsersIcon,
+    url: routes.app.admin.vendors.url(),
   },
   {
     title: routes.app.admin.settings.label,
@@ -57,6 +57,21 @@ const items = [
 export default function DashboardLayout({
   children,
 }: Readonly<PropsWithChildren>) {
+  const { auth } = useAuthContext();
+
+  if (
+    auth?.role === "SUPER_ADMIN" &&
+    !items.find((item) => item.title === routes.app.superAdmin.admins.label)
+  ) {
+    const vendorIndex = items.findIndex(
+      (item) => item.title === routes.app.admin.vendors.label,
+    );
+    items.splice(vendorIndex + 1, 0, {
+      title: routes.app.superAdmin.admins.label,
+      icon: UsersIcon,
+      url: routes.app.superAdmin.admins.url(),
+    });
+  }
   return (
     <main className={cn("py-7 px-7 min-h-svh w-full flex")}>
       <DashboardSidebar items={items} />

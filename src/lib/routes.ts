@@ -49,6 +49,14 @@ const api = {
       url: () => `${process.env.NEXT_PUBLIC_API_URL}/profile`,
     },
   },
+  superAdmin: {
+    admins: {
+      url: (id?: string) =>
+        id
+          ? `${process.env.NEXT_PUBLIC_API_URL}/admin/admins/${id}`
+          : `${process.env.NEXT_PUBLIC_API_URL}/admin/admins`,
+    },
+  },
   admin: {
     profile: {
       url: () => `${process.env.NEXT_PUBLIC_API_URL}/admin/profile`,
@@ -184,6 +192,12 @@ const app = {
     profile: {
       url: () => "/profile",
       label: "Profile",
+    },
+  },
+  superAdmin: {
+    admins: {
+      url: () => "/admin/admins",
+      label: "Admins",
     },
   },
   admin: {
