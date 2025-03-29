@@ -267,7 +267,7 @@ export default function ProductsPage() {
               </ul>
             </div>
             <div className={cn("flex items-center gap-8")}>
-              <CardDescription>
+              <div>
                 <p>
                   Showing{" "}
                   {productsQuery.meta.limit < productsQuery.meta.total
@@ -275,7 +275,7 @@ export default function ProductsPage() {
                     : productsQuery.meta.total}{" "}
                   of {productsQuery.meta.total} products
                 </p>
-              </CardDescription>
+              </div>
               <Pagination className={cn("flex-1 justify-end")}>
                 <PaginationContent>
                   <PaginationItem>
