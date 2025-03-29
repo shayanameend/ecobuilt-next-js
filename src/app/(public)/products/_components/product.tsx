@@ -10,7 +10,7 @@ import Image from "next/image";
 
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardFooter } from "~/components/ui/card";
-import { cn } from "~/lib/utils";
+import { cn, formatPrice } from "~/lib/utils";
 
 interface ProductProps {
   product: PublicProductType & {
@@ -32,12 +32,12 @@ export function Product({ product }: Readonly<ProductProps>) {
           className={cn("h-48 w-full object-cover rounded-t-xl")}
         />
       </CardContent>
-      <CardFooter className={cn("p-4 flex-col items-stretch")}>
+      <CardFooter className={cn("p-4 flex-col items-stretch gap-2")}>
         <div>
           <h3 className={cn("")}>{product.name}</h3>
         </div>
         <div className={cn("flex justify-between items-center")}>
-          <p className={cn("")}>{product.price}</p>
+          <p className={cn("")}>{formatPrice(product.price)}</p>
           <Button variant="default" size="lg">
             Purchase
           </Button>
