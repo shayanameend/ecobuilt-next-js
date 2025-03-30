@@ -40,6 +40,7 @@ import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { FilterProducts } from "../../_components/filter-products";
 import { Product } from "../../_components/product";
+import { domine } from "~/lib/fonts";
 
 async function getVendor({
   token,
@@ -258,6 +259,21 @@ export default function VendorsPage() {
               Search
             </Button>
           </form>
+        </div>
+        <div className={cn("flex items-center justify-between gap-6")}>
+          <div className={cn("space-y-2")}>
+            <h2
+              className={cn(
+                "text-black/75 text-3xl font-bold",
+                domine.className,
+              )}
+            >
+              {vendorQuery.data.vendor.name}
+            </h2>
+            <p className={cn("text-muted-foreground text-base font-medium")}>
+              {vendorQuery.data.vendor.description}
+            </p>
+          </div>
         </div>
         {vendorQuery.data.vendor.products.length > 0 && (
           <>

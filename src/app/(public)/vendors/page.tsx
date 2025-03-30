@@ -180,6 +180,7 @@ export default function VendorsPage() {
     <>
       <section className={cn("flex-1 space-y-8 py-8 px-4")}>
         <div className={cn("relative flex items-center justify-between gap-2")}>
+          <FilterVendors />
           <form
             onSubmit={handleSearch}
             className="flex-1 flex items-center relative"
@@ -199,7 +200,6 @@ export default function VendorsPage() {
               Search
             </Button>
           </form>
-          <FilterVendors />
         </div>
         <div>
           <ul
