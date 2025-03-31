@@ -239,7 +239,9 @@ export default function VendorsPage() {
     <>
       <section className={cn("flex-1 space-y-8 py-8 px-4")}>
         <div className={cn("relative flex items-center justify-between gap-2")}>
-          <FilterProducts />
+          <div className={cn("md:hidden")}>
+            <FilterProducts />
+          </div>
           <form
             onSubmit={handleSearch}
             className="flex-1 flex items-center relative"
