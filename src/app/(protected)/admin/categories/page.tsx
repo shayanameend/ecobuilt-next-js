@@ -192,16 +192,20 @@ export default function CategoriesPage() {
         >
           {categories.length > 0 ? (
             categories.map((category) => (
-              <Card key={category.id}>
-                <CardContent className={cn("flex justify-between gap-3")}>
-                  <CardTitle>
-                    <h3 className={cn("text-2xl font-bold", domine.className)}>
-                      {category.name}
-                    </h3>
+              <Card key={category.id} className={cn("py-3")}>
+                <CardContent
+                  className={cn("flex-1 flex justify-between gap-3 px-4")}
+                >
+                  <CardTitle className={cn("text-2xl font-medium")}>
+                    {category.name}
                   </CardTitle>
-                  <EditCategory category={category} />
                 </CardContent>
-                <CardFooter className={cn("justify-between gap-3")}>
+                <CardFooter className={cn("justify-between gap-3 px-3")}>
+                  <ToggleDeleteCategory
+                    id={category.id}
+                    isDeleted={category.isDeleted}
+                  />
+                  <EditCategory category={category} />
                   <Button
                     variant="outline"
                     size="default"
@@ -214,10 +218,6 @@ export default function CategoriesPage() {
                   >
                     <span>View Products</span>
                   </Button>
-                  <ToggleDeleteCategory
-                    id={category.id}
-                    isDeleted={category.isDeleted}
-                  />
                 </CardFooter>
               </Card>
             ))

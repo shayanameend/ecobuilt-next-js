@@ -130,23 +130,26 @@ export default function CategoriesPage() {
         >
           {filteredCategories.length > 0 ? (
             filteredCategories.map((category) => (
-              <Card key={category.id}>
-                <CardFooter className={cn("justify-between gap-4 ")}>
-                  <CardTitle>
-                    <h3 className={cn("text-2xl font-bold", domine.className)}>
-                      {category.name}
-                    </h3>
+              <Card key={category.id} className={cn("py-3")}>
+                <CardContent
+                  className={cn("flex-1 flex justify-between gap-3 px-4")}
+                >
+                  <CardTitle className={cn("text-2xl font-medium")}>
+                    {category.name}
                   </CardTitle>
+                </CardContent>
+                <CardFooter className={cn("justify-between gap-3 px-3")}>
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="default"
+                    className={cn("flex-1")}
                     onClick={() => {
                       router.push(
-                        `${routes.app.vendor.products.url()}?categoryId=${category.id}`,
+                        `${routes.app.admin.products.url()}?categoryId=${category.id}`,
                       );
                     }}
                   >
-                    <span>View</span>
+                    <span>View Products</span>
                   </Button>
                 </CardFooter>
               </Card>
