@@ -3,7 +3,7 @@
 import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
@@ -73,6 +73,8 @@ export function VendorsSidebar() {
   const { token } = useAuthContext();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
 
   const currentCategoryId = searchParams.get("categoryId") || "";
   const currentSort = searchParams.get("sort") || "";
@@ -152,7 +154,17 @@ export function VendorsSidebar() {
             render={({ field }) => (
               <FormItem>
                 <Select
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    setCategoryIds((prev) => {
+                      if (prev.includes(value)) {
+                        return prev.filter((id) => id !== value);
+                      }
+
+                      return [...prev, value];
+                    });
+
+                    return field.onChange(value);
+                  }}
                   value={field.value}
                   disabled={categoriesQueryIsLoading || categoriesQueryIsError}
                 >

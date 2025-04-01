@@ -48,12 +48,14 @@ async function getVendors({
   limit = 10,
   sort = "",
   name = "",
+  categoryId = "",
 }: {
   token: string | null;
   page?: number;
   limit?: number;
   sort?: string;
   name?: string;
+  categoryId?: string;
 }) {
   const params = new URLSearchParams({
     page: page.toString(),
@@ -66,6 +68,10 @@ async function getVendors({
 
   if (name) {
     params.append("name", name);
+  }
+
+  if (categoryId) {
+    params.append("categoryId", categoryId);
   }
 
   const url = `${routes.api.public.vendors.url()}?${params.toString()}`;
@@ -88,6 +94,7 @@ export default function VendorsPage() {
   const currentPage = Number(searchParams.get("page") || "1");
   const currentSort = searchParams.get("sort") || "";
   const currentName = searchParams.get("name") || "";
+  const currentCategoryId = searchParams.get("categoryId") || "";
 
   const [queryTerm, setQueryTerm] = useState(currentName);
 
@@ -102,13 +109,20 @@ export default function VendorsPage() {
       })[];
     }>
   >({
-    queryKey: ["vendors", currentPage, currentSort, currentName],
+    queryKey: [
+      "vendors",
+      currentPage,
+      currentSort,
+      currentName,
+      currentCategoryId,
+    ],
     queryFn: () =>
       getVendors({
         token,
         page: currentPage,
         name: currentName,
         sort: currentSort,
+        categoryId: currentCategoryId,
       }),
   });
 
@@ -229,24 +243,16 @@ export default function VendorsPage() {
                 icon={Store}
                 title="No vendors found"
                 description={
-                  currentName
-                    ? `No vendors match "${currentName}". Try a different search term or clear filters.`
+                  currentName || currentCategoryId
+                    ? "No vendors match your current filters. Try adjusting your search criteria."
                     : "There are no vendors available at the moment."
                 }
                 action={
-                  currentName
+                  currentName || currentCategoryId
                     ? {
-                        label: "Clear search",
+                        label: "Clear filters",
                         onClick: () => {
-                          const params = new URLSearchParams(
-                            searchParams.toString(),
-                          );
-                          params.delete("name");
-                          params.delete("page");
-                          const newUrl = `${window.location.pathname}${
-                            params.toString() ? `?${params.toString()}` : ""
-                          }`;
-                          router.push(newUrl);
+                          router.push(window.location.pathname);
                         },
                       }
                     : undefined
