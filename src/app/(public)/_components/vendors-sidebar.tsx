@@ -40,15 +40,11 @@ const FilterFormSchema = zod.object({
       .enum(["RELEVANCE", "LATEST", "OLDEST"], {
         message: "Sort must be one of 'RELEVANCE', 'LATEST', 'OLDEST'",
       })
-      .optional(),
+      .optional()
   ),
 });
 
-async function getCategories({
-  token,
-}: {
-  token: string | null;
-}) {
+async function getCategories({ token }: { token: string | null }) {
   const response = await axios.get(routes.api.public.categories.url(), {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -102,7 +98,7 @@ export function VendorsSidebar() {
   });
 
   const categoriesMap = new Map(
-    categoriesQuery?.data?.categories?.map((cat) => [cat.id, cat.name]) || [],
+    categoriesQuery?.data?.categories?.map((cat) => [cat.id, cat.name]) || []
   );
 
   const handleAddCategory = (categoryId: string) => {
@@ -138,7 +134,9 @@ export function VendorsSidebar() {
     params.delete("maxPrice");
     params.delete("name");
 
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    const newUrl = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
     router.push(newUrl);
   };
 
@@ -242,21 +240,17 @@ export function VendorsSidebar() {
               </FormItem>
             )}
           />
-
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className={cn("flex-1")}
-              type="button"
-              onClick={resetFilters}
-            >
-              Reset
-            </Button>
-
-            <Button variant="default" className={cn("flex-1")} type="submit">
-              Apply
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            className={cn("w-full")}
+            type="button"
+            onClick={resetFilters}
+          >
+            Reset
+          </Button>
+          <Button variant="default" className={cn("w-full")} type="submit">
+            Apply
+          </Button>
         </form>
       </Form>
     </aside>
