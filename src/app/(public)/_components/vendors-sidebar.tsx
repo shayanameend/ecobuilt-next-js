@@ -9,17 +9,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
 
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "~/components/ui/form";
 import {
@@ -34,17 +34,6 @@ import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
 const FilterFormSchema = zod.object({
-  categoryId: zod.preprocess(
-    (val) => (val === "" ? undefined : val),
-    zod
-      .string({
-        message: "Category ID must be a string",
-      })
-      .length(24, {
-        message: "Category ID must be a 24-character string",
-      })
-      .optional(),
-  ),
   sort: zod.preprocess(
     (val) => (val === "" ? undefined : val),
     zod
@@ -74,25 +63,30 @@ export function VendorsSidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
 
-  const currentCategoryId = searchParams.get("categoryId") || "";
+  const [selectValue, setSelectValue] = useState<string>("");
+
   const currentSort = searchParams.get("sort") || "";
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const categoryIdsFromUrl = params.getAll("categoryId");
+    setSelectedCategoryIds(categoryIdsFromUrl);
+  }, []);
 
   const form = useForm<zod.infer<typeof FilterFormSchema>>({
     resolver: zodResolver(FilterFormSchema),
     defaultValues: {
-      categoryId: currentCategoryId,
       sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
     },
   });
 
   useEffect(() => {
     form.reset({
-      categoryId: currentCategoryId,
       sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
     });
-  }, [form.reset, currentCategoryId, currentSort]);
+  }, [form.reset, currentSort]);
 
   const {
     data: categoriesQuery,
@@ -107,13 +101,29 @@ export function VendorsSidebar() {
     queryFn: () => getCategories({ token }),
   });
 
+  const categoriesMap = new Map(
+    categoriesQuery?.data?.categories?.map((cat) => [cat.id, cat.name]) || [],
+  );
+
+  const handleAddCategory = (categoryId: string) => {
+    if (categoryId && !selectedCategoryIds.includes(categoryId)) {
+      setSelectedCategoryIds((prev) => [...prev, categoryId]);
+    }
+
+    setSelectValue("");
+  };
+
+  const handleRemoveCategory = (categoryId: string) => {
+    setSelectedCategoryIds((prev) => prev.filter((id) => id !== categoryId));
+  };
+
   const onSubmit = (data: zod.infer<typeof FilterFormSchema>) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (data.categoryId) {
-      params.set("categoryId", data.categoryId);
-    } else {
-      params.delete("categoryId");
+    params.delete("categoryId");
+
+    for (const id of selectedCategoryIds) {
+      params.append("categoryId", id);
     }
 
     if (data.sort) {
@@ -126,6 +136,7 @@ export function VendorsSidebar() {
     params.delete("minStock");
     params.delete("minPrice");
     params.delete("maxPrice");
+    params.delete("name");
 
     const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
     router.push(newUrl);
@@ -133,9 +144,10 @@ export function VendorsSidebar() {
 
   const resetFilters = () => {
     form.reset({
-      categoryId: "",
       sort: undefined,
     });
+    setSelectedCategoryIds([]);
+    setSelectValue("");
 
     const newUrl = window.location.pathname;
     router.push(newUrl);
@@ -148,57 +160,66 @@ export function VendorsSidebar() {
           onSubmit={form.handleSubmit(onSubmit)}
           className={cn("space-y-5")}
         >
-          <FormField
-            control={form.control}
-            name="categoryId"
-            render={({ field }) => (
-              <FormItem>
-                <Select
-                  onValueChange={(value) => {
-                    setCategoryIds((prev) => {
-                      if (prev.includes(value)) {
-                        return prev.filter((id) => id !== value);
-                      }
+          <FormItem>
+            <Select
+              value={selectValue}
+              onValueChange={(value) => {
+                setSelectValue(value);
 
-                      return [...prev, value];
-                    });
+                handleAddCategory(value);
+              }}
+              disabled={categoriesQueryIsLoading || categoriesQueryIsError}
+            >
+              <FormControl className={cn("w-full")}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Add Category Filter" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {categoriesQueryIsLoading && (
+                  <div className="flex items-center justify-center p-2">
+                    <Loader2Icon className="animate-spin h-4 w-4 mr-2" />
+                    <span>Loading categories...</span>
+                  </div>
+                )}
+                {categoriesQueryIsError && (
+                  <div className="text-destructive p-2">
+                    Failed to load categories
+                  </div>
+                )}
+                {!categoriesQueryIsLoading &&
+                  !categoriesQueryIsError &&
+                  categoriesQuery?.data?.categories &&
+                  categoriesQuery.data.categories.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id}
+                      disabled={selectedCategoryIds.includes(category.id)}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
 
-                    return field.onChange(value);
-                  }}
-                  value={field.value}
-                  disabled={categoriesQueryIsLoading || categoriesQueryIsError}
-                >
-                  <FormControl className={cn("w-full")}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categoriesQueryIsLoading && (
-                      <div className="flex items-center justify-center p-2">
-                        <Loader2Icon className="animate-spin h-4 w-4 mr-2" />
-                        <span>Loading categories...</span>
-                      </div>
-                    )}
-                    {categoriesQueryIsError && (
-                      <div className="text-destructive p-2">
-                        Failed to load categories
-                      </div>
-                    )}
-                    {!categoriesQueryIsLoading &&
-                      !categoriesQueryIsError &&
-                      categoriesQuery?.data?.categories &&
-                      categoriesQuery.data.categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
+            {selectedCategoryIds.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {selectedCategoryIds.map((id) => (
+                  <Badge key={id} variant="secondary">
+                    {categoriesMap.get(id) || "Unknown Category"}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCategory(id)}
+                      className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      aria-label={`Remove ${categoriesMap.get(id)} filter`}
+                    >
+                      <XIcon className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
             )}
-          />
+          </FormItem>
 
           <FormField
             control={form.control}
