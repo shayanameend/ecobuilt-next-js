@@ -100,7 +100,11 @@ export type ProductType = PublicProductType & {
   isDeleted: boolean;
 };
 
-export type PublicReviewType = {
+export type CartItemType = PublicProductType & {
+  quantity: number;
+};
+
+export type ReviewType = {
   id: string;
   rating: number;
   comment: string;

@@ -8,9 +8,12 @@ import type {
 
 import Image from "next/image";
 
+import { useStore } from "@nanostores/react";
+
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardFooter } from "~/components/ui/card";
 import { cn, formatPrice } from "~/lib/utils";
+import { $cart } from "~/stores/cart";
 
 interface ProductProps {
   product: PublicProductType & {
@@ -20,6 +23,8 @@ interface ProductProps {
 }
 
 export function Product({ product }: Readonly<ProductProps>) {
+  let cart = useStore($cart);
+
   return (
     <Card className={cn("p-0 gap-0")}>
       <CardContent className={cn("p-0")}>
@@ -38,7 +43,27 @@ export function Product({ product }: Readonly<ProductProps>) {
         </div>
         <div className={cn("flex justify-between items-center")}>
           <p className={cn("")}>{formatPrice(product.price)}</p>
-          <Button variant="default" size="default">
+          <Button
+            variant="default"
+            size="default"
+            onClick={() => {
+              if (cart.items.find((item) => item.id === product.id)) {
+                $cart.set({
+                  ...cart,
+                  items: cart.items.map((item) =>
+                    item.id === product.id
+                      ? { ...item, quantity: item.quantity + 1 }
+                      : item
+                  ),
+                });
+              } else {
+                $cart.set({
+                  ...cart,
+                  items: [...cart.items, { ...product, quantity: 1 }],
+                });
+              }
+            }}
+          >
             Purchase
           </Button>
         </div>

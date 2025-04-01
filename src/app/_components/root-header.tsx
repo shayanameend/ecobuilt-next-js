@@ -9,6 +9,8 @@ import {
 } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useStore } from "@nanostores/react";
+
 import { MenuIcon, ShoppingCartIcon } from "lucide-react";
 
 import { assets } from "~/assets";
@@ -27,6 +29,13 @@ import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { Role } from "~/lib/types";
 import { cn } from "~/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { Badge } from "~/components/ui/badge";
+import { $cart } from "~/stores/cart";
 
 const navLinks = [
   {
@@ -67,7 +76,7 @@ export function RootHeader() {
   return (
     <header
       className={cn(
-        "flex flex-row items-center justify-between gap-6 py-2 px-4",
+        "flex flex-row items-center justify-between gap-6 py-2 px-4"
       )}
     >
       <Image
@@ -101,9 +110,7 @@ export function RootHeader() {
         </ul>
       </nav>
       <div className={cn("flex flex-row items-center gap-4")}>
-        <Button variant="outline" size="icon" className={cn("relative")}>
-          <ShoppingCartIcon />
-        </Button>
+        <RootHeaderCartButton />
         <RootHeaderCTAButton className={cn("hidden md:inline-flex")} />
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild className={cn("md:hidden")}>
@@ -120,7 +127,9 @@ export function RootHeader() {
                     if (event.key === "Enter") {
                       if (event.currentTarget.value) {
                         router.push(
-                          `${routes.app.public.products.url()}/?name=${event.currentTarget.value}`,
+                          `${routes.app.public.products.url()}/?name=${
+                            event.currentTarget.value
+                          }`
                         );
                       } else {
                         router.push(routes.app.public.products.url());
@@ -208,5 +217,48 @@ function RootHeaderCTAButton({ className }: { className?: string }) {
     >
       Sign In
     </Button>
+  );
+}
+
+function RootHeaderCartButton() {
+  const cart = useStore($cart);
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="icon" className={cn("relative")}>
+          {cart.items.length > 0 && (
+            <Badge className={cn("absolute -top-1.5 -right-1.5 size-5")}>
+              {cart.items.length}
+            </Badge>
+          )}
+          <ShoppingCartIcon />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className={cn("space-y-4 mt-2 mr-4 w-72")}>
+        <h2>Your Cart</h2>
+        {cart.items.length > 0 && (
+          <ul className={cn("space-y-2")}>
+            {cart.items.map((item) => (
+              <li key={item.id}>
+                <div className={cn("flex flex-row items-center gap-2")}>
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_FILE_URL}/${item.pictureIds[0]}`}
+                    alt={item.name}
+                    width={48}
+                    height={48}
+                    className={cn("size-12 object-cover rounded-md")}
+                  />
+                  <div>
+                    <h3>{item.name}</h3>
+                    <p>{item.price}</p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }
