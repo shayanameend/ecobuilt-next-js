@@ -38,7 +38,7 @@ export function Product({ product }: Readonly<ProductProps>) {
         </div>
         <div className={cn("flex justify-between items-center")}>
           <p className={cn("")}>{formatPrice(product.price)}</p>
-          <Button variant="default" size="lg">
+          <Button variant="default" size="default">
             Purchase
           </Button>
         </div>
