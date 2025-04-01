@@ -37,9 +37,9 @@ import {
 import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
+import { EmptyState } from "../_components/empty-state";
 import { FilterProducts } from "../_components/filter-products";
 import { Product } from "../_components/product";
-import { EmptyState } from "../_components/empty-state";
 import { ProductsSidebar } from "../_components/products-sidebar";
 
 async function getProducts({

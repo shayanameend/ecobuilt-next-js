@@ -172,7 +172,7 @@ export function VendorsSidebar() {
             >
               <FormControl className={cn("w-full")}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Add Category Filter" />
+                  <SelectValue placeholder="Select Categories" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
