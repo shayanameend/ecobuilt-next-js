@@ -217,7 +217,7 @@ export default function ProductsPage() {
     );
   }
 
-  if (productsQueryIsError || !productsQuery?.data?.vendor.products) {
+  if (productsQueryIsError || !productsQuery?.data?.vendor?.products) {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
