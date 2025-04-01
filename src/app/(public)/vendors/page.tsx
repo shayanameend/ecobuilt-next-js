@@ -13,7 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import { AlertCircleIcon, Loader2Icon } from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, Store } from "lucide-react";
 
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
@@ -39,6 +39,7 @@ import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { FilterVendors } from "../_components/filter-vendors";
 import { Vendor } from "../_components/vendor";
+import { EmptyState } from "../_components/empty-state";
 
 async function getVendors({
   token,
@@ -202,101 +203,133 @@ export default function VendorsPage() {
           </form>
         </div>
         <div>
-          <ul
-            className={cn(
-              "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4",
-            )}
-          >
-            {vendorsQuery.data.vendors.map((vendor) => (
-              <li key={vendor.id}>
-                <Link href={routes.app.public.vendors.url(vendor.id)}>
-                  <Vendor vendor={vendor} />
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {vendorsQuery.data.vendors.length > 0 ? (
+            <ul
+              className={cn(
+                "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4",
+              )}
+            >
+              {vendorsQuery.data.vendors.map((vendor) => (
+                <li key={vendor.id}>
+                  <Link href={routes.app.public.vendors.url(vendor.id)}>
+                    <Vendor vendor={vendor} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState
+              icon={Store}
+              title="No vendors found"
+              description={
+                currentName
+                  ? `No vendors match "${currentName}". Try a different search term or clear filters.`
+                  : "There are no vendors available at the moment."
+              }
+              action={
+                currentName
+                  ? {
+                      label: "Clear search",
+                      onClick: () => {
+                        const params = new URLSearchParams(
+                          searchParams.toString(),
+                        );
+                        params.delete("name");
+                        params.delete("page");
+                        const newUrl = `${window.location.pathname}${
+                          params.toString() ? `?${params.toString()}` : ""
+                        }`;
+                        router.push(newUrl);
+                      },
+                    }
+                  : undefined
+              }
+            />
+          )}
         </div>
-        <div className={cn("flex items-center gap-8")}>
-          <div>
-            <p>
-              Showing{" "}
-              {vendorsQuery.meta.limit < vendorsQuery.meta.total
-                ? vendorsQuery.meta.limit
-                : vendorsQuery.meta.total}{" "}
-              of {vendorsQuery.meta.total} vendors
-            </p>
-          </div>
-          <Pagination className={cn("flex-1 justify-end")}>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    currentPage > 1 && handlePageChange(currentPage - 1)
-                  }
-                  className={
-                    currentPage <= 1
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
-              {Array.from(
-                {
-                  length: Math.min(
-                    5,
-                    Math.ceil(
-                      (vendorsQuery.meta.total || 0) /
-                        (vendorsQuery.meta.limit || 10),
-                    ),
-                  ),
-                },
-                (_, i) => {
-                  const pageNumber = i + 1;
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink
-                        onClick={() => handlePageChange(pageNumber)}
-                        isActive={currentPage === pageNumber}
-                      >
-                        {pageNumber}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                },
-              )}
-
-              {Math.ceil(
-                (vendorsQuery.meta.total || 0) /
-                  (vendorsQuery.meta.limit || 10),
-              ) > 5 && (
+        {vendorsQuery.data.vendors.length > 0 && (
+          <div className={cn("flex items-center gap-8")}>
+            <div>
+              <p>
+                Showing{" "}
+                {vendorsQuery.meta.limit < vendorsQuery.meta.total
+                  ? vendorsQuery.meta.limit
+                  : vendorsQuery.meta.total}{" "}
+                of {vendorsQuery.meta.total} vendors
+              </p>
+            </div>
+            <Pagination className={cn("flex-1 justify-end")}>
+              <PaginationContent>
                 <PaginationItem>
-                  <PaginationEllipsis />
+                  <PaginationPrevious
+                    onClick={() =>
+                      currentPage > 1 && handlePageChange(currentPage - 1)
+                    }
+                    className={
+                      currentPage <= 1
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
                 </PaginationItem>
-              )}
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    currentPage <
+                {Array.from(
+                  {
+                    length: Math.min(
+                      5,
                       Math.ceil(
                         (vendorsQuery.meta.total || 0) /
                           (vendorsQuery.meta.limit || 10),
-                      ) && handlePageChange(currentPage + 1)
-                  }
-                  className={
-                    currentPage >=
-                    Math.ceil(
-                      (vendorsQuery.meta.total || 0) /
-                        (vendorsQuery.meta.limit || 10),
-                    )
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+                      ),
+                    ),
+                  },
+                  (_, i) => {
+                    const pageNumber = i + 1;
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(pageNumber)}
+                          isActive={currentPage === pageNumber}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  },
+                )}
+
+                {Math.ceil(
+                  (vendorsQuery.meta.total || 0) /
+                    (vendorsQuery.meta.limit || 10),
+                ) > 5 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      currentPage <
+                        Math.ceil(
+                          (vendorsQuery.meta.total || 0) /
+                            (vendorsQuery.meta.limit || 10),
+                        ) && handlePageChange(currentPage + 1)
+                    }
+                    className={
+                      currentPage >=
+                      Math.ceil(
+                        (vendorsQuery.meta.total || 0) /
+                          (vendorsQuery.meta.limit || 10),
+                      )
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </section>
     </>
   );

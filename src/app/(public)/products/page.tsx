@@ -14,7 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import { AlertCircleIcon, Loader2Icon } from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, Package } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -39,6 +39,7 @@ import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { FilterProducts } from "../_components/filter-products";
 import { Product } from "../_components/product";
+import { EmptyState } from "../_components/empty-state";
 
 async function getProducts({
   token,
@@ -253,7 +254,7 @@ export default function ProductsPage() {
             </Button>
           </form>
         </div>
-        {productsQuery.data.products.length > 0 && (
+        {productsQuery.data.products.length > 0 ? (
           <>
             <div>
               <ul
@@ -350,6 +351,34 @@ export default function ProductsPage() {
               </Pagination>
             </div>
           </>
+        ) : (
+          <EmptyState
+            icon={Package}
+            title="No products found"
+            description={
+              currentName ||
+              currentCategoryId ||
+              currentMinPrice ||
+              currentMaxPrice ||
+              currentMinStock
+                ? "No products match your current filters. Try adjusting your search criteria."
+                : "There are no products available at the moment."
+            }
+            action={
+              currentName ||
+              currentCategoryId ||
+              currentMinPrice ||
+              currentMaxPrice ||
+              currentMinStock
+                ? {
+                    label: "Clear filters",
+                    onClick: () => {
+                      router.push(window.location.pathname);
+                    },
+                  }
+                : undefined
+            }
+          />
         )}
       </section>
     </>

@@ -15,7 +15,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import { AlertCircleIcon, Loader2Icon } from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, Package } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -41,6 +41,7 @@ import { cn } from "~/lib/utils";
 import { FilterProducts } from "../../_components/filter-products";
 import { Product } from "../../_components/product";
 import { domine } from "~/lib/fonts";
+import { EmptyState } from "../../_components/empty-state";
 
 async function getVendor({
   token,
@@ -277,7 +278,7 @@ export default function VendorsPage() {
             </p>
           </div>
         </div>
-        {vendorQuery.data.vendor.products.length > 0 && (
+        {vendorQuery.data.vendor.products.length > 0 ? (
           <>
             <div>
               <ul
@@ -374,6 +375,34 @@ export default function VendorsPage() {
               </Pagination>
             </div>
           </>
+        ) : (
+          <EmptyState
+            icon={Package}
+            title="No products found"
+            description={
+              currentName ||
+              currentCategoryId ||
+              currentMinPrice ||
+              currentMaxPrice ||
+              currentMinStock
+                ? `This vendor doesn't have any products matching your filters.`
+                : `${vendorQuery.data.vendor.name} doesn't have any products listed yet.`
+            }
+            action={
+              currentName ||
+              currentCategoryId ||
+              currentMinPrice ||
+              currentMaxPrice ||
+              currentMinStock
+                ? {
+                    label: "Clear filters",
+                    onClick: () => {
+                      router.push(window.location.pathname);
+                    },
+                  }
+                : undefined
+            }
+          />
         )}
       </section>
     </>
