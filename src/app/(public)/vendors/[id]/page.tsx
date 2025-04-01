@@ -275,14 +275,13 @@ export default function ProductsPage() {
               <h2
                 className={cn(
                   "text-black/75 text-3xl font-bold",
-                  domine.className,
+                  domine.className
                 )}
               >
-                Products
+                {productsQuery.data.vendor.name}
               </h2>
               <p className={cn("text-muted-foreground text-base font-medium")}>
-                View and manage products inventory. You can search, filter and
-                delete products from here.
+                {productsQuery.data.vendor.description}
               </p>
             </div>
           </div>
@@ -291,7 +290,7 @@ export default function ProductsPage() {
               <div>
                 <ul
                   className={cn(
-                    "grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4",
+                    "grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
                   )}
                 >
                   {productsQuery.data.vendor.products.map((product) => (
@@ -331,8 +330,8 @@ export default function ProductsPage() {
                           5,
                           Math.ceil(
                             (productsQuery.meta.total || 0) /
-                              (productsQuery.meta.limit || 10),
-                          ),
+                              (productsQuery.meta.limit || 10)
+                          )
                         ),
                       },
                       (_, i) => {
@@ -347,11 +346,11 @@ export default function ProductsPage() {
                             </PaginationLink>
                           </PaginationItem>
                         );
-                      },
+                      }
                     )}
                     {Math.ceil(
                       (productsQuery.meta.total || 0) /
-                        (productsQuery.meta.limit || 10),
+                        (productsQuery.meta.limit || 10)
                     ) > 5 && (
                       <PaginationItem>
                         <PaginationEllipsis />
@@ -363,14 +362,14 @@ export default function ProductsPage() {
                           currentPage <
                             Math.ceil(
                               (productsQuery.meta.total || 0) /
-                                (productsQuery.meta.limit || 10),
+                                (productsQuery.meta.limit || 10)
                             ) && handlePageChange(currentPage + 1)
                         }
                         className={
                           currentPage >=
                           Math.ceil(
                             (productsQuery.meta.total || 0) /
-                              (productsQuery.meta.limit || 10),
+                              (productsQuery.meta.limit || 10)
                           )
                             ? "pointer-events-none opacity-50"
                             : "cursor-pointer"
