@@ -22,7 +22,6 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -54,42 +53,6 @@ const FilterFormSchema = zod.object({
       })
       .optional(),
   ),
-  minStock: zod.preprocess(
-    (val) => (val === "" || val === 0 ? undefined : val),
-    zod.coerce
-      .number({
-        message: "Min Stock must be a number",
-      })
-      .int({
-        message: "Min Stock must be an integer",
-      })
-      .min(0, {
-        message: "Min Stock must be a non-negative number",
-      })
-      .optional(),
-  ),
-  minPrice: zod.preprocess(
-    (val) => (val === "" || val === 0 ? undefined : val),
-    zod.coerce
-      .number({
-        message: "Min Price must be a number",
-      })
-      .min(1, {
-        message: "Min Price must be a positive number",
-      })
-      .optional(),
-  ),
-  maxPrice: zod.preprocess(
-    (val) => (val === "" || val === 0 ? undefined : val),
-    zod.coerce
-      .number({
-        message: "Max Price must be a number",
-      })
-      .min(1, {
-        message: "Max Price must be a positive number",
-      })
-      .optional(),
-  ),
 });
 
 async function getCategories({
@@ -113,24 +76,12 @@ export function VendorsSidebar() {
 
   const currentCategoryId = searchParams.get("categoryId") || "";
   const currentSort = searchParams.get("sort") || "";
-  const currentMinStock = searchParams.get("minStock")
-    ? Number(searchParams.get("minStock"))
-    : 0;
-  const currentMinPrice = searchParams.get("minPrice")
-    ? Number(searchParams.get("minPrice"))
-    : 0;
-  const currentMaxPrice = searchParams.get("maxPrice")
-    ? Number(searchParams.get("maxPrice"))
-    : 0;
 
   const form = useForm<zod.infer<typeof FilterFormSchema>>({
     resolver: zodResolver(FilterFormSchema),
     defaultValues: {
       categoryId: currentCategoryId,
       sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
-      minStock: currentMinStock,
-      minPrice: currentMinPrice,
-      maxPrice: currentMaxPrice,
     },
   });
 
@@ -138,18 +89,8 @@ export function VendorsSidebar() {
     form.reset({
       categoryId: currentCategoryId,
       sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
-      minStock: currentMinStock,
-      minPrice: currentMinPrice,
-      maxPrice: currentMaxPrice,
     });
-  }, [
-    form.reset,
-    currentCategoryId,
-    currentSort,
-    currentMinStock,
-    currentMinPrice,
-    currentMaxPrice,
-  ]);
+  }, [form.reset, currentCategoryId, currentSort]);
 
   const {
     data: categoriesQuery,
@@ -179,25 +120,10 @@ export function VendorsSidebar() {
       params.delete("sort");
     }
 
-    if (data.minStock && data.minStock > 0) {
-      params.set("minStock", data.minStock.toString());
-    } else {
-      params.delete("minStock");
-    }
-
-    if (data.minPrice && data.minPrice > 0) {
-      params.set("minPrice", data.minPrice.toString());
-    } else {
-      params.delete("minPrice");
-    }
-
-    if (data.maxPrice && data.maxPrice > 0) {
-      params.set("maxPrice", data.maxPrice.toString());
-    } else {
-      params.delete("maxPrice");
-    }
-
     params.delete("page");
+    params.delete("minStock");
+    params.delete("minPrice");
+    params.delete("maxPrice");
 
     const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
     router.push(newUrl);
@@ -207,9 +133,6 @@ export function VendorsSidebar() {
     form.reset({
       categoryId: "",
       sort: undefined,
-      minStock: undefined,
-      minPrice: undefined,
-      maxPrice: undefined,
     });
 
     const newUrl = window.location.pathname;
@@ -282,48 +205,6 @@ export function VendorsSidebar() {
                     <SelectItem value="OLDEST">Oldest</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="minStock"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Min Stock</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="10" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="minPrice"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Min Price</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="99.99" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="maxPrice"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Max Price</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="999.99" {...field} />
-                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
