@@ -40,6 +40,7 @@ import { cn } from "~/lib/utils";
 import { FilterProducts } from "../_components/filter-products";
 import { Product } from "../_components/product";
 import { EmptyState } from "../_components/empty-state";
+import { ProductsSidebar } from "../_components/products-sidebar";
 
 async function getProducts({
   token,
@@ -229,157 +230,160 @@ export default function ProductsPage() {
 
   return (
     <>
-      <section className={cn("flex-1 space-y-8 py-8 px-4")}>
-        <div className={cn("relative flex items-center justify-between gap-2")}>
-          <div className={cn("md:hidden")}>
-            <FilterProducts />
-          </div>
-          <form
-            onSubmit={handleSearch}
-            className="flex-1 flex items-center relative"
+      <section className={cn("flex items-baseline")}>
+        <ProductsSidebar />
+        <div className={cn("flex-1 space-y-8 py-8 px-4")}>
+          <div
+            className={cn("relative flex items-center justify-between gap-2")}
           >
-            <Input
-              placeholder="Search Products..."
-              className={cn("pr-10")}
-              value={queryTerm}
-              onChange={(e) => setQueryTerm(e.target.value)}
-            />
-            <Button
-              type="submit"
-              variant="secondary"
-              size="sm"
-              className={cn("absolute right-0.5")}
-            >
-              Search
-            </Button>
-          </form>
-        </div>
-        {productsQuery.data.products.length > 0 ? (
-          <>
-            <div>
-              <ul
-                className={cn(
-                  "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4",
-                )}
-              >
-                {productsQuery.data.products.map((product) => (
-                  <li key={product.id}>
-                    <Product product={product} />
-                  </li>
-                ))}
-              </ul>
+            <div className={cn("md:hidden")}>
+              <FilterProducts />
             </div>
-            <div className={cn("flex items-center gap-8")}>
+            <form
+              onSubmit={handleSearch}
+              className="flex-1 flex items-center relative"
+            >
+              <Input
+                placeholder="Search Products..."
+                className={cn("pr-10")}
+                value={queryTerm}
+                onChange={(e) => setQueryTerm(e.target.value)}
+              />
+              <Button
+                type="submit"
+                variant="secondary"
+                size="sm"
+                className={cn("absolute right-0.5")}
+              >
+                Search
+              </Button>
+            </form>
+          </div>
+          {productsQuery.data.products.length > 0 ? (
+            <>
               <div>
-                <p>
-                  Showing{" "}
-                  {productsQuery.meta.limit < productsQuery.meta.total
-                    ? productsQuery.meta.limit
-                    : productsQuery.meta.total}{" "}
-                  of {productsQuery.meta.total} products
-                </p>
+                <ul
+                  className={cn(
+                    "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4",
+                  )}
+                >
+                  {productsQuery.data.products.map((product) => (
+                    <li key={product.id}>
+                      <Product product={product} />
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <Pagination className={cn("flex-1 justify-end")}>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() =>
-                        currentPage > 1 && handlePageChange(currentPage - 1)
-                      }
-                      className={
-                        currentPage <= 1
-                          ? "pointer-events-none opacity-50"
-                          : "cursor-pointer"
-                      }
-                    />
-                  </PaginationItem>
-                  {Array.from(
-                    {
-                      length: Math.min(
-                        5,
-                        Math.ceil(
-                          (productsQuery.meta.total || 0) /
-                            (productsQuery.meta.limit || 10),
-                        ),
-                      ),
-                    },
-                    (_, i) => {
-                      const pageNumber = i + 1;
-                      return (
-                        <PaginationItem key={pageNumber}>
-                          <PaginationLink
-                            onClick={() => handlePageChange(pageNumber)}
-                            isActive={currentPage === pageNumber}
-                          >
-                            {pageNumber}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    },
-                  )}
-
-                  {Math.ceil(
-                    (productsQuery.meta.total || 0) /
-                      (productsQuery.meta.limit || 10),
-                  ) > 5 && (
+              <div className={cn("flex items-center gap-8")}>
+                <div>
+                  <p>
+                    Showing{" "}
+                    {productsQuery.meta.limit < productsQuery.meta.total
+                      ? productsQuery.meta.limit
+                      : productsQuery.meta.total}{" "}
+                    of {productsQuery.meta.total} products
+                  </p>
+                </div>
+                <Pagination className={cn("flex-1 justify-end")}>
+                  <PaginationContent>
                     <PaginationItem>
-                      <PaginationEllipsis />
+                      <PaginationPrevious
+                        onClick={() =>
+                          currentPage > 1 && handlePageChange(currentPage - 1)
+                        }
+                        className={
+                          currentPage <= 1
+                            ? "pointer-events-none opacity-50"
+                            : "cursor-pointer"
+                        }
+                      />
                     </PaginationItem>
-                  )}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() =>
-                        currentPage <
+                    {Array.from(
+                      {
+                        length: Math.min(
+                          5,
                           Math.ceil(
                             (productsQuery.meta.total || 0) /
                               (productsQuery.meta.limit || 10),
-                          ) && handlePageChange(currentPage + 1)
-                      }
-                      className={
-                        currentPage >=
-                        Math.ceil(
-                          (productsQuery.meta.total || 0) /
-                            (productsQuery.meta.limit || 10),
-                        )
-                          ? "pointer-events-none opacity-50"
-                          : "cursor-pointer"
-                      }
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          </>
-        ) : (
-          <EmptyState
-            icon={Package}
-            title="No products found"
-            description={
-              currentName ||
-              currentCategoryId ||
-              currentMinPrice ||
-              currentMaxPrice ||
-              currentMinStock
-                ? "No products match your current filters. Try adjusting your search criteria."
-                : "There are no products available at the moment."
-            }
-            action={
-              currentName ||
-              currentCategoryId ||
-              currentMinPrice ||
-              currentMaxPrice ||
-              currentMinStock
-                ? {
-                    label: "Clear filters",
-                    onClick: () => {
-                      router.push(window.location.pathname);
-                    },
-                  }
-                : undefined
-            }
-          />
-        )}
+                          ),
+                        ),
+                      },
+                      (_, i) => {
+                        const pageNumber = i + 1;
+                        return (
+                          <PaginationItem key={pageNumber}>
+                            <PaginationLink
+                              onClick={() => handlePageChange(pageNumber)}
+                              isActive={currentPage === pageNumber}
+                            >
+                              {pageNumber}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      },
+                    )}
+                    {Math.ceil(
+                      (productsQuery.meta.total || 0) /
+                        (productsQuery.meta.limit || 10),
+                    ) > 5 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() =>
+                          currentPage <
+                            Math.ceil(
+                              (productsQuery.meta.total || 0) /
+                                (productsQuery.meta.limit || 10),
+                            ) && handlePageChange(currentPage + 1)
+                        }
+                        className={
+                          currentPage >=
+                          Math.ceil(
+                            (productsQuery.meta.total || 0) /
+                              (productsQuery.meta.limit || 10),
+                          )
+                            ? "pointer-events-none opacity-50"
+                            : "cursor-pointer"
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            </>
+          ) : (
+            <EmptyState
+              icon={Package}
+              title="No products found"
+              description={
+                currentName ||
+                currentCategoryId ||
+                currentMinPrice ||
+                currentMaxPrice ||
+                currentMinStock
+                  ? "No products match your current filters. Try adjusting your search criteria."
+                  : "There are no products available at the moment."
+              }
+              action={
+                currentName ||
+                currentCategoryId ||
+                currentMinPrice ||
+                currentMaxPrice ||
+                currentMinStock
+                  ? {
+                      label: "Clear filters",
+                      onClick: () => {
+                        router.push(window.location.pathname);
+                      },
+                    }
+                  : undefined
+              }
+            />
+          )}
+        </div>
       </section>
     </>
   );
