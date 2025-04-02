@@ -30,22 +30,44 @@ export function Product({ product }: Readonly<ProductProps>) {
   return (
     <Link href={routes.app.public.products.url(product.id)}>
       <Card className={cn("p-0 gap-0")}>
-        <CardContent className={cn("p-0")}>
+        <CardContent className={cn("py-5 px-10")}>
           <Image
             src={`${process.env.NEXT_PUBLIC_FILE_URL}/${product.pictureIds[0]}`}
             alt={product.name}
-            width={180}
-            height={180}
-            sizes="(max-width: 640px) 120px, (max-width: 1024px) 150px, 180px"
-            className={cn("h-48 w-full object-cover rounded-t-xl")}
+            width={240}
+            height={240}
+            className={cn("h-60 w-full object-contain rounded-t-xl")}
           />
         </CardContent>
-        <CardFooter className={cn("p-4 flex-col items-stretch gap-2")}>
+        <CardFooter
+          className={cn("p-4 flex-col items-stretch gap-2 bg-gray-50")}
+        >
           <div>
-            <h3 className={cn("")}>{product.name}</h3>
+            <h4 className={cn("text-[10px] uppercase")}>
+              {product.vendor.name}
+            </h4>
+            <h3 className={cn("text-[16px]")}>{product.name}</h3>
           </div>
           <div className={cn("flex justify-between items-center")}>
-            <p className={cn("")}>{formatPrice(product.price)}</p>
+            <div className={cn("-space-y-1")}>
+              <p className={cn("space-x-1 text-lg font-medium")}>
+                <span>
+                  {product.salePrice
+                    ? formatPrice(product.salePrice)
+                    : formatPrice(product.price)}
+                </span>
+                {product.salePrice && (
+                  <span
+                    className={cn("text-muted-foreground text-sm line-through")}
+                  >
+                    {formatPrice(product.price)}
+                  </span>
+                )}
+              </p>
+              <p className={cn("text-[10px] text-muted-foreground")}>
+                Excl. VAT
+              </p>
+            </div>
             <Button
               variant="default"
               size="default"
