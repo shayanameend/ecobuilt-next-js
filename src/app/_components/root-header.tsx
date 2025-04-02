@@ -14,8 +14,14 @@ import { useStore } from "@nanostores/react";
 import { MenuIcon, ShoppingCartIcon } from "lucide-react";
 
 import { assets } from "~/assets";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
 import {
   Sheet,
   SheetContent,
@@ -29,12 +35,6 @@ import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { Role } from "~/lib/types";
 import { cn } from "~/lib/utils";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-import { Badge } from "~/components/ui/badge";
 import { $cart } from "~/stores/cart";
 
 const navLinks = [
@@ -76,7 +76,7 @@ export function RootHeader() {
   return (
     <header
       className={cn(
-        "flex flex-row items-center justify-between gap-6 py-2 px-4"
+        "flex flex-row items-center justify-between gap-6 py-2 px-4",
       )}
     >
       <Image
@@ -129,7 +129,7 @@ export function RootHeader() {
                         router.push(
                           `${routes.app.public.products.url()}/?name=${
                             event.currentTarget.value
-                          }`
+                          }`,
                         );
                       } else {
                         router.push(routes.app.public.products.url());

@@ -10,7 +10,7 @@ import type {
 } from "~/lib/types";
 
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
@@ -35,7 +35,6 @@ import {
   PaginationPrevious,
 } from "~/components/ui/pagination";
 import { useAuthContext } from "~/context/auth";
-import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { EmptyState } from "../../_components/empty-state";
@@ -43,9 +42,8 @@ import { FilterProducts } from "../../_components/filter-products";
 import { Product } from "../../_components/product";
 import { ProductsSidebar } from "../../_components/products-sidebar";
 
-async function getVendor({
+async function getProducts({
   token,
-  id,
   name = "",
   page = 1,
   limit = 10,
@@ -55,7 +53,6 @@ async function getVendor({
   minPrice,
   maxPrice,
 }: {
-  id: string;
   token: string | null;
   name?: string;
   page?: number;
@@ -95,7 +92,7 @@ async function getVendor({
     params.append("maxPrice", maxPrice.toString());
   }
 
-  const url = `${routes.api.public.vendors.url(id)}?${params.toString()}`;
+  const url = `${routes.api.public.products.url()}?${params.toString()}`;
 
   const response = await axios.get(url, {
     headers: {
@@ -108,7 +105,6 @@ async function getVendor({
 
 export default function ProductsPage() {
   const router = useRouter();
-  const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
 
   const { token } = useAuthContext();
@@ -131,22 +127,19 @@ export default function ProductsPage() {
   const [queryTerm, setQueryTerm] = useState(currentName);
 
   const {
-    data: vendorQuery,
-    isLoading: vendorQueryIsLoading,
-    isError: vendorQueryIsError,
+    data: productsQuery,
+    isLoading: productsQueryIsLoading,
+    isError: productsQueryIsError,
   } = useQuery<
     MultipleResponseType<{
-      vendor: VendorProfileType & {
-        products: (ProductType & {
-          category: PublicCategoryType;
-          vendor: VendorProfileType;
-        })[];
-      };
+      products: (ProductType & {
+        category: PublicCategoryType;
+        vendor: VendorProfileType;
+      })[];
     }>
   >({
     queryKey: [
-      "vendor",
-      params.id,
+      "products",
       currentPage,
       currentName,
       currentCategoryId,
@@ -156,9 +149,8 @@ export default function ProductsPage() {
       currentMaxPrice,
     ],
     queryFn: () =>
-      getVendor({
+      getProducts({
         token,
-        id: params.id,
         page: currentPage,
         name: currentName,
         categoryId: currentCategoryId,
@@ -208,7 +200,7 @@ export default function ProductsPage() {
     setQueryTerm(currentName);
   }, [currentName]);
 
-  if (vendorQueryIsLoading) {
+  if (productsQueryIsLoading) {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
         <div className="text-center space-y-4">
@@ -218,7 +210,7 @@ export default function ProductsPage() {
     );
   }
 
-  if (vendorQueryIsError || !vendorQuery?.data?.vendor?.products) {
+  if (productsQueryIsError || !productsQuery?.data?.products) {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
@@ -271,22 +263,7 @@ export default function ProductsPage() {
               </Button>
             </form>
           </div>
-          <div className={cn("flex items-center justify-between gap-6")}>
-            <div className={cn("space-y-2")}>
-              <h2
-                className={cn(
-                  "text-black/75 text-3xl font-bold",
-                  domine.className,
-                )}
-              >
-                {vendorQuery.data.vendor.name}
-              </h2>
-              <p className={cn("text-muted-foreground text-base font-medium")}>
-                {vendorQuery.data.vendor.description}
-              </p>
-            </div>
-          </div>
-          {vendorQuery.data.vendor.products.length > 0 ? (
+          {productsQuery.data.products.length > 0 ? (
             <>
               <div>
                 <ul
@@ -294,7 +271,7 @@ export default function ProductsPage() {
                     "grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4",
                   )}
                 >
-                  {vendorQuery.data.vendor.products.map((product) => (
+                  {productsQuery.data.products.map((product) => (
                     <li key={product.id}>
                       <Product product={product} />
                     </li>
@@ -305,10 +282,10 @@ export default function ProductsPage() {
                 <div>
                   <p>
                     Showing{" "}
-                    {vendorQuery.meta.limit < vendorQuery.meta.total
-                      ? vendorQuery.meta.limit
-                      : vendorQuery.meta.total}{" "}
-                    of {vendorQuery.meta.total} products
+                    {productsQuery.meta.limit < productsQuery.meta.total
+                      ? productsQuery.meta.limit
+                      : productsQuery.meta.total}{" "}
+                    of {productsQuery.meta.total} products
                   </p>
                 </div>
                 <Pagination className={cn("flex-1 justify-end")}>
@@ -330,8 +307,8 @@ export default function ProductsPage() {
                         length: Math.min(
                           5,
                           Math.ceil(
-                            (vendorQuery.meta.total || 0) /
-                              (vendorQuery.meta.limit || 10),
+                            (productsQuery.meta.total || 0) /
+                              (productsQuery.meta.limit || 10),
                           ),
                         ),
                       },
@@ -350,8 +327,8 @@ export default function ProductsPage() {
                       },
                     )}
                     {Math.ceil(
-                      (vendorQuery.meta.total || 0) /
-                        (vendorQuery.meta.limit || 10),
+                      (productsQuery.meta.total || 0) /
+                        (productsQuery.meta.limit || 10),
                     ) > 5 && (
                       <PaginationItem>
                         <PaginationEllipsis />
@@ -362,15 +339,15 @@ export default function ProductsPage() {
                         onClick={() =>
                           currentPage <
                             Math.ceil(
-                              (vendorQuery.meta.total || 0) /
-                                (vendorQuery.meta.limit || 10),
+                              (productsQuery.meta.total || 0) /
+                                (productsQuery.meta.limit || 10),
                             ) && handlePageChange(currentPage + 1)
                         }
                         className={
                           currentPage >=
                           Math.ceil(
-                            (vendorQuery.meta.total || 0) /
-                              (vendorQuery.meta.limit || 10),
+                            (productsQuery.meta.total || 0) /
+                              (productsQuery.meta.limit || 10),
                           )
                             ? "pointer-events-none opacity-50"
                             : "cursor-pointer"

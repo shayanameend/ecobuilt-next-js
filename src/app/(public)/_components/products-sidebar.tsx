@@ -44,7 +44,7 @@ const FilterFormSchema = zod.object({
       .length(24, {
         message: "Category ID must be a 24-character string",
       })
-      .optional()
+      .optional(),
   ),
   sort: zod.preprocess(
     (val) => (val === "" ? undefined : val),
@@ -52,7 +52,7 @@ const FilterFormSchema = zod.object({
       .enum(["RELEVANCE", "LATEST", "OLDEST"], {
         message: "Sort must be one of 'RELEVANCE', 'LATEST', 'OLDEST'",
       })
-      .optional()
+      .optional(),
   ),
   minStock: zod.preprocess(
     (val) => (val === "" || val === 0 ? undefined : val),
@@ -66,7 +66,7 @@ const FilterFormSchema = zod.object({
       .min(0, {
         message: "Min Stock must be a non-negative number",
       })
-      .optional()
+      .optional(),
   ),
   minPrice: zod.preprocess(
     (val) => (val === "" || val === 0 ? undefined : val),
@@ -77,7 +77,7 @@ const FilterFormSchema = zod.object({
       .min(1, {
         message: "Min Price must be a positive number",
       })
-      .optional()
+      .optional(),
   ),
   maxPrice: zod.preprocess(
     (val) => (val === "" || val === 0 ? undefined : val),
@@ -88,7 +88,7 @@ const FilterFormSchema = zod.object({
       .min(1, {
         message: "Max Price must be a positive number",
       })
-      .optional()
+      .optional(),
   ),
 });
 

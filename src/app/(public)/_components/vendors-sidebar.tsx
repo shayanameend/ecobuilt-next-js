@@ -40,7 +40,7 @@ const FilterFormSchema = zod.object({
       .enum(["RELEVANCE", "LATEST", "OLDEST"], {
         message: "Sort must be one of 'RELEVANCE', 'LATEST', 'OLDEST'",
       })
-      .optional()
+      .optional(),
   ),
 });
 
@@ -98,7 +98,7 @@ export function VendorsSidebar() {
   });
 
   const categoriesMap = new Map(
-    categoriesQuery?.data?.categories?.map((cat) => [cat.id, cat.name]) || []
+    categoriesQuery?.data?.categories?.map((cat) => [cat.id, cat.name]) || [],
   );
 
   const handleAddCategory = (categoryId: string) => {
