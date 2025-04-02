@@ -146,6 +146,7 @@ export default function ProductsPage() {
   >({
     queryKey: [
       "vendor",
+      params.id,
       currentPage,
       currentName,
       currentCategoryId,
