@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import * as React from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import { useStore } from "@nanostores/react";
+
 import { MinusIcon, PlusIcon, ShoppingCartIcon, XIcon } from "lucide-react";
 
 import { Badge } from "~/components/ui/badge";
@@ -21,9 +23,16 @@ import { cn, formatPrice } from "~/lib/utils";
 import { $cart } from "~/stores/cart";
 
 export function RootHeaderCartButton() {
+  const pathName = usePathname();
   const cart = useStore($cart);
 
-  const { totalQuantity, totalPrice } = React.useMemo(() => {
+  const [isCartPopoverOpen, setIsCartPopoverOpen] = useState(false);
+
+  useEffect(() => {
+    setIsCartPopoverOpen(false);
+  }, [pathName]);
+
+  const { totalQuantity, totalPrice } = useMemo(() => {
     let quantity = 0;
     let price = 0;
     for (const item of cart.items) {
@@ -67,7 +76,7 @@ export function RootHeaderCartButton() {
   };
 
   return (
-    <Popover>
+    <Popover open={isCartPopoverOpen} onOpenChange={setIsCartPopoverOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
