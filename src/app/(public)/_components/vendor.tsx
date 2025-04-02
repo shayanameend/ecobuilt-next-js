@@ -34,7 +34,7 @@ export function Vendor({ vendor }: Readonly<VendorProps>) {
             </h3>
           </div>
           <div className={cn("flex justify-between items-center")}>
-            <p className={cn("")}>{vendor.description}</p>
+            <p className={cn("text-base")}>{vendor.description}</p>
           </div>
         </CardFooter>
       </Card>

@@ -17,14 +17,14 @@ import { routes } from "~/lib/routes";
 import { cn, formatPrice } from "~/lib/utils";
 import { $cart } from "~/stores/cart";
 
-interface ProductProps {
+interface ProductDetails {
   product: PublicProductType & {
     category: PublicCategoryType;
     vendor: VendorProfileType;
   };
 }
 
-export function Product({ product }: Readonly<ProductProps>) {
+export function ProductDetails({ product }: Readonly<ProductDetails>) {
   const cart = useStore($cart);
 
   return (
