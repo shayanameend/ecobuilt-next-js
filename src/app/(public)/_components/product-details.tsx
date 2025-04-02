@@ -236,7 +236,7 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
         <Separator />
 
         {/* Quantity Selector & Add to Cart Button */}
-        <div className={cn("pt-2 flex flex-col sm:flex-row gap-4")}>
+        <div className={cn("pt-2 flex gap-4")}>
           {/* Quantity Input */}
           <div className={cn("flex items-center border rounded-md")}>
             <Button

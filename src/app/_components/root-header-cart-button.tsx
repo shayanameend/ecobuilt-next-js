@@ -5,7 +5,7 @@ import Link from "next/link";
 import * as React from "react";
 
 import { useStore } from "@nanostores/react";
-import { ShoppingCartIcon, XIcon } from "lucide-react";
+import { MinusIcon, PlusIcon, ShoppingCartIcon, XIcon } from "lucide-react"; // Import PlusIcon and MinusIcon
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -34,6 +34,36 @@ export function RootHeaderCartButton() {
     return { totalQuantity: quantity, totalPrice: price };
   }, [cart.items]);
 
+  // Function to update item quantity
+  const handleUpdateQuantity = (itemId: string, change: number) => {
+    const updatedItems = cart.items
+      .map((item) => {
+        if (item.id === itemId) {
+          const newQuantity = item.quantity + change;
+          // Ensure quantity doesn't go below 1 if decreasing,
+          // or handle removal if it reaches 0
+          return { ...item, quantity: Math.max(0, newQuantity) };
+        }
+        return item;
+      })
+      .filter((item) => item.quantity > 0); // Remove items with quantity 0
+
+    $cart.set({
+      ...cart,
+      items: updatedItems,
+    });
+  };
+
+  // Specific handlers for increase/decrease
+  const handleIncreaseQuantity = (itemId: string) => {
+    handleUpdateQuantity(itemId, 1);
+  };
+
+  const handleDecreaseQuantity = (itemId: string) => {
+    handleUpdateQuantity(itemId, -1);
+  };
+
+  // Keep the original remove function for the 'X' button
   const handleRemoveItem = (itemId: string) => {
     $cart.set({
       ...cart,
@@ -65,7 +95,7 @@ export function RootHeaderCartButton() {
       </PopoverTrigger>
       <PopoverContent
         className={cn("w-80 space-y-0 p-0 mt-2 mr-4")}
-        align="end"
+        align="center"
       >
         <div className={cn("p-4")}>
           <h3 className={cn("text-lg font-medium")}>Shopping Cart</h3>
@@ -86,6 +116,7 @@ export function RootHeaderCartButton() {
                   const itemSubtotal = itemPrice * item.quantity;
                   return (
                     <div key={item.id} className={cn("flex items-start gap-4")}>
+                      {/* Image */}
                       <div
                         className={cn(
                           "relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border",
@@ -100,6 +131,7 @@ export function RootHeaderCartButton() {
                         />
                       </div>
 
+                      {/* Details & Quantity Controls */}
                       <div className={cn("flex-grow space-y-1")}>
                         <p
                           className={cn(
@@ -108,14 +140,40 @@ export function RootHeaderCartButton() {
                         >
                           {item.name}
                         </p>
+                        {/* Quantity Controls */}
+                        <div className={cn("flex items-center gap-2")}>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleDecreaseQuantity(item.id)}
+                            aria-label={`Decrease quantity of ${item.name}`}
+                            disabled={item.quantity <= 1} // Disable if quantity is 1
+                          >
+                            <MinusIcon className="h-3 w-3" />
+                          </Button>
+                          <span className="text-sm font-medium w-4 text-center">
+                            {item.quantity}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleIncreaseQuantity(item.id)}
+                            aria-label={`Increase quantity of ${item.name}`}
+                          >
+                            <PlusIcon className="h-3 w-3" />
+                          </Button>
+                        </div>
                         <p className={cn("text-xs text-muted-foreground")}>
-                          Qty: {item.quantity} @ {formatPrice(itemPrice)}
+                          @ {formatPrice(itemPrice)} each
                         </p>
                         <p className={cn("text-sm font-medium")}>
-                          {formatPrice(itemSubtotal)}
+                          Subtotal: {formatPrice(itemSubtotal)}
                         </p>
                       </div>
 
+                      {/* Remove Button */}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -139,7 +197,7 @@ export function RootHeaderCartButton() {
         {cart.items.length > 0 && (
           <div className={cn("p-4 space-y-3")}>
             <div className={cn("flex justify-between text-base font-medium")}>
-              <p>Subtotal</p>
+              <p>Total</p>
               <p>{formatPrice(totalPrice)}</p>
             </div>
             <p className={cn("text-xs text-muted-foreground")}>
@@ -147,6 +205,7 @@ export function RootHeaderCartButton() {
             </p>
             <div className={cn("flex flex-col gap-2 sm:flex-row")}>
               <Button className={cn("flex-1")} asChild>
+                {/* Ensure checkout link is correct */}
                 <Link href={routes.app.public.home.url()}>Checkout</Link>
               </Button>
             </div>
