@@ -234,7 +234,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      <section className={cn("lg:px-32 flex items-baseline")}>
+      <section className={cn("flex items-baseline mx-auto max-w-7xl")}>
         <ProductsSidebar />
         <div className={cn("flex-1 space-y-8 py-8 px-4")}>
           <div
@@ -280,7 +280,7 @@ export default function ProductsPage() {
               </div>
               <div className={cn("flex items-center gap-8")}>
                 <div>
-                  <p>
+                  <p className={cn("text-sm text-muted-foreground")}>
                     Showing{" "}
                     {productsQuery.meta.limit < productsQuery.meta.total
                       ? productsQuery.meta.limit

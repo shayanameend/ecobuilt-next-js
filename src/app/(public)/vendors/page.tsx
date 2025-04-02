@@ -134,7 +134,9 @@ export default function VendorsPage() {
 
     params.delete("page");
 
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    const newUrl = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
 
     router.push(newUrl);
   };
@@ -148,7 +150,9 @@ export default function VendorsPage() {
       params.delete("page");
     }
 
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    const newUrl = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
 
     router.push(newUrl);
   };
@@ -190,7 +194,7 @@ export default function VendorsPage() {
 
   return (
     <>
-      <section className={cn("flex items-baseline")}>
+      <section className={cn("flex items-baseline mx-auto max-w-7xl")}>
         <VendorsSidebar />
         <div className={cn("flex-1 space-y-8 py-8 px-4")}>
           <div
@@ -224,7 +228,7 @@ export default function VendorsPage() {
               <div>
                 <ul
                   className={cn(
-                    "grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4",
+                    "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4",
                   )}
                 >
                   {vendorsQuery.data.vendors.map((vendor) => (
