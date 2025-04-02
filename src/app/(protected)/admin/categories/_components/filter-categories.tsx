@@ -92,13 +92,14 @@ export function FilterCategories() {
       params.delete("isDeleted");
     }
 
-    // Preserve the name parameter if it exists
     const name = searchParams.get("name");
     if (name) {
       params.set("name", name);
     }
 
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    const newUrl = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
     router.push(newUrl);
 
     setIsFilterCategoriesOpen(false);
@@ -110,14 +111,15 @@ export function FilterCategories() {
       isDeleted: false,
     });
 
-    // Preserve only the name parameter if it exists
     const name = searchParams.get("name");
     const params = new URLSearchParams();
     if (name) {
       params.set("name", name);
     }
 
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    const newUrl = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
     router.push(newUrl);
 
     setIsFilterCategoriesOpen(false);

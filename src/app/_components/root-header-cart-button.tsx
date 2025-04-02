@@ -5,7 +5,7 @@ import Link from "next/link";
 import * as React from "react";
 
 import { useStore } from "@nanostores/react";
-import { MinusIcon, PlusIcon, ShoppingCartIcon, XIcon } from "lucide-react"; // Import PlusIcon and MinusIcon
+import { MinusIcon, PlusIcon, ShoppingCartIcon, XIcon } from "lucide-react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -34,19 +34,16 @@ export function RootHeaderCartButton() {
     return { totalQuantity: quantity, totalPrice: price };
   }, [cart.items]);
 
-  // Function to update item quantity
   const handleUpdateQuantity = (itemId: string, change: number) => {
     const updatedItems = cart.items
       .map((item) => {
         if (item.id === itemId) {
           const newQuantity = item.quantity + change;
-          // Ensure quantity doesn't go below 1 if decreasing,
-          // or handle removal if it reaches 0
           return { ...item, quantity: Math.max(0, newQuantity) };
         }
         return item;
       })
-      .filter((item) => item.quantity > 0); // Remove items with quantity 0
+      .filter((item) => item.quantity > 0);
 
     $cart.set({
       ...cart,
@@ -54,7 +51,6 @@ export function RootHeaderCartButton() {
     });
   };
 
-  // Specific handlers for increase/decrease
   const handleIncreaseQuantity = (itemId: string) => {
     handleUpdateQuantity(itemId, 1);
   };
@@ -63,7 +59,6 @@ export function RootHeaderCartButton() {
     handleUpdateQuantity(itemId, -1);
   };
 
-  // Keep the original remove function for the 'X' button
   const handleRemoveItem = (itemId: string) => {
     $cart.set({
       ...cart,
@@ -116,7 +111,6 @@ export function RootHeaderCartButton() {
                   const itemSubtotal = itemPrice * item.quantity;
                   return (
                     <div key={item.id} className={cn("flex items-start gap-4")}>
-                      {/* Image */}
                       <div
                         className={cn(
                           "relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border",
@@ -131,7 +125,6 @@ export function RootHeaderCartButton() {
                         />
                       </div>
 
-                      {/* Details & Quantity Controls */}
                       <div className={cn("flex-grow space-y-1")}>
                         <p
                           className={cn(
@@ -140,7 +133,7 @@ export function RootHeaderCartButton() {
                         >
                           {item.name}
                         </p>
-                        {/* Quantity Controls */}
+
                         <div className={cn("flex items-center gap-2")}>
                           <Button
                             variant="outline"
@@ -148,7 +141,7 @@ export function RootHeaderCartButton() {
                             className="h-6 w-6"
                             onClick={() => handleDecreaseQuantity(item.id)}
                             aria-label={`Decrease quantity of ${item.name}`}
-                            disabled={item.quantity <= 1} // Disable if quantity is 1
+                            disabled={item.quantity <= 1}
                           >
                             <MinusIcon className="h-3 w-3" />
                           </Button>
@@ -173,7 +166,6 @@ export function RootHeaderCartButton() {
                         </p>
                       </div>
 
-                      {/* Remove Button */}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -205,7 +197,6 @@ export function RootHeaderCartButton() {
             </p>
             <div className={cn("flex flex-col gap-2 sm:flex-row")}>
               <Button className={cn("flex-1")} asChild>
-                {/* Ensure checkout link is correct */}
                 <Link href={routes.app.public.home.url()}>Checkout</Link>
               </Button>
             </div>

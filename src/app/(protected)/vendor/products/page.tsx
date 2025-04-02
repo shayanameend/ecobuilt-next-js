@@ -14,12 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import {
-  AlertCircleIcon,
-  Loader2Icon,
-  MessageSquareIcon,
-  SearchIcon,
-} from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -132,7 +127,6 @@ export default function ProductsPage() {
   const currentPage = Number(searchParams.get("page") || "1");
   const currentName = searchParams.get("name") || "";
 
-  // Get filter values from URL
   const currentCategoryId = searchParams.get("categoryId") || "";
   const currentSort = searchParams.get("sort") || "";
   const currentIsDeleted = searchParams.get("isDeleted") === "true";
@@ -188,10 +182,8 @@ export default function ProductsPage() {
   const handleSearch = (event: FormEvent) => {
     event.preventDefault();
 
-    // Preserve existing filter params
     const params = new URLSearchParams(searchParams.toString());
 
-    // Update name parameter and reset to page 1
     if (queryTerm) {
       params.set("name", queryTerm);
     } else {
@@ -200,13 +192,14 @@ export default function ProductsPage() {
 
     params.delete("page");
 
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    const newUrl = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
 
     router.push(newUrl);
   };
 
   const handlePageChange = (page: number) => {
-    // Update only the page parameter, preserving all other params
     const params = new URLSearchParams(searchParams.toString());
 
     if (page > 1) {
@@ -215,7 +208,9 @@ export default function ProductsPage() {
       params.delete("page");
     }
 
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    const newUrl = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
     router.push(newUrl);
   };
 

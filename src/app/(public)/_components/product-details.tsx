@@ -82,7 +82,6 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
           item.id === product.id
             ? {
                 ...item,
-
                 quantity: Math.min(item.quantity + quantity, product.stock),
               }
             : item,
@@ -98,17 +97,22 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
   };
 
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12")}>
-      <div className={cn("flex flex-col items-center")}>
+    <div
+      className={cn(
+        "grid grid-cols-1 md:grid-cols-5 gap-8 lg:gap-12 items-start",
+      )}
+    >
+      <div className={cn("w-full md:col-span-2 max-w-xl mx-auto md:mx-0")}>
+        {" "}
         <Carousel
           setApi={setApi}
           opts={{
             loop: product.pictureIds.length > 1,
           }}
-          className={cn("w-full max-w-md")}
+          className={cn("w-full")}
         >
           <CarouselContent>
-            {product.pictureIds.map((id) => (
+            {product.pictureIds.map((id, index) => (
               <CarouselItem key={id}>
                 <div
                   className={cn(
@@ -121,7 +125,7 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
                     width={600}
                     height={600}
                     className={cn("h-full w-full object-contain")}
-                    priority={id === product.pictureIds[0]}
+                    priority={index === 0}
                   />
                 </div>
               </CarouselItem>
@@ -130,12 +134,15 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
 
           {product.pictureIds.length > 1 && (
             <>
-              <CarouselPrevious className={cn("absolute left-2")} />
-              <CarouselNext className={cn("absolute right-2")} />
+              <CarouselPrevious
+                className={cn("absolute left-2 top-1/2 -translate-y-1/2")}
+              />
+              <CarouselNext
+                className={cn("absolute right-2 top-1/2 -translate-y-1/2")}
+              />
             </>
           )}
         </Carousel>
-
         {product.pictureIds.length > 1 && (
           <div className={cn("mt-4 flex flex-wrap justify-center gap-2")}>
             {product.pictureIds.map((id, index) => (
@@ -148,6 +155,7 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
                     ? "ring-2 ring-primary ring-offset-2"
                     : "opacity-60",
                 )}
+                aria-label={`Go to slide ${index + 1}`}
               >
                 <Image
                   src={`${process.env.NEXT_PUBLIC_FILE_URL}/${id}`}
@@ -162,13 +170,13 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
         )}
       </div>
 
-      <div className={cn("flex flex-col space-y-4")}>
+      <div className={cn("flex flex-col space-y-4 md:col-span-3")}>
         <h1 className={cn("text-2xl lg:text-3xl font-bold tracking-tight")}>
           {product.name}
         </h1>
 
-        <div className={cn("flex flex-wrap items-center gap-2")}>
-          <span className={cn("text-sm text-muted-foreground")}>
+        <div className={cn("flex flex-wrap items-center gap-2 text-sm")}>
+          <span className={cn("text-muted-foreground")}>
             Sold by: {product.vendor.name}
           </span>
           <Separator orientation="vertical" className="h-4" />
@@ -182,6 +190,7 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
                 ? formatPrice(product.salePrice)
                 : formatPrice(product.price)}
             </span>
+
             {product.salePrice && (
               <span
                 className={cn(
@@ -200,37 +209,39 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
         <div className={cn("space-y-2")}>
           <h2 className={cn("text-lg font-semibold")}>Description</h2>
           <p className={cn("text-sm text-muted-foreground")}>
-            {product.description}
+            {product.description || "No description available."}
           </p>
         </div>
 
         <div className={cn("text-sm text-muted-foreground space-y-1")}>
-          <p>SKU: {product.sku}</p>
+          <p>SKU: {product.sku || "N/A"}</p>
           <p>
             Stock:{" "}
             {product.stock > 0 ? (
-              <span className={cn("text-green-600")}>
+              <span className={cn("font-medium text-green-600")}>
                 {product.stock} In Stock
               </span>
             ) : (
-              <span className={cn("text-red-600")}>Out of Stock</span>
+              <span className={cn("font-medium text-red-600")}>
+                Out of Stock
+              </span>
             )}
           </p>
         </div>
 
         <Separator />
 
-        <div className={cn("pt-2 flex gap-4")}>
+        <div className={cn("pt-2 flex flex-col sm:flex-row gap-4")}>
           <div className={cn("flex items-center border rounded-md")}>
             <Button
               variant="outline"
               size="icon"
-              className={cn("h-9 w-9 border-r rounded-r-none")}
+              className={cn("h-10 w-10 border-r rounded-r-none")}
               onClick={() => handleQuantityChange(-1)}
               disabled={quantity <= 1 || product.stock <= 0}
+              aria-label="Decrease quantity"
             >
               <MinusIcon className="h-4 w-4" />
-              <span className="sr-only">Decrease quantity</span>
             </Button>
             <Input
               type="number"
@@ -239,19 +250,20 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
               value={quantity}
               onChange={handleInputChange}
               className={cn(
-                "h-9 w-16 rounded-none text-center focus-visible:ring-0 focus-visible:ring-offset-0",
+                "h-10 w-16 rounded-none border-y-0 text-center focus-visible:ring-0 focus-visible:ring-offset-0",
               )}
               disabled={product.stock <= 0}
+              aria-label="Quantity"
             />
             <Button
               variant="outline"
               size="icon"
-              className={cn("h-9 w-9 border-l rounded-l-none")}
+              className={cn("h-10 w-10 border-l rounded-l-none")}
               onClick={() => handleQuantityChange(1)}
               disabled={quantity >= product.stock || product.stock <= 0}
+              aria-label="Increase quantity"
             >
               <PlusIcon className="h-4 w-4" />
-              <span className="sr-only">Increase quantity</span>
             </Button>
           </div>
 
@@ -264,9 +276,10 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
             {product.stock <= 0 ? "Out of Stock" : "Add to Cart"}
           </Button>
         </div>
+
         {product.stock > 0 && product.stock < 10 && (
           <p className={cn("mt-2 text-sm text-orange-600")}>
-            Limited quantity available! ({product.stock} left)
+            Limited quantity available! Only {product.stock} left in stock.
           </p>
         )}
       </div>

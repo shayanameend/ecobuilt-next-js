@@ -1,7 +1,5 @@
 "use client";
 
-import type { FormEvent } from "react";
-
 import type {
   MultipleResponseType,
   ProductType,
@@ -10,10 +8,9 @@ import type {
 } from "~/lib/types";
 
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-
 import axios from "axios";
 import { AlertCircleIcon, Loader2Icon, Package } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -23,12 +20,20 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { EmptyState } from "./empty-state";
 import { Product } from "./product";
 
-async function getRelatedProducts({ vendorId }: { vendorId: string }) {
+type EnrichedProductType = ProductType & {
+  category: PublicCategoryType;
+  vendor: VendorProfileType;
+};
+
+async function getRelatedProducts(
+  vendorId: string,
+): Promise<MultipleResponseType<{ products: EnrichedProductType[] }>> {
   const page = 1;
   const limit = 4;
   const sort = "RELEVANCE";
@@ -36,21 +41,23 @@ async function getRelatedProducts({ vendorId }: { vendorId: string }) {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
+    sort: sort,
+    vendorId: vendorId,
   });
-
-  if (sort) {
-    params.append("sort", sort);
-  }
-
-  if (vendorId) {
-    params.append("vendorId", vendorId);
-  }
 
   const url = `${routes.api.public.products.url()}?${params.toString()}`;
 
-  const response = await axios.get(url);
+  try {
+    const response = await axios.get(url);
 
-  return response.data;
+    return response.data as MultipleResponseType<{
+      products: EnrichedProductType[];
+    }>;
+  } catch (error) {
+    console.error("Failed to fetch related products:", error);
+
+    throw new Error("Could not fetch related products.");
+  }
 }
 
 interface RelatedProductsProps {
@@ -61,41 +68,36 @@ export function RelatedProducts({ vendorId }: Readonly<RelatedProductsProps>) {
   const router = useRouter();
 
   const {
-    data: relatedProductsQuery,
-    isLoading: relatedProductsQueryIsLoading,
-    isError: relatedProductsQueryIsError,
-  } = useQuery<
-    MultipleResponseType<{
-      products: (ProductType & {
-        category: PublicCategoryType;
-        vendor: VendorProfileType;
-      })[];
-    }>
-  >({
-    queryKey: ["related-products"],
-    queryFn: () => getRelatedProducts({ vendorId }),
+    data: relatedProductsData,
+    isLoading: isLoadingRelatedProducts,
+    isError: isErrorRelatedProducts,
+  } = useQuery<MultipleResponseType<{ products: EnrichedProductType[] }>>({
+    queryKey: ["related-products", vendorId],
+    queryFn: () => getRelatedProducts(vendorId),
+    enabled: !!vendorId,
+    retry: 1,
   });
 
-  if (relatedProductsQueryIsLoading) {
+  if (isLoadingRelatedProducts) {
     return (
-      <section className="flex-1 flex items-center justify-center p-8">
+      <section className="flex flex-1 items-center justify-center p-8">
         <div className="text-center space-y-4">
-          <Loader2Icon className="size-8 text-primary animate-spin mx-auto" />
+          <Loader2Icon className="mx-auto size-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading related products...</p>
         </div>
       </section>
     );
   }
 
-  if (relatedProductsQueryIsError || !relatedProductsQuery?.data?.products) {
+  if (isErrorRelatedProducts) {
     return (
-      <section className="flex-1 flex items-center justify-center p-8">
+      <section className="flex flex-1 items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <AlertCircleIcon className="size-12 text-destructive mx-auto mb-2" />
+            <AlertCircleIcon className="mx-auto mb-2 size-12 text-destructive" />
             <CardTitle>Error Loading Products</CardTitle>
             <CardDescription>
-              We couldn't load your products information. Please try again
-              later.
+              We couldn't load related products. Please try again later.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center">
@@ -108,43 +110,48 @@ export function RelatedProducts({ vendorId }: Readonly<RelatedProductsProps>) {
     );
   }
 
+  const products = relatedProductsData?.data?.products ?? [];
+
   return (
-    <>
-      <section className={cn("flex items-baseline mx-auto max-w-7xl")}>
-        <div className={cn("flex-1 space-y-8 py-8 px-4")}>
-          {relatedProductsQuery.data.products.length > 0 ? (
-            <>
-              <div>
-                <ul
-                  className={cn(
-                    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4",
-                  )}
-                >
-                  {relatedProductsQuery.data.products.map((product) => (
-                    <li key={product.id}>
-                      <Product product={product} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </>
-          ) : (
-            <EmptyState
-              icon={Package}
-              title="No related products found"
-              description={
-                "There are no related products available at the moment."
-              }
-              action={{
-                label: "Refresh",
-                onClick: () => {
-                  router.push(window.location.pathname);
-                },
-              }}
-            />
-          )}
+    <section className="mx-auto max-w-7xl">
+      <div className="flex-1 space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h2
+              className={cn(
+                "text-lg font-bold tracking-tight text-foreground sm:text-2xl",
+                domine.className,
+              )}
+            >
+              Related Products
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Check out other items from this vendor.
+            </p>
+          </div>
         </div>
-      </section>
-    </>
+
+        {products.length > 0 ? (
+          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {products.map((product) => (
+              <li key={product.id}>
+                <Product product={product} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState
+            icon={Package}
+            title="No Related Products Found"
+            description="There are no other products available from this vendor right now."
+            action={{
+              label: "Refresh",
+
+              onClick: () => router.refresh(),
+            }}
+          />
+        )}
+      </div>
+    </section>
   );
 }
