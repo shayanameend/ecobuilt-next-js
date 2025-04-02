@@ -7,14 +7,13 @@ import type {
 } from "~/lib/types";
 
 import Image from "next/image";
-import * as React from "react"; // Import React for useState
+import * as React from "react";
 
 import { useStore } from "@nanostores/react";
-import { MinusIcon, PlusIcon } from "lucide-react"; // Icons for quantity
+import { MinusIcon, PlusIcon } from "lucide-react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-// Import Carousel components
 import {
   Carousel,
   type CarouselApi,
@@ -37,13 +36,10 @@ interface ProductDetailsProps {
 
 export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
   const cart = useStore($cart);
-  // State for Carousel API to sync thumbnails
   const [api, setApi] = React.useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = React.useState(0);
-  // State for quantity
   const [quantity, setQuantity] = React.useState(1);
 
-  // Update current slide index when carousel changes
   React.useEffect(() => {
     if (!api) {
       return;
@@ -57,8 +53,8 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
   const handleQuantityChange = (change: number) => {
     setQuantity((prev) => {
       const newValue = prev + change;
-      if (newValue < 1) return 1; // Minimum quantity is 1
-      if (newValue > product.stock) return product.stock; // Maximum is stock
+      if (newValue < 1) return 1;
+      if (newValue > product.stock) return product.stock;
       return newValue;
     });
   };
@@ -75,7 +71,7 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
   };
 
   const handleAddToCart = () => {
-    if (quantity <= 0) return; // Should not happen with validation, but good practice
+    if (quantity <= 0) return;
 
     const existingItem = cart.items.find((item) => item.id === product.id);
 
@@ -86,7 +82,7 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
           item.id === product.id
             ? {
                 ...item,
-                // Ensure new total quantity doesn't exceed stock
+
                 quantity: Math.min(item.quantity + quantity, product.stock),
               }
             : item,
@@ -98,20 +94,16 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
         items: [...cart.items, { ...product, quantity: quantity }],
       });
     }
-    // Optional: Add user feedback like a toast notification here
     console.log(`Added ${quantity} of ${product.name} to cart`);
-    // Reset quantity to 1 after adding? Optional.
-    // setQuantity(1);
   };
 
   return (
     <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12")}>
-      {/* Left Column: Image Carousel */}
       <div className={cn("flex flex-col items-center")}>
         <Carousel
-          setApi={setApi} // Get API instance
+          setApi={setApi}
           opts={{
-            loop: product.pictureIds.length > 1, // Loop only if multiple images
+            loop: product.pictureIds.length > 1,
           }}
           className={cn("w-full max-w-md")}
         >
@@ -129,13 +121,13 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
                     width={600}
                     height={600}
                     className={cn("h-full w-full object-contain")}
-                    priority={id === product.pictureIds[0]} // Prioritize first image
+                    priority={id === product.pictureIds[0]}
                   />
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
-          {/* Show controls only if multiple images */}
+
           {product.pictureIds.length > 1 && (
             <>
               <CarouselPrevious className={cn("absolute left-2")} />
@@ -144,17 +136,16 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
           )}
         </Carousel>
 
-        {/* Thumbnails */}
         {product.pictureIds.length > 1 && (
           <div className={cn("mt-4 flex flex-wrap justify-center gap-2")}>
             {product.pictureIds.map((id, index) => (
               <button
                 key={id}
-                onClick={() => api?.scrollTo(index)} // Scroll to clicked thumbnail
+                onClick={() => api?.scrollTo(index)}
                 className={cn(
                   "h-16 w-16 overflow-hidden rounded border transition-opacity hover:opacity-80",
                   index === currentSlide
-                    ? "ring-2 ring-primary ring-offset-2" // Highlight selected
+                    ? "ring-2 ring-primary ring-offset-2"
                     : "opacity-60",
                 )}
               >
@@ -171,14 +162,11 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
         )}
       </div>
 
-      {/* Right Column: Product Information */}
       <div className={cn("flex flex-col space-y-4")}>
-        {/* Product Title */}
         <h1 className={cn("text-2xl lg:text-3xl font-bold tracking-tight")}>
           {product.name}
         </h1>
 
-        {/* Vendor & Category */}
         <div className={cn("flex flex-wrap items-center gap-2")}>
           <span className={cn("text-sm text-muted-foreground")}>
             Sold by: {product.vendor.name}
@@ -187,7 +175,6 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
           <Badge variant="outline">{product.category.name}</Badge>
         </div>
 
-        {/* Price */}
         <div className={cn("flex flex-col")}>
           <p className={cn("text-2xl lg:text-3xl font-semibold")}>
             <span>
@@ -210,7 +197,6 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
 
         <Separator />
 
-        {/* Description */}
         <div className={cn("space-y-2")}>
           <h2 className={cn("text-lg font-semibold")}>Description</h2>
           <p className={cn("text-sm text-muted-foreground")}>
@@ -218,7 +204,6 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
           </p>
         </div>
 
-        {/* SKU & Stock */}
         <div className={cn("text-sm text-muted-foreground space-y-1")}>
           <p>SKU: {product.sku}</p>
           <p>
@@ -235,9 +220,7 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
 
         <Separator />
 
-        {/* Quantity Selector & Add to Cart Button */}
         <div className={cn("pt-2 flex gap-4")}>
-          {/* Quantity Input */}
           <div className={cn("flex items-center border rounded-md")}>
             <Button
               variant="outline"
@@ -272,12 +255,11 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
             </Button>
           </div>
 
-          {/* Add to Cart Button */}
           <Button
             size="lg"
-            className={cn("flex-grow")} // Allow button to grow
+            className={cn("flex-grow")}
             onClick={handleAddToCart}
-            disabled={product.stock <= 0} // Disable if out of stock
+            disabled={product.stock <= 0}
           >
             {product.stock <= 0 ? "Out of Stock" : "Add to Cart"}
           </Button>
