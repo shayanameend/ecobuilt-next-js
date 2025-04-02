@@ -1,7 +1,14 @@
 import type { CartItemType } from "~/lib/types";
 
-import { map } from "nanostores";
+import { persistentMap } from "@nanostores/persistent";
 
-export const $cart = map<{ items: CartItemType[] }>({
-  items: [],
-});
+export const $cart = persistentMap<{ items: CartItemType[] }>(
+  "ecobuilt-cart:",
+  {
+    items: [],
+  },
+  {
+    encode: JSON.stringify,
+    decode: JSON.parse,
+  },
+);
