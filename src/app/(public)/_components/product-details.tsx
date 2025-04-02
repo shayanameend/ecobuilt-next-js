@@ -231,7 +231,7 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
 
         <Separator />
 
-        <div className={cn("pt-2 flex flex-col sm:flex-row gap-4")}>
+        <div className={cn("pt-2 flex gap-4")}>
           <div className={cn("flex items-center border rounded-md")}>
             <Button
               variant="outline"
