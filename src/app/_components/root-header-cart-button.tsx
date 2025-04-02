@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { ScrollArea } from "~/components/ui/scroll-area";
+
 import { Separator } from "~/components/ui/separator";
 import { routes } from "~/lib/routes";
 import { cn, formatPrice } from "~/lib/utils";
@@ -89,22 +89,22 @@ export function RootHeaderCartButton() {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className={cn("w-80 space-y-0 p-0 mt-2 mr-4")}
+        className={cn(
+          "w-80 space-y-0 p-0 mt-2 mr-4 max-h-[80vh] overflow-visible",
+        )}
         align="center"
       >
         <div className={cn("p-4")}>
           <h3 className={cn("text-lg font-medium")}>Shopping Cart</h3>
         </div>
         <Separator />
-
         {cart.items.length === 0 ? (
           <div className={cn("p-6 text-center text-sm text-muted-foreground")}>
             Your cart is empty.
           </div>
         ) : (
           <>
-            <ScrollArea className={cn("max-h-[300px]")}>
-              {" "}
+            <div className={cn("max-h-[300px] w-full overflow-y-auto")}>
               <div className={cn("p-4 space-y-4")}>
                 {cart.items.map((item) => {
                   const itemPrice = item.salePrice ?? item.price;
@@ -124,7 +124,6 @@ export function RootHeaderCartButton() {
                           className={cn("object-cover")}
                         />
                       </div>
-
                       <div className={cn("flex-grow space-y-1")}>
                         <p
                           className={cn(
@@ -133,7 +132,6 @@ export function RootHeaderCartButton() {
                         >
                           {item.name}
                         </p>
-
                         <div className={cn("flex items-center gap-2")}>
                           <Button
                             variant="outline"
@@ -165,7 +163,6 @@ export function RootHeaderCartButton() {
                           Subtotal: {formatPrice(itemSubtotal)}
                         </p>
                       </div>
-
                       <Button
                         variant="ghost"
                         size="icon"
@@ -181,11 +178,10 @@ export function RootHeaderCartButton() {
                   );
                 })}
               </div>
-            </ScrollArea>
+            </div>
             <Separator />
           </>
         )}
-
         {cart.items.length > 0 && (
           <div className={cn("p-4 space-y-3")}>
             <div className={cn("flex justify-between text-base font-medium")}>
