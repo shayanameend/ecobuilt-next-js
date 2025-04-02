@@ -9,19 +9,11 @@ import {
 } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useStore } from "@nanostores/react";
-
-import { MenuIcon, ShoppingCartIcon } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 
 import { assets } from "~/assets";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
 import {
   Sheet,
   SheetContent,
@@ -35,7 +27,7 @@ import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { Role } from "~/lib/types";
 import { cn } from "~/lib/utils";
-import { $cart } from "~/stores/cart";
+import { RootHeaderCartButton } from "./root-header-cart-button";
 
 const navLinks = [
   {
@@ -217,48 +209,5 @@ function RootHeaderCTAButton({ className }: { className?: string }) {
     >
       Sign In
     </Button>
-  );
-}
-
-function RootHeaderCartButton() {
-  const cart = useStore($cart);
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" className={cn("relative")}>
-          {cart.items.length > 0 && (
-            <Badge className={cn("absolute -top-1.5 -right-1.5 size-5")}>
-              {cart.items.length}
-            </Badge>
-          )}
-          <ShoppingCartIcon />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className={cn("space-y-4 mt-2 mr-4 w-72")}>
-        <h2>Your Cart</h2>
-        {cart.items.length > 0 && (
-          <ul className={cn("space-y-2")}>
-            {cart.items.map((item) => (
-              <li key={item.id}>
-                <div className={cn("flex flex-row items-center gap-2")}>
-                  <Image
-                    src={`${process.env.NEXT_PUBLIC_FILE_URL}/${item.pictureIds[0]}`}
-                    alt={item.name}
-                    width={48}
-                    height={48}
-                    className={cn("size-12 object-cover rounded-md")}
-                  />
-                  <div>
-                    <h3>{item.name}</h3>
-                    <p>{item.price}</p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </PopoverContent>
-    </Popover>
   );
 }
