@@ -240,17 +240,21 @@ export function VendorsSidebar() {
               </FormItem>
             )}
           />
-          <Button
-            variant="outline"
-            className={cn("w-full")}
-            type="button"
-            onClick={resetFilters}
-          >
-            Reset
-          </Button>
-          <Button variant="default" className={cn("w-full")} type="submit">
-            Apply
-          </Button>
+
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className={cn("flex-1")}
+              type="button"
+              onClick={resetFilters}
+            >
+              Reset
+            </Button>
+
+            <Button variant="default" className={cn("flex-1")} type="submit">
+              Apply
+            </Button>
+          </div>
         </form>
       </Form>
     </aside>
