@@ -1,6 +1,6 @@
 "use client";
 
-import type { MultipleResponseType, ReviewType } from "~/lib/types";
+import type { MultipleResponseType, PublicReviewType } from "~/lib/types";
 
 import * as React from "react";
 
@@ -59,7 +59,7 @@ async function getReviewsPage({
 }) {
   const url = routes.api.public.reviews.url(productId);
   const response = await axios.get<
-    MultipleResponseType<{ reviews: ReviewType[] }>
+    MultipleResponseType<{ reviews: PublicReviewType[] }>
   >(url, {
     params: {
       sort: "LATEST",

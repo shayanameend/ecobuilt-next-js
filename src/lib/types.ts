@@ -23,6 +23,16 @@ export enum CategoryStatus {
   REJECTED = "REJECTED",
 }
 
+export enum OrderStatus {
+  PENDING = "PENDING",
+  REJECTED = "REJECTED",
+  CANCELLED = "CANCELLED",
+  APPROVED = "APPROVED",
+  PROCESSING = "PROCESSING",
+  IN_TRANSIT = "IN_TRANSIT",
+  DELIVERED = "DELIVERED",
+}
+
 export type PublicAuthType = {
   id: string;
   email: string;
@@ -104,7 +114,22 @@ export type CartItemType = PublicProductType & {
   quantity: number;
 };
 
-export type ReviewType = {
+export type PublicOrderType = {
+  id: string;
+  status: OrderStatus;
+  totalPrice: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PublicOrderToProductType = {
+  id: string;
+  quantity: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PublicReviewType = {
   id: string;
   rating: number;
   comment: string;
