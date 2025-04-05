@@ -301,6 +301,8 @@ export const adminRoutes = [
   routes.app.admin.products.url(),
   routes.app.admin.orders.url(),
   routes.app.admin.users.url(),
+  routes.app.admin.vendors.url(),
+  routes.app.superAdmin.admins.url(),
   routes.app.admin.settings.url(),
 ];
 
@@ -314,7 +316,7 @@ export const vendorRoutes = [
 ];
 
 export const userRoutes = [
-  routes.app.user.orders.url(),
-  routes.app.user.checkout.url(),
   routes.app.user.settings.url(),
+  routes.app.user.checkout.url(),
+  routes.app.user.orders.url(),
 ];
