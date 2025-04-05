@@ -16,13 +16,7 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import {
   Pagination,
@@ -64,19 +58,27 @@ async function getOrders({
   page = 1,
   limit = 10,
   sort = "",
-  userId = "",
   status = "",
-  minPrice,
-  maxPrice,
+  categoryId = "",
+  userName = "",
+  vendorName = "",
+  productName = "",
+  userId = "",
+  minTotalPrice,
+  maxTotalPrice,
 }: {
   token: string | null;
   page?: number;
   limit?: number;
   sort?: string;
-  userId?: string;
   status?: string;
-  minPrice?: number;
-  maxPrice?: number;
+  categoryId?: string;
+  userName?: string;
+  vendorName?: string;
+  productName?: string;
+  userId?: string;
+  minTotalPrice?: number;
+  maxTotalPrice?: number;
 }) {
   const params = new URLSearchParams({
     page: page.toString(),
@@ -87,20 +89,36 @@ async function getOrders({
     params.append("sort", sort);
   }
 
-  if (userId) {
-    params.append("userId", userId);
-  }
-
   if (status) {
     params.append("status", status);
   }
 
-  if (minPrice !== undefined && minPrice > 0) {
-    params.append("minPrice", minPrice.toString());
+  if (categoryId) {
+    params.append("categoryId", categoryId);
   }
 
-  if (maxPrice !== undefined && maxPrice > 0) {
-    params.append("maxPrice", maxPrice.toString());
+  if (userName) {
+    params.append("userName", userName);
+  }
+
+  if (vendorName) {
+    params.append("vendorName", vendorName);
+  }
+
+  if (productName) {
+    params.append("productName", productName);
+  }
+
+  if (userId) {
+    params.append("userId", userId);
+  }
+
+  if (minTotalPrice !== undefined && minTotalPrice > 0) {
+    params.append("minTotalPrice", minTotalPrice.toString());
+  }
+
+  if (maxTotalPrice !== undefined && maxTotalPrice > 0) {
+    params.append("maxTotalPrice", maxTotalPrice.toString());
   }
 
   const response = await axios.get(
@@ -123,16 +141,20 @@ export default function OrdersPage() {
 
   const currentPage = Number(searchParams.get("page") || "1");
   const currentSort = searchParams.get("sort") || "";
-  const currentUserId = searchParams.get("userId") || "";
   const currentStatus = searchParams.get("status") || "";
-  const currentMinPrice = searchParams.get("minPrice")
-    ? Number(searchParams.get("minPrice"))
+  const currentCategoryId = searchParams.get("categoryId") || "";
+  const currentUserName = searchParams.get("userName") || "";
+  const currentVendorName = searchParams.get("vendorName") || "";
+  const currentProductName = searchParams.get("productName") || "";
+  const currentUserId = searchParams.get("userId") || "";
+  const currentMinTotalPrice = searchParams.get("minTotalPrice")
+    ? Number(searchParams.get("minTotalPrice"))
     : undefined;
-  const currentMaxPrice = searchParams.get("maxPrice")
-    ? Number(searchParams.get("maxPrice"))
+  const currentMaxTotalPrice = searchParams.get("maxTotalPrice")
+    ? Number(searchParams.get("maxTotalPrice"))
     : undefined;
 
-  const [queryTerm, setQueryTerm] = useState(currentUserId);
+  const [queryTerm, setQueryTerm] = useState(currentVendorName);
 
   const {
     data: ordersQuery,
@@ -155,20 +177,28 @@ export default function OrdersPage() {
       "orders",
       currentPage,
       currentSort,
-      currentUserId,
       currentStatus,
-      currentMinPrice,
-      currentMaxPrice,
+      currentCategoryId,
+      currentUserName,
+      currentVendorName,
+      currentProductName,
+      currentUserId,
+      currentMinTotalPrice,
+      currentMaxTotalPrice,
     ],
     queryFn: () =>
       getOrders({
         token,
         page: currentPage,
-        userId: currentUserId,
-        status: currentStatus,
         sort: currentSort,
-        minPrice: currentMinPrice,
-        maxPrice: currentMaxPrice,
+        status: currentStatus,
+        categoryId: currentCategoryId,
+        userName: currentUserName,
+        vendorName: currentVendorName,
+        productName: currentProductName,
+        userId: currentUserId,
+        minTotalPrice: currentMinTotalPrice,
+        maxTotalPrice: currentMaxTotalPrice,
       }),
   });
 
@@ -177,9 +207,9 @@ export default function OrdersPage() {
     const params = new URLSearchParams(window.location.search);
 
     if (queryTerm) {
-      params.set("userId", queryTerm);
+      params.set("vendorName", queryTerm);
     } else {
-      params.delete("userId");
+      params.delete("vendorName");
     }
 
     params.delete("page");
@@ -253,7 +283,7 @@ export default function OrdersPage() {
           className="flex-1 flex items-center relative"
         >
           <Input
-            placeholder="Search by User ID..."
+            placeholder="Search by Vendor Name..."
             className={cn("pr-10")}
             value={queryTerm}
             onChange={(e) => setQueryTerm(e.target.value)}
