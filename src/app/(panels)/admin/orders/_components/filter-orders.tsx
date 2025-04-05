@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  OrderStatus,
+  type PublicCategoryType,
+  type SingleResponseType,
+} from "~/lib/types";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FilterIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+
+import axios from "axios";
+import { FilterIcon, Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
 
@@ -34,21 +42,60 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { useAuthContext } from "~/context/auth";
+import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
-const FilterOrdersFormSchema = zod.object({
+const CreateProductFormSchema = zod.object({
+  categoryId: zod.preprocess(
+    (val) => (val === "" ? undefined : val),
+    zod
+      .string({
+        message: "Category ID must be a string",
+      })
+      .length(24, {
+        message: "Category ID must be a 24-character string",
+      })
+      .optional(),
+  ),
+  sort: zod.preprocess(
+    (val) => (val === "" ? undefined : val),
+    zod
+      .enum(["RELEVANCE", "LATEST", "OLDEST"], {
+        message: "Sort must be one of 'RELEVANCE', 'LATEST', 'OLDEST'",
+      })
+      .optional(),
+  ),
+  status: zod.preprocess(
+    (val) => (val === "" ? undefined : val),
+    zod
+      .enum(
+        [
+          OrderStatus.PENDING,
+          OrderStatus.REJECTED,
+          OrderStatus.APPROVED,
+          OrderStatus.CANCELLED,
+          OrderStatus.PROCESSING,
+          OrderStatus.IN_TRANSIT,
+          OrderStatus.DELIVERED,
+        ],
+        {
+          message:
+            "Status must be one of 'PENDING', 'REJECTED', 'APPROVED', 'CANCELLED', 'PROCESSING', 'IN_TRANSIT', 'DELIVERED'",
+        },
+      )
+      .optional(),
+  ),
   userName: zod.string().optional(),
   productName: zod.string().optional(),
-  categoryId: zod.string().optional(),
-  status: zod.string().optional(),
   minTotalPrice: zod.preprocess(
     (val) => (val === "" || val === 0 ? undefined : val),
     zod.coerce
       .number({
-        message: "Min price must be a number",
+        message: "Min Price must be a number",
       })
-      .min(0, {
-        message: "Min price must be at least 0",
+      .min(1, {
+        message: "Min Price must be a positive number",
       })
       .optional(),
   ),
@@ -56,77 +103,111 @@ const FilterOrdersFormSchema = zod.object({
     (val) => (val === "" || val === 0 ? undefined : val),
     zod.coerce
       .number({
-        message: "Max price must be a number",
+        message: "Max Price must be a number",
       })
-      .min(0, {
-        message: "Max price must be at least 0",
-      })
-      .optional(),
-  ),
-  sort: zod.preprocess(
-    (val) => (val === "" ? undefined : val),
-    zod
-      .enum(["LATEST", "OLDEST"], {
-        message: "Sort must be one of 'LATEST', 'OLDEST'",
+      .min(1, {
+        message: "Max Price must be a positive number",
       })
       .optional(),
   ),
 });
 
+async function getCategories({ token }: { token: string | null }) {
+  const response = await axios.get(routes.api.public.categories.url(), {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}
+
 export function FilterOrders() {
+  const { token } = useAuthContext();
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFilterOrdersOpen, setIsFilterOrdersOpen] = useState(false);
 
+  const currentCategoryId = searchParams.get("categoryId") || "";
+  const currentSort = searchParams.get("sort") || "";
+  const currentStatus = searchParams.get("status") || "";
   const currentUserName = searchParams.get("userName") || "";
   const currentProductName = searchParams.get("productName") || "";
-  const currentCategoryId = searchParams.get("categoryId") || "";
-  const currentStatus = searchParams.get("status") || "";
-  const currentSort = searchParams.get("sort") || "";
-  const currentMinTotalPrice = searchParams.get("minTotalPrice")
+  const currentMinPrice = searchParams.get("minTotalPrice")
     ? Number(searchParams.get("minTotalPrice"))
     : 0;
-  const currentMaxTotalPrice = searchParams.get("maxTotalPrice")
+  const currentMaxPrice = searchParams.get("maxTotalPrice")
     ? Number(searchParams.get("maxTotalPrice"))
     : 0;
 
-  const form = useForm<zod.infer<typeof FilterOrdersFormSchema>>({
-    resolver: zodResolver(FilterOrdersFormSchema),
+  const form = useForm<zod.infer<typeof CreateProductFormSchema>>({
+    resolver: zodResolver(CreateProductFormSchema),
     defaultValues: {
+      categoryId: currentCategoryId,
+      sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
+      status: currentStatus as OrderStatus | undefined,
       userName: currentUserName,
       productName: currentProductName,
-      categoryId: currentCategoryId,
-      status: currentStatus,
-      minTotalPrice: currentMinTotalPrice || undefined,
-      maxTotalPrice: currentMaxTotalPrice || undefined,
-      sort: currentSort as "LATEST" | "OLDEST" | undefined,
+      minTotalPrice: currentMinPrice,
+      maxTotalPrice: currentMaxPrice,
     },
   });
 
   useEffect(() => {
     form.reset({
+      categoryId: currentCategoryId,
+      sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
+      status: currentStatus as OrderStatus | undefined,
       userName: currentUserName,
       productName: currentProductName,
-      categoryId: currentCategoryId,
-      status: currentStatus,
-      minTotalPrice: currentMinTotalPrice || undefined,
-      maxTotalPrice: currentMaxTotalPrice || undefined,
-      sort: currentSort as "LATEST" | "OLDEST" | undefined,
+      minTotalPrice: currentMinPrice,
+      maxTotalPrice: currentMaxPrice,
     });
   }, [
     form.reset,
+    currentCategoryId,
+    currentSort,
+    currentStatus,
     currentUserName,
     currentProductName,
-    currentCategoryId,
-    currentStatus,
-    currentMinTotalPrice,
-    currentMaxTotalPrice,
-    currentSort,
+    currentMinPrice,
+    currentMaxPrice,
   ]);
 
-  const onSubmit = (data: zod.infer<typeof FilterOrdersFormSchema>) => {
+  const {
+    data: categoriesQuery,
+    isLoading: categoriesQueryIsLoading,
+    isError: categoriesQueryIsError,
+  } = useQuery<
+    SingleResponseType<{
+      categories: PublicCategoryType[];
+    }>
+  >({
+    queryKey: ["categories"],
+    queryFn: () => getCategories({ token }),
+  });
+
+  const onSubmit = (data: zod.infer<typeof CreateProductFormSchema>) => {
     const params = new URLSearchParams(searchParams.toString());
+
+    if (data.categoryId) {
+      params.set("categoryId", data.categoryId);
+    } else {
+      params.delete("categoryId");
+    }
+
+    if (data.sort) {
+      params.set("sort", data.sort);
+    } else {
+      params.delete("sort");
+    }
+
+    if (data.status) {
+      params.set("status", data.status);
+    } else {
+      params.delete("status");
+    }
 
     if (data.userName) {
       params.set("userName", data.userName);
@@ -138,24 +219,6 @@ export function FilterOrders() {
       params.set("productName", data.productName);
     } else {
       params.delete("productName");
-    }
-
-    if (data.categoryId) {
-      params.set("categoryId", data.categoryId);
-    } else {
-      params.delete("categoryId");
-    }
-
-    if (data.status) {
-      params.set("status", data.status);
-    } else {
-      params.delete("status");
-    }
-
-    if (data.sort) {
-      params.set("sort", data.sort);
-    } else {
-      params.delete("sort");
     }
 
     if (data.minTotalPrice && data.minTotalPrice > 0) {
@@ -177,47 +240,46 @@ export function FilterOrders() {
     }`;
     router.push(newUrl);
 
-    setIsFilterOpen(false);
+    setIsFilterOrdersOpen(false);
   };
 
   const resetFilters = () => {
     form.reset({
+      categoryId: "",
+      sort: undefined,
+      status: undefined,
       userName: "",
       productName: "",
-      categoryId: "",
-      status: "",
       minTotalPrice: undefined,
       maxTotalPrice: undefined,
-      sort: undefined,
     });
 
-    router.push(window.location.pathname);
-    setIsFilterOpen(false);
+    const newUrl = window.location.pathname;
+
+    router.push(newUrl);
+
+    setIsFilterOrdersOpen(false);
   };
 
-  const hasActiveFilters = Object.entries({
-    userName: currentUserName,
-    productName: currentProductName,
-    categoryId: currentCategoryId,
-    status: currentStatus,
-    sort: currentSort,
-    minTotalPrice: currentMinTotalPrice,
-    maxTotalPrice: currentMaxTotalPrice,
-  }).some(([_, value]) => value);
-
   return (
-    <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+    <Dialog open={isFilterOrdersOpen} onOpenChange={setIsFilterOrdersOpen}>
       <DialogTrigger asChild>
         <Button
           variant="secondary"
           size="icon"
           className={
-            hasActiveFilters
+            Object.entries({
+              categoryId: currentCategoryId,
+              sort: currentSort,
+              status: currentStatus,
+              minTotalPrice: currentMinPrice,
+              maxTotalPrice: currentMaxPrice,
+            }).some(([_, value]) => value)
               ? "bg-primary text-primary-foreground hover:bg-primary/90"
               : ""
           }
         >
-          <FilterIcon className="h-4 w-4" />
+          <FilterIcon />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -228,97 +290,99 @@ export function FilterOrders() {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-4">
-              {/* User Name Filter */}
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className={cn("space-y-6")}
+          >
+            <div className={cn("flex gap-2 items-start")}>
               <FormField
                 control={form.control}
                 name="userName"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Customer Name</FormLabel>
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Customer</FormLabel>
                     <FormControl>
-                      <Input placeholder="Filter by customer name" {...field} />
+                      <Input placeholder="Customer" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {/* Product Name Filter */}
               <FormField
                 control={form.control}
                 name="productName"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product Name</FormLabel>
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Product</FormLabel>
                     <FormControl>
-                      <Input placeholder="Filter by product name" {...field} />
+                      <Input placeholder="Product" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {/* Category ID Filter */}
+            </div>
+            <div className={cn("flex gap-2 items-start")}>
               <FormField
                 control={form.control}
                 name="categoryId"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Filter by category ID" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Status Filter */}
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
+                  <FormItem className={cn("flex-[2]")}>
+                    <FormLabel>Category</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={
+                        categoriesQueryIsLoading || categoriesQueryIsError
+                      }
+                    >
+                      <FormControl className={cn("w-full")}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">All Statuses</SelectItem>
-                        <SelectItem value="PENDING">Pending</SelectItem>
-                        <SelectItem value="APPROVED">Approved</SelectItem>
-                        <SelectItem value="PROCESSING">Processing</SelectItem>
-                        <SelectItem value="IN_TRANSIT">In Transit</SelectItem>
-                        <SelectItem value="DELIVERED">Delivered</SelectItem>
-                        <SelectItem value="REJECTED">Rejected</SelectItem>
-                        <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                        {categoriesQueryIsLoading && (
+                          <div className="flex items-center justify-center p-2">
+                            <Loader2Icon className="animate-spin h-4 w-4 mr-2" />
+                            <span>Loading categories...</span>
+                          </div>
+                        )}
+                        {categoriesQueryIsError && (
+                          <div className="text-destructive p-2">
+                            Failed to load categories
+                          </div>
+                        )}
+                        {!categoriesQueryIsLoading &&
+                          !categoriesQueryIsError &&
+                          categoriesQuery?.data?.categories &&
+                          categoriesQuery.data.categories.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {/* Sort Filter */}
+            </div>
+            <div className={cn("flex gap-2 items-start")}>
               <FormField
                 control={form.control}
                 name="sort"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sort</FormLabel>
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Sort by</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
+                      <FormControl className={cn("w-full")}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Sort by" />
+                          <SelectValue placeholder="Sort order" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Default</SelectItem>
+                        <SelectItem value="RELEVANCE">Relevance</SelectItem>
                         <SelectItem value="LATEST">Latest</SelectItem>
                         <SelectItem value="OLDEST">Oldest</SelectItem>
                       </SelectContent>
@@ -327,65 +391,79 @@ export function FilterOrders() {
                   </FormItem>
                 )}
               />
-
-              {/* Price Range Filters */}
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="minTotalPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Min Price</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="0.00"
-                          {...field}
-                          value={field.value || ""}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            field.onChange(
-                              value === "" ? undefined : Number(value),
-                            );
-                          }}
-                        />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl className={cn("w-full")}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Order status" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="maxTotalPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Max Price</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="99.99"
-                          {...field}
-                          value={field.value || ""}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            field.onChange(
-                              value === "" ? undefined : Number(value),
-                            );
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                      <SelectContent>
+                        <SelectItem value="PENDING">Pending</SelectItem>
+                        <SelectItem value="REJECTED">Rejected</SelectItem>
+                        <SelectItem value="APPROVED">Approved</SelectItem>
+                        <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                        <SelectItem value="PROCESSING">Processing</SelectItem>
+                        <SelectItem value="IN_TRANSIT">In Transit</SelectItem>
+                        <SelectItem value="DELIVERED">Delivered</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-
-            <div className="flex justify-between pt-2">
-              <Button type="button" variant="outline" onClick={resetFilters}>
-                Reset
+            <div className={cn("flex gap-2 items-start")}>
+              <FormField
+                control={form.control}
+                name="minTotalPrice"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Min Price</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="99.99" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="maxTotalPrice"
+                render={({ field }) => (
+                  <FormItem className={cn("flex-1")}>
+                    <FormLabel>Max Price</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="99.99" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="lg"
+                className={cn("w-1/3")}
+                type="button"
+                onClick={resetFilters}
+              >
+                <span>Reset</span>
               </Button>
-              <Button type="submit">Apply Filters</Button>
+              <Button
+                variant="default"
+                size="lg"
+                className={cn("w-2/3")}
+                type="submit"
+              >
+                <span>Apply</span>
+              </Button>
             </div>
           </form>
         </Form>

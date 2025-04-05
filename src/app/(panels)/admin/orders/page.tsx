@@ -283,7 +283,7 @@ export default function OrdersPage() {
           className="flex-1 flex items-center relative"
         >
           <Input
-            placeholder="Search by Vendor Name..."
+            placeholder="Search by Vendor..."
             className={cn("pr-10")}
             value={queryTerm}
             onChange={(e) => setQueryTerm(e.target.value)}
