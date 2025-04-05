@@ -202,7 +202,7 @@ export function RootHeaderCartButton() {
             </p>
             <div className={cn("flex flex-col gap-2 sm:flex-row")}>
               <Button className={cn("flex-1")} asChild>
-                <Link href={routes.app.public.home.url()}>Checkout</Link>
+                <Link href={routes.app.user.checkout.url()}>Checkout</Link>
               </Button>
             </div>
           </div>

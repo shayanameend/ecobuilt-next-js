@@ -23,7 +23,7 @@ import {
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
-import { EmptyState } from "./empty-state";
+import { EmptyState } from "../../_components/empty-state";
 import { Product } from "./product";
 
 type EnrichedProductType = ProductType & {

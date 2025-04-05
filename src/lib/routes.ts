@@ -261,6 +261,10 @@ const app = {
       url: () => "/user/dashboard",
       label: "Dashboard",
     },
+    checkout: {
+      url: () => "/user/checkout",
+      label: "Checkout",
+    },
     settings: {
       url: () => "/user/settings",
       label: "Settings",
@@ -311,5 +315,6 @@ export const vendorRoutes = [
 
 export const userRoutes = [
   routes.app.user.dashboard.url(),
+  routes.app.user.checkout.url(),
   routes.app.user.settings.url(),
 ];

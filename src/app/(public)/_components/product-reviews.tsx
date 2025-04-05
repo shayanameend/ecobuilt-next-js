@@ -26,7 +26,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
-import { EmptyState } from "../_components/empty-state";
+import { EmptyState } from "../../_components/empty-state";
 
 const REVIEW_LIMIT = 5;
 

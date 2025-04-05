@@ -24,7 +24,7 @@ import {
 } from "~/components/ui/card";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
-import { EmptyState } from "../../_components/empty-state";
+import { EmptyState } from "../../../_components/empty-state";
 import { ProductDetails } from "../../_components/product-details";
 import { ProductReviews } from "../../_components/product-reviews";
 import { RelatedProducts } from "../../_components/related-products";
