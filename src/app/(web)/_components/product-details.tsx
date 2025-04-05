@@ -12,7 +12,7 @@ import * as React from "react";
 import { useStore } from "@nanostores/react";
 import { MinusIcon, PlusIcon } from "lucide-react";
 
-import { VendorConfirmationDialog } from "~/app/(public)/_components/vendor-confirmation-dialog";
+import { VendorConfirmationDialog } from "~/app/(web)/_components/vendor-confirmation-dialog";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {

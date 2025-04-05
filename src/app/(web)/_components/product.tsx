@@ -12,7 +12,7 @@ import { useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { VendorConfirmationDialog } from "~/app/(public)/_components/vendor-confirmation-dialog";
+import { VendorConfirmationDialog } from "~/app/(web)/_components/vendor-confirmation-dialog";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardFooter } from "~/components/ui/card";
 import { checkVendorCompatibility } from "~/lib/cart-utils";

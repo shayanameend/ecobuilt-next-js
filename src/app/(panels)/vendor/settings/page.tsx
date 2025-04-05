@@ -20,7 +20,7 @@ import {
   TagIcon,
 } from "lucide-react";
 
-import { UpdateVendorProfileForm } from "~/app/(protected)/vendor/settings/_components/update-vendor-profile-form";
+import { UpdateVendorProfileForm } from "~/app/(panels)/vendor/settings/_components/update-vendor-profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -38,11 +38,7 @@ import { routes } from "~/lib/routes";
 import { UserStatus } from "~/lib/types";
 import { cn } from "~/lib/utils";
 
-async function getVendorProfile({
-  token,
-}: {
-  token: string | null;
-}) {
+async function getVendorProfile({ token }: { token: string | null }) {
   const response = await axios.get(routes.api.vendor.profile.url(), {
     headers: {
       Authorization: `Bearer ${token}`,
