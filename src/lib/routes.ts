@@ -257,17 +257,17 @@ const app = {
     },
   },
   user: {
-    dashboard: {
-      url: () => "/user/dashboard",
-      label: "Dashboard",
+    settings: {
+      url: () => "/user/settings",
+      label: "Settings",
     },
     checkout: {
       url: () => "/user/checkout",
       label: "Checkout",
     },
-    settings: {
-      url: () => "/user/settings",
-      label: "Settings",
+    orders: {
+      url: () => "/user/orders",
+      label: "Orders",
     },
   },
 };
@@ -314,7 +314,7 @@ export const vendorRoutes = [
 ];
 
 export const userRoutes = [
-  routes.app.user.dashboard.url(),
+  routes.app.user.orders.url(),
   routes.app.user.checkout.url(),
   routes.app.user.settings.url(),
 ];

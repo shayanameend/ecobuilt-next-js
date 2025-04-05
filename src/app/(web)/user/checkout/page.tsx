@@ -198,7 +198,7 @@ export default function CheckoutPage() {
       // Clear cart after successful order
       $cart.set({ items: [] });
       // Redirect to user dashboard
-      router.push(routes.app.user.dashboard.url());
+      router.push(routes.app.user.checkout.url());
     },
     onError: (error: AxiosError<any>) => {
       toast.error(

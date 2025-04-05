@@ -153,7 +153,7 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
             url = routes.app.vendor.dashboard.url();
             break;
           case Role.USER:
-            url = routes.app.user.dashboard.url();
+            url = routes.app.user.settings.url();
             break;
           default:
             url = routes.app.unspecified.profile.url();
