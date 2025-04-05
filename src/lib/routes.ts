@@ -249,7 +249,7 @@ const app = {
     },
     users: {
       url: () => "/vendor/users",
-      label: "Users",
+      label: "Customers",
     },
     settings: {
       url: () => "/vendor/settings",
