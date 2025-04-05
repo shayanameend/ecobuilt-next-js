@@ -12,6 +12,7 @@ import * as React from "react";
 import { useStore } from "@nanostores/react";
 import { MinusIcon, PlusIcon } from "lucide-react";
 
+import { VendorConfirmationDialog } from "~/app/(public)/_components/vendor-confirmation-dialog";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -24,6 +25,7 @@ import {
 } from "~/components/ui/carousel";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
+import { checkVendorCompatibility } from "~/lib/cart-utils";
 import { cn, formatPrice } from "~/lib/utils";
 import { $cart } from "~/stores/cart";
 
@@ -39,6 +41,11 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const [quantity, setQuantity] = React.useState(1);
+  const [showVendorDialog, setShowVendorDialog] = React.useState(false);
+  const [vendorDialogData, setVendorDialogData] = React.useState<{
+    currentVendor: VendorProfileType | null;
+    newVendor: VendorProfileType;
+  } | null>(null);
 
   React.useEffect(() => {
     if (!api) {
@@ -70,7 +77,7 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
     }
   };
 
-  const handleAddToCart = () => {
+  const addProductToCart = (replaceExisting = false) => {
     if (quantity <= 0) return;
 
     const existingItem = cart.items.find((item) => item.id === product.id);
@@ -87,13 +94,52 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
             : item,
         ),
       });
+    } else if (replaceExisting) {
+      // Replace all items with the new product
+      $cart.set({
+        items: [{ ...product, quantity: quantity }],
+      });
     } else {
+      // Add to existing items
       $cart.set({
         ...cart,
         items: [...cart.items, { ...product, quantity: quantity }],
       });
     }
     console.log(`Added ${quantity} of ${product.name} to cart`);
+  };
+
+  const handleAddToCart = () => {
+    if (quantity <= 0) return;
+
+    // Check if product is from the same vendor
+    const { isSameVendor, currentVendor, newVendor } = checkVendorCompatibility(
+      cart.items,
+      product,
+    );
+
+    // If cart is empty or product is from the same vendor, add it directly
+    if (isSameVendor) {
+      addProductToCart();
+      return;
+    }
+
+    // If product is from a different vendor, show confirmation dialog
+    if (currentVendor && newVendor) {
+      setVendorDialogData({ currentVendor, newVendor });
+      setShowVendorDialog(true);
+    }
+  };
+
+  const handleVendorConfirm = () => {
+    // User confirmed to replace cart items with the new product
+    addProductToCart(true);
+    setShowVendorDialog(false);
+  };
+
+  const handleVendorCancel = () => {
+    // User chose to keep existing items
+    setShowVendorDialog(false);
   };
 
   return (
@@ -283,6 +329,18 @@ export function ProductDetails({ product }: Readonly<ProductDetailsProps>) {
           </p>
         )}
       </div>
+
+      {/* Vendor Confirmation Dialog */}
+      {vendorDialogData && (
+        <VendorConfirmationDialog
+          isOpen={showVendorDialog}
+          onOpenChange={setShowVendorDialog}
+          currentVendor={vendorDialogData.currentVendor!}
+          newVendor={vendorDialogData.newVendor}
+          onConfirm={handleVendorConfirm}
+          onCancel={handleVendorCancel}
+        />
+      )}
     </div>
   );
 }
