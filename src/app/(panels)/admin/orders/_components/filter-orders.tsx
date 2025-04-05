@@ -61,8 +61,8 @@ const CreateProductFormSchema = zod.object({
   sort: zod.preprocess(
     (val) => (val === "" ? undefined : val),
     zod
-      .enum(["RELEVANCE", "LATEST", "OLDEST"], {
-        message: "Sort must be one of 'RELEVANCE', 'LATEST', 'OLDEST'",
+      .enum(["LATEST", "OLDEST"], {
+        message: "Sort must be one of 'LATEST', 'OLDEST'",
       })
       .optional(),
   ),
@@ -145,7 +145,7 @@ export function FilterOrders() {
     resolver: zodResolver(CreateProductFormSchema),
     defaultValues: {
       categoryId: currentCategoryId,
-      sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
+      sort: currentSort as "LATEST" | "OLDEST" | undefined,
       status: currentStatus as OrderStatus | undefined,
       userName: currentUserName,
       productName: currentProductName,
@@ -157,7 +157,7 @@ export function FilterOrders() {
   useEffect(() => {
     form.reset({
       categoryId: currentCategoryId,
-      sort: currentSort as "RELEVANCE" | "LATEST" | "OLDEST" | undefined,
+      sort: currentSort as "LATEST" | "OLDEST" | undefined,
       status: currentStatus as OrderStatus | undefined,
       userName: currentUserName,
       productName: currentProductName,
@@ -382,7 +382,6 @@ export function FilterOrders() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="RELEVANCE">Relevance</SelectItem>
                         <SelectItem value="LATEST">Latest</SelectItem>
                         <SelectItem value="OLDEST">Oldest</SelectItem>
                       </SelectContent>
