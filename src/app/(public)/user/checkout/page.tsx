@@ -4,6 +4,7 @@ import type {
   PublicOrderType,
   SingleResponseType,
   UserProfileType,
+  VendorProfileType,
 } from "~/lib/types";
 
 import Image from "next/image";
@@ -15,12 +16,37 @@ import { useStore } from "@nanostores/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import axios, { type AxiosError } from "axios";
-import { Loader2Icon, ShoppingCartIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  ClockIcon,
+  InfoIcon,
+  Loader2Icon,
+  MapPinIcon,
+  PhoneIcon,
+  ShoppingCartIcon,
+  StoreIcon,
+  TruckIcon,
+  UserIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
@@ -33,6 +59,24 @@ async function getUserProfile({ token }: { token: string | null }) {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+  });
+
+  return response.data;
+}
+
+async function getVendorProfile({
+  vendorId,
+  token,
+}: {
+  vendorId: string;
+  token: string | null;
+}) {
+  const response = await axios.get(routes.api.public.vendors.url(vendorId), {
+    headers: token
+      ? {
+          Authorization: `Bearer ${token}`,
+        }
+      : undefined,
   });
 
   return response.data;
@@ -70,6 +114,14 @@ export default function CheckoutPage() {
   const { token, auth } = useAuthContext();
   const cart = useStore($cart);
 
+  // Get vendor ID from first cart item (assuming all items are from same vendor)
+  const vendorId = useMemo(() => {
+    if (cart.items.length > 0 && (cart.items[0] as any).vendor?.id) {
+      return (cart.items[0] as any).vendor.id;
+    }
+    return null;
+  }, [cart.items]);
+
   // Redirect to products page if cart is empty
   useEffect(() => {
     if (cart.items.length === 0) {
@@ -78,7 +130,7 @@ export default function CheckoutPage() {
   }, [cart.items.length, router]);
 
   // Calculate totals
-  const { totalQuantity, totalPrice } = useMemo(() => {
+  const { totalPrice } = useMemo(() => {
     let quantity = 0;
     let price = 0;
     for (const item of cart.items) {
@@ -104,6 +156,33 @@ export default function CheckoutPage() {
     enabled: !!token && auth?.role === "USER",
   });
 
+  // Fetch vendor profile
+  const {
+    data: vendorQuery,
+    isLoading: vendorQueryIsLoading,
+    isError: vendorQueryIsError,
+  } = useQuery<
+    SingleResponseType<{
+      vendor: VendorProfileType;
+    }>
+  >({
+    queryKey: ["vendor", vendorId],
+    queryFn: () => getVendorProfile({ vendorId: vendorId!, token }),
+    enabled: !!vendorId,
+  });
+
+  // Estimated delivery date (5 days from now)
+  const estimatedDeliveryDate = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 5);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }, []);
+
   // Create order mutation
   const createOrderMutation = useMutation({
     mutationFn: async (data: {
@@ -114,7 +193,7 @@ export default function CheckoutPage() {
         products: data.products,
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Order placed successfully!");
       // Clear cart after successful order
       $cart.set({ items: [] });
@@ -267,101 +346,258 @@ export default function CheckoutPage() {
           </CardContent>
         </Card>
 
-        {/* User Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <h3 className={cn("text-2xl font-bold", domine.className)}>
-                Delivery Information
-              </h3>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!token || auth?.role !== "USER" ? (
-              <div className={cn("space-y-4")}>
-                <p>Please sign in to complete your purchase.</p>
-                <Button asChild>
-                  <Link href={routes.app.auth.signIn.url()}>Sign In</Link>
-                </Button>
-              </div>
-            ) : profileQueryIsLoading ? (
-              <div className={cn("flex justify-center py-8")}>
-                <Loader2Icon
-                  className={cn("h-8 w-8 animate-spin text-primary")}
-                />
-              </div>
-            ) : profileQueryIsError ? (
-              <div className={cn("space-y-4")}>
-                <p>Failed to load your profile information.</p>
-                <Button variant="outline" onClick={() => router.refresh()}>
-                  Retry
-                </Button>
-              </div>
-            ) : (
-              <div className={cn("space-y-4")}>
-                <div className={cn("grid grid-cols-1 gap-2")}>
-                  <div>
-                    <p
-                      className={cn(
-                        "text-sm font-medium text-muted-foreground",
-                      )}
-                    >
-                      Name
-                    </p>
-                    <p>{profileQuery?.data?.profile.name}</p>
-                  </div>
-                  <div>
-                    <p
-                      className={cn(
-                        "text-sm font-medium text-muted-foreground",
-                      )}
-                    >
-                      Phone
-                    </p>
-                    <p>{profileQuery?.data?.profile.phone}</p>
-                  </div>
-                  <div>
-                    <p
-                      className={cn(
-                        "text-sm font-medium text-muted-foreground",
-                      )}
-                    >
-                      Delivery Address
-                    </p>
-                    <p>{profileQuery?.data?.profile.deliveryAddress}</p>
-                  </div>
-                  <div>
-                    <p
-                      className={cn(
-                        "text-sm font-medium text-muted-foreground",
-                      )}
-                    >
-                      City
-                    </p>
-                    <p>{profileQuery?.data?.profile.city}</p>
-                  </div>
-                  <div>
-                    <p
-                      className={cn(
-                        "text-sm font-medium text-muted-foreground",
-                      )}
-                    >
-                      Postal Code
-                    </p>
-                    <p>{profileQuery?.data?.profile.postalCode}</p>
-                  </div>
-                </div>
-                <div>
-                  <Button variant="outline" asChild className={cn("w-full")}>
-                    <Link href={routes.app.user.settings.url()}>
-                      Update Profile
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Information Tabs */}
+        <div className={cn("space-y-6")}>
+          <Tabs defaultValue="customer" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="customer">
+                <UserIcon className="h-4 w-4 mr-2" />
+                Customer
+              </TabsTrigger>
+              <TabsTrigger value="vendor">
+                <StoreIcon className="h-4 w-4 mr-2" />
+                Vendor
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Customer Information Tab */}
+            <TabsContent value="customer" className="mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <UserIcon className="h-5 w-5 mr-2 text-primary" />
+                    Customer Information
+                  </CardTitle>
+                  <CardDescription>
+                    Your account and contact details
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {!token || auth?.role !== "USER" ? (
+                    <div className="space-y-4">
+                      <div className="bg-muted/50 p-4 rounded-lg border border-border">
+                        <p className="text-sm mb-2">
+                          Please sign in to complete your purchase
+                        </p>
+                        <Button asChild>
+                          <Link href={routes.app.auth.signIn.url()}>
+                            Sign In
+                          </Link>
+                        </Button>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        <p>Don't have an account?</p>
+                        <Button variant="link" asChild className="p-0 h-auto">
+                          <Link href={routes.app.auth.signUp.url()}>
+                            Create an account
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  ) : profileQueryIsLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : profileQueryIsError ? (
+                    <div className="space-y-4">
+                      <p className="text-sm text-destructive">
+                        Failed to load your profile information.
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={() => router.refresh()}
+                      >
+                        Retry
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="bg-muted/50 p-4 rounded-lg border border-border">
+                          <div className="flex items-center mb-3">
+                            <UserIcon className="h-5 w-5 mr-2 text-primary" />
+                            <h4 className="font-medium">Personal Details</h4>
+                          </div>
+                          <div className="grid grid-cols-1 gap-2 pl-7">
+                            <div className="flex items-start">
+                              <p className="text-sm font-medium text-muted-foreground w-24">
+                                Name:
+                              </p>
+                              <p className="text-sm">
+                                {profileQuery?.data?.profile.name}
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <p className="text-sm font-medium text-muted-foreground w-24">
+                                Phone:
+                              </p>
+                              <p className="text-sm">
+                                {profileQuery?.data?.profile.phone}
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <p className="text-sm font-medium text-muted-foreground w-24">
+                                Email:
+                              </p>
+                              <p className="text-sm">{auth?.email}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-muted/50 p-4 rounded-lg border border-border">
+                          <div className="flex items-center mb-3">
+                            <MapPinIcon className="h-5 w-5 mr-2 text-primary" />
+                            <h4 className="font-medium">Address</h4>
+                          </div>
+                          <div className="grid grid-cols-1 gap-2 pl-7">
+                            <div className="flex items-start">
+                              <p className="text-sm font-medium text-muted-foreground w-24">
+                                Address:
+                              </p>
+                              <p className="text-sm">
+                                {profileQuery?.data?.profile.deliveryAddress}
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <p className="text-sm font-medium text-muted-foreground w-24">
+                                City:
+                              </p>
+                              <p className="text-sm">
+                                {profileQuery?.data?.profile.city}
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <p className="text-sm font-medium text-muted-foreground w-24">
+                                Postal Code:
+                              </p>
+                              <p className="text-sm">
+                                {profileQuery?.data?.profile.postalCode}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Button variant="outline" asChild className="w-full">
+                          <Link href={routes.app.user.settings.url()}>
+                            Update Profile
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Vendor Information Tab */}
+            <TabsContent value="vendor" className="mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <StoreIcon className="h-5 w-5 mr-2 text-primary" />
+                    Vendor Information
+                  </CardTitle>
+                  <CardDescription>
+                    Details about the seller of your products
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {vendorQueryIsLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : vendorQueryIsError || !vendorId ? (
+                    <div className="bg-muted/50 p-4 rounded-lg border border-border">
+                      <div className="flex items-center mb-2">
+                        <InfoIcon className="h-5 w-5 mr-2 text-amber-500" />
+                        <h4 className="font-medium">
+                          Vendor Information Unavailable
+                        </h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground pl-7">
+                        We couldn't load the vendor information at this time.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative h-16 w-16 overflow-hidden rounded-md border">
+                          {vendorQuery?.data?.vendor.pictureId ? (
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_FILE_URL}/${vendorQuery.data.vendor.pictureId}`}
+                              alt={vendorQuery.data.vendor.name}
+                              fill
+                              sizes="64px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-muted flex items-center justify-center">
+                              <StoreIcon className="h-8 w-8 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-medium">
+                            {vendorQuery?.data?.vendor.name}
+                          </h4>
+                          <Badge variant="outline" className="mt-1">
+                            Verified Seller
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <div className="bg-muted/50 p-4 rounded-lg border border-border">
+                        <p className="text-sm mb-2 font-medium">
+                          About the Vendor
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {vendorQuery?.data?.vendor.description ||
+                            "No description available."}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="flex items-center">
+                          <MapPinIcon className="h-4 w-4 mr-2 text-primary" />
+                          <div>
+                            <p className="text-sm font-medium">
+                              Pickup Address
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {vendorQuery?.data?.vendor.pickupAddress},{" "}
+                              {vendorQuery?.data?.vendor.city},{" "}
+                              {vendorQuery?.data?.vendor.postalCode}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center">
+                          <PhoneIcon className="h-4 w-4 mr-2 text-primary" />
+                          <div>
+                            <p className="text-sm font-medium">
+                              Contact Number
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {vendorQuery?.data?.vendor.phone}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button variant="outline" asChild className="w-full">
+                        <Link href={routes.app.public.vendors.url(vendorId)}>
+                          View Vendor Store
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </section>
   );
