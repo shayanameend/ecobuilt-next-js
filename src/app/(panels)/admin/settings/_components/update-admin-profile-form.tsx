@@ -95,7 +95,9 @@ async function updateProfile({
 
 export function UpdateAdminProfileForm({
   profile,
-}: { profile: AdminProfileType }) {
+}: {
+  profile: AdminProfileType;
+}) {
   const queryClient = useQueryClient();
 
   const { token } = useAuthContext();
@@ -256,7 +258,7 @@ export function UpdateAdminProfileForm({
             )}
           />
         </div>
-        <div className={cn("mt-28")}>
+        <div>
           <Button
             variant="default"
             size="lg"

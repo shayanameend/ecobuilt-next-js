@@ -89,8 +89,8 @@ export default function SettingsPage() {
         </Button>
       }
     >
-      <div className={cn("grid grid-cols-1 gap-4 lg:grid-cols-2")}>
-        <Card>
+      <div className={cn("flex flex-col lg:flex-row gap-6 items-start")}>
+        <Card className={cn("w-full lg:flex-1 min-w-0 self-start")}>
           <CardHeader>
             <CardTitle>
               <h3 className={cn("text-2xl font-bold")}>Update Profile</h3>
@@ -105,7 +105,7 @@ export default function SettingsPage() {
             <UpdateAdminProfileForm profile={profileQuery?.data?.profile!} />
           </CardContent>
         </Card>
-        <Card className={cn("hidden lg:flex")}>
+        <Card className={cn("hidden lg:block lg:flex-1 min-w-0 self-start")}>
           <CardHeader>
             <CardTitle>
               <h3 className={cn("text-2xl font-bold")}>Profile Information</h3>
@@ -163,7 +163,7 @@ export default function SettingsPage() {
               <Separator />
               <div className="space-y-4">
                 <h4 className="text-base font-semibold">Account Details</h4>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2 text-sm">
                     <ShieldIcon className="size-4 text-muted-foreground" />
                     <span className="font-medium">Status:</span>
