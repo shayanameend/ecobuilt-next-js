@@ -23,8 +23,8 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    <Card className={cn("border-dashed bg-muted/40", className)}>
-      <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+    <Card className={cn("border-dashed bg-muted/40 w-full", className)}>
+      <CardContent className="flex flex-col items-center justify-center py-8 text-center">
         <Icon
           className="h-12 w-12 text-muted-foreground mb-4"
           strokeWidth={1.5}

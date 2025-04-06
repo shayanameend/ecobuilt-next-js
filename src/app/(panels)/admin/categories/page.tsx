@@ -8,26 +8,15 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
-import {
-  AlertCircleIcon,
-  FolderIcon,
-  Loader2Icon,
-  SearchIcon,
-} from "lucide-react";
+import { FolderIcon } from "lucide-react";
 
+import { AdminPageLayout } from "~/app/(panels)/_components/admin-page-layout";
+import { SearchFilterBar } from "~/app/(panels)/_components/search-filter-bar";
 import { EmptyState } from "~/app/_components/empty-state";
+
 import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
+import { Card, CardContent, CardFooter, CardTitle } from "~/components/ui/card";
 import { useAuthContext } from "~/context/auth";
-import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { EditCategory } from "./_components/edit-category";
@@ -123,130 +112,79 @@ export default function CategoriesPage() {
 
   const categories = categoriesQuery?.data?.categories || [];
 
-  if (categoriesQueryIsLoading) {
-    return (
-      <section className="flex-1 flex items-center justify-center p-8">
-        <div className="text-center space-y-4">
-          <Loader2Icon className="size-8 text-primary animate-spin mx-auto" />
-        </div>
-      </section>
-    );
-  }
-
-  if (categoriesQueryIsError || !categoriesQuery?.data?.categories) {
-    return (
-      <section className="flex-1 flex items-center justify-center p-8">
-        <EmptyState
-          icon={AlertCircleIcon}
-          title="Error Loading Categories"
-          description="We couldn't load your categories information. Please try again later."
-          action={{
-            label: "Retry",
-            onClick: () => window.location.reload(),
-          }}
-          className="w-full max-w-md"
-        />
-      </section>
-    );
-  }
-
   return (
-    <>
-      <section className={cn("flex-1 space-y-8")}>
-        <div className={cn("space-y-2")}>
-          <h2
-            className={cn("text-black/75 text-3xl font-bold", domine.className)}
-          >
-            Categories
-          </h2>
-          <p className={cn("text-muted-foreground text-base font-medium")}>
-            Manage your product categories here. Organize inventory efficiently,
-            and add new categories.
-          </p>
-        </div>
-        <div className={cn("relative flex items-center justify-between gap-2")}>
-          <FilterCategories />
-          <form
-            onSubmit={handleSearch}
-            className="flex-1 flex items-center relative"
-          >
-            <SearchIcon
-              className={cn(
-                "absolute top-2.5 left-2.5 size-4 text-muted-foreground",
-              )}
-            />
-            <Input
-              placeholder="Search Categories..."
-              className={cn("pl-8")}
-              value={queryTerm}
-              onChange={(event) => setQueryTerm(event.target.value)}
-            />
-            <Button
-              type="submit"
-              variant="secondary"
-              size="icon"
-              className={cn("absolute right-0.5 size-8")}
-            >
-              <SearchIcon className="size-4" />
-            </Button>
-          </form>
-          <NewCategory />
-        </div>
-        <div
-          className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4")}
-        >
-          {categories.length > 0 ? (
-            categories.map((category) => (
-              <Card key={category.id} className={cn("py-3")}>
-                <CardContent
-                  className={cn("flex-1 flex justify-between gap-3 px-4")}
+    <AdminPageLayout
+      title="Categories"
+      description="Manage your product categories here. Organize inventory efficiently, and add new categories."
+      isLoading={categoriesQueryIsLoading}
+      isError={categoriesQueryIsError || !categoriesQuery?.data?.categories}
+      errorTitle="Error Loading Categories"
+      errorDescription="We couldn't load your categories information. Please try again later."
+    >
+      <div className={cn("flex items-center gap-2")}>
+        <SearchFilterBar
+          queryTerm={queryTerm}
+          setQueryTerm={setQueryTerm}
+          handleSearch={handleSearch}
+          placeholder="Search Categories..."
+          filterComponent={<FilterCategories />}
+        />
+        <NewCategory />
+      </div>
+      <div
+        className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4")}
+      >
+        {categories.length > 0 ? (
+          categories.map((category) => (
+            <Card key={category.id} className={cn("py-3")}>
+              <CardContent
+                className={cn("flex-1 flex justify-between gap-3 px-4")}
+              >
+                <CardTitle className={cn("text-2xl font-medium")}>
+                  {category.name}
+                </CardTitle>
+              </CardContent>
+              <CardFooter className={cn("justify-between gap-3 px-3")}>
+                <ToggleDeleteCategory
+                  id={category.id}
+                  isDeleted={category.isDeleted}
+                />
+                <EditCategory category={category} />
+                <Button
+                  variant="outline"
+                  size="default"
+                  className={cn("flex-1")}
+                  onClick={() => {
+                    router.push(
+                      `${routes.app.admin.products.url()}?categoryId=${
+                        category.id
+                      }`,
+                    );
+                  }}
                 >
-                  <CardTitle className={cn("text-2xl font-medium")}>
-                    {category.name}
-                  </CardTitle>
-                </CardContent>
-                <CardFooter className={cn("justify-between gap-3 px-3")}>
-                  <ToggleDeleteCategory
-                    id={category.id}
-                    isDeleted={category.isDeleted}
-                  />
-                  <EditCategory category={category} />
-                  <Button
-                    variant="outline"
-                    size="default"
-                    className={cn("flex-1")}
-                    onClick={() => {
-                      router.push(
-                        `${routes.app.admin.products.url()}?categoryId=${
-                          category.id
-                        }`,
-                      );
-                    }}
-                  >
-                    <span>View Products</span>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))
-          ) : (
-            <div className="col-span-full">
-              <EmptyState
-                icon={FolderIcon}
-                title="No categories found"
-                description={
-                  currentName || currentStatus || currentIsDeleted
-                    ? "No categories match your current filters. Try adjusting your search criteria."
-                    : "There are no categories available at the moment."
-                }
-                action={{
-                  label: "Clear Filters",
-                  onClick: () => router.push(routes.app.admin.categories.url()),
-                }}
-              />
-            </div>
-          )}
-        </div>
-      </section>
-    </>
+                  <span>View Products</span>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))
+        ) : (
+          <div className="col-span-full">
+            <EmptyState
+              icon={FolderIcon}
+              title="No categories found"
+              description={
+                currentName || currentStatus || currentIsDeleted
+                  ? "No categories match your current filters. Try adjusting your search criteria."
+                  : "There are no categories available at the moment."
+              }
+              action={{
+                label: "Clear Filters",
+                onClick: () => router.push(routes.app.admin.categories.url()),
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </AdminPageLayout>
   );
 }
