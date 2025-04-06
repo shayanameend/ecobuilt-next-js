@@ -37,7 +37,7 @@ export default function UserLayout({ children }: Readonly<PropsWithChildren>) {
     <>
       <div className="max-w-7xl mx-auto mt-8 px-4">
         <nav>
-          <ul className="flex items-center">
+          <ul className="flex items-center gap-4">
             {userNavItems.map((item) => (
               <li key={item.href} className="flex-1">
                 <Link

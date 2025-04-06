@@ -50,7 +50,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useAuthContext } from "~/context/auth";
 import { domine } from "~/lib/fonts";
 import { routes } from "~/lib/routes";
-import { cn, formatPrice } from "~/lib/utils";
+import { cn, formatDate, formatPrice } from "~/lib/utils";
 import { $cart } from "~/stores/cart";
 import { EmptyState } from "../../../_components/empty-state";
 
@@ -175,12 +175,7 @@ export default function CheckoutPage() {
   const estimatedDeliveryDate = useMemo(() => {
     const date = new Date();
     date.setDate(date.getDate() + 5);
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    return formatDate(date, "EEEE, MMMM d, yyyy");
   }, []);
 
   // Create order mutation

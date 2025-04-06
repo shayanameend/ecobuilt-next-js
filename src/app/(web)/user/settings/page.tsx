@@ -38,7 +38,7 @@ import { useAuthContext } from "~/context/auth";
 
 import { routes } from "~/lib/routes";
 import { UserStatus } from "~/lib/types";
-import { cn } from "~/lib/utils";
+import { cn, formatDate } from "~/lib/utils";
 
 async function getVendorProfile({ token }: { token: string | null }) {
   const response = await axios.get(routes.api.user.profile.url(), {
@@ -237,13 +237,10 @@ export default function SettingsPage() {
                       <span className="font-medium">Registered:</span>
                       <span className="text-muted-foreground">
                         {profileQuery?.data?.profile?.auth?.createdAt
-                          ? new Date(
+                          ? formatDate(
                               profileQuery.data.profile.auth.createdAt,
-                            ).toLocaleDateString(undefined, {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })
+                              "MMMM d, yyyy",
+                            )
                           : "N/A"}
                       </span>
                     </div>

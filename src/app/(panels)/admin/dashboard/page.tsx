@@ -25,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { cn } from "~/lib/utils";
+import { cn, formatPrice } from "~/lib/utils";
 
 export default function DashboardPage() {
   return (
@@ -144,7 +144,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Completed</Badge>
                   </TableCell>
-                  <TableCell>$123.45</TableCell>
+                  <TableCell>{formatPrice(123.45)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View
@@ -168,7 +168,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Completed</Badge>
                   </TableCell>
-                  <TableCell>$234.56</TableCell>
+                  <TableCell>{formatPrice(234.56)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Completed</Badge>
                   </TableCell>
-                  <TableCell>$345.67</TableCell>
+                  <TableCell>{formatPrice(345.67)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View
@@ -216,7 +216,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Completed</Badge>
                   </TableCell>
-                  <TableCell>$456.78</TableCell>
+                  <TableCell>{formatPrice(456.78)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View
@@ -240,7 +240,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Completed</Badge>
                   </TableCell>
-                  <TableCell>$567.89</TableCell>
+                  <TableCell>{formatPrice(567.89)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View
@@ -294,7 +294,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Electronics</Badge>
                   </TableCell>
-                  <TableCell>$799.99</TableCell>
+                  <TableCell>{formatPrice(799.99)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View
@@ -321,7 +321,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Electronics</Badge>
                   </TableCell>
-                  <TableCell>$1299.99</TableCell>
+                  <TableCell>{formatPrice(1299.99)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View
@@ -350,7 +350,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Electronics</Badge>
                   </TableCell>
-                  <TableCell>$399.99</TableCell>
+                  <TableCell>{formatPrice(399.99)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View
@@ -377,7 +377,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Electronics</Badge>
                   </TableCell>
-                  <TableCell>$199.99</TableCell>
+                  <TableCell>{formatPrice(199.99)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View
@@ -401,7 +401,7 @@ export default function DashboardPage() {
                   <TableCell>
                     <Badge variant="outline">Electronics</Badge>
                   </TableCell>
-                  <TableCell>$999.99</TableCell>
+                  <TableCell>{formatPrice(999.99)}</TableCell>
                   <TableCell>
                     <Button variant="secondary" size="sm">
                       View

@@ -131,7 +131,7 @@ export function OrdersSidebar() {
     resolver: zodResolver(FilterFormSchema),
     defaultValues: {
       categoryId: currentCategoryId,
-      status: currentStatus as keyof typeof OrderStatus | undefined,
+      status: currentStatus as OrderStatus | undefined,
       sort: currentSort as
         | "LATEST"
         | "OLDEST"
@@ -147,7 +147,7 @@ export function OrdersSidebar() {
   useEffect(() => {
     form.reset({
       categoryId: currentCategoryId,
-      status: currentStatus as keyof typeof OrderStatus | undefined,
+      status: currentStatus as OrderStatus | undefined,
       sort: currentSort as
         | "LATEST"
         | "OLDEST"

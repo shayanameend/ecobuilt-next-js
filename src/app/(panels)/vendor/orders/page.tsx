@@ -27,7 +27,7 @@ import type {
   UserProfileType,
   VendorProfileType,
 } from "~/lib/types";
-import { cn } from "~/lib/utils";
+import { cn, formatDate, formatPrice } from "~/lib/utils";
 
 import { FilterOrders } from "./_components/filter-orders";
 import { OrderDetail } from "./_components/order-detail";
@@ -252,9 +252,7 @@ export default function OrdersPage() {
           },
           {
             header: "Date",
-            cell: (order) => (
-              <span>{new Date(order.createdAt).toLocaleDateString()}</span>
-            ),
+            cell: (order) => <span>{formatDate(order.createdAt)}</span>,
           },
           {
             header: "Items",
@@ -262,7 +260,7 @@ export default function OrdersPage() {
           },
           {
             header: "Total",
-            cell: (order) => <span>${order.totalPrice.toFixed(2)}</span>,
+            cell: (order) => <span>{formatPrice(order.totalPrice)}</span>,
           },
           {
             header: "Status",

@@ -6,7 +6,7 @@ import * as React from "react";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { format } from "date-fns";
+
 import {
   AlertCircleIcon,
   Loader2Icon,
@@ -25,7 +25,7 @@ import {
 } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { routes } from "~/lib/routes";
-import { cn } from "~/lib/utils";
+import { cn, formatDate } from "~/lib/utils";
 import { EmptyState } from "../../_components/empty-state";
 
 const REVIEW_LIMIT = 5;
@@ -172,7 +172,7 @@ export function ProductReviews({ productId }: Readonly<ProductReviewsProps>) {
                           <StarRating rating={review.rating} />
                         </div>
                         <span className="text-xs text-muted-foreground">
-                          {format(new Date(review.createdAt), "PP")}
+                          {formatDate(review.createdAt, "PP")}
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground leading-relaxed">

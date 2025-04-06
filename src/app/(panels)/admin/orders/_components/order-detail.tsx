@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import Image from "next/image";
 
-import { format } from "date-fns";
 import {
   CalendarIcon,
   ExternalLinkIcon,
@@ -43,7 +42,7 @@ import type {
   UserProfileType,
   VendorProfileType,
 } from "~/lib/types";
-import { cn } from "~/lib/utils";
+import { cn, formatDate, formatPrice } from "~/lib/utils";
 import { OrderStatusSwitcher } from "./order-status-switcher";
 
 type OrderDetailProps = {
@@ -61,15 +60,6 @@ type OrderDetailProps = {
 
 export function OrderDetail({ order, token }: OrderDetailProps) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const formatDate = (date: Date) => {
-    return format(new Date(date), "MMM dd, yyyy");
-  };
-
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return `$${amount.toFixed(2)}`;
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -104,7 +94,7 @@ export function OrderDetail({ order, token }: OrderDetailProps) {
             <div className="text-right space-y-1">
               <p className="text-sm text-muted-foreground">Total</p>
               <p className="text-lg font-semibold">
-                {formatCurrency(order.totalPrice)}
+                {formatPrice(order.totalPrice)}
               </p>
             </div>
           </div>
@@ -197,7 +187,7 @@ export function OrderDetail({ order, token }: OrderDetailProps) {
                       {item.quantity}
                     </TableCell>
                     <TableCell className="text-right">
-                      {formatCurrency(
+                      {formatPrice(
                         (item.product.salePrice || item.product.price) *
                           item.quantity,
                       )}
@@ -209,7 +199,7 @@ export function OrderDetail({ order, token }: OrderDetailProps) {
                     Total
                   </TableCell>
                   <TableCell className="text-right font-semibold">
-                    {formatCurrency(order.totalPrice)}
+                    {formatPrice(order.totalPrice)}
                   </TableCell>
                 </TableRow>
               </TableBody>
