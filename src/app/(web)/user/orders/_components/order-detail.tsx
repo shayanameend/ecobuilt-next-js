@@ -8,6 +8,7 @@ import {
   ClockIcon,
   ExternalLinkIcon,
   ShoppingBagIcon,
+  StarIcon,
   TagIcon,
   XCircleIcon,
 } from "lucide-react";
@@ -41,9 +42,11 @@ import {
   type ProductType,
   type PublicOrderToProductType,
   type PublicOrderType,
+  type PublicReviewType,
   type VendorProfileType,
 } from "~/lib/types";
 import { cn, formatDate, formatPrice } from "~/lib/utils";
+import { AddReview } from "./add-review";
 
 type OrderDetailProps = {
   order: PublicOrderType & {
@@ -53,11 +56,13 @@ type OrderDetailProps = {
         vendor: VendorProfileType;
       };
     })[];
+    review?: PublicReviewType;
   };
   token: string | null;
+  onReviewAdded?: () => void;
 };
 
-export function OrderDetail({ order, token }: OrderDetailProps) {
+export function OrderDetail({ order, token, onReviewAdded }: OrderDetailProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   // Get status badge color
@@ -217,51 +222,105 @@ export function OrderDetail({ order, token }: OrderDetailProps) {
           </div>
         </div>
 
-        <DialogFooter className="flex justify-end pt-4">
-          {canCancel && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => {
-                // Close the current dialog
-                setIsOpen(false);
+        {/* Display existing review if available */}
+        {order.status === OrderStatus.DELIVERED && order.review && (
+          <>
+            <Separator className="my-4" />
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <StarIcon className="size-4 text-primary" />
+                <h3 className={cn("text-sm font-semibold", domine.className)}>
+                  Your Review
+                </h3>
+              </div>
+              <div className="p-4 bg-muted/50 rounded-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <StarIcon
+                        key={i}
+                        className={cn(
+                          "size-4",
+                          i < order.review!.rating
+                            ? "text-yellow-400 fill-yellow-400"
+                            : "text-muted-foreground",
+                        )}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {formatDate(order.review.createdAt)}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {order.review.comment || (
+                    <span className="italic">No comment provided.</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
 
-                // Show a confirmation dialog
-                const confirmCancel = window.confirm(
-                  "Are you sure you want to cancel this order? This action cannot be undone.",
-                );
+        <DialogFooter className="flex justify-between pt-4">
+          <div>
+            {order.status === OrderStatus.DELIVERED && !order.review && (
+              <AddReview
+                orderId={order.id}
+                orderStatus={order.status as OrderStatus}
+                token={token}
+                onReviewAdded={onReviewAdded}
+              />
+            )}
+          </div>
+          <div>
+            {canCancel && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  // Close the current dialog
+                  setIsOpen(false);
 
-                if (confirmCancel) {
-                  // Make the API call to cancel the order
-                  fetch(routes.api.user.orders.url(order.id), {
-                    method: "PUT",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                      status: OrderStatus.CANCELLED,
-                    }),
-                  })
-                    .then((response) => response.json())
-                    .then((data) => {
-                      toast.success(
-                        data.info?.message || "Order cancelled successfully",
-                      );
-                      // Refresh the page to show updated status
-                      window.location.reload();
+                  // Show a confirmation dialog
+                  const confirmCancel = window.confirm(
+                    "Are you sure you want to cancel this order? This action cannot be undone.",
+                  );
+
+                  if (confirmCancel) {
+                    // Make the API call to cancel the order
+                    fetch(routes.api.user.orders.url(order.id), {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
+                        status: OrderStatus.CANCELLED,
+                      }),
                     })
-                    .catch((error) => {
-                      toast.error("Failed to cancel order. Please try again.");
-                      console.error("Error cancelling order:", error);
-                    });
-                }
-              }}
-            >
-              <XCircleIcon className="size-4 mr-2" />
-              Cancel Order
-            </Button>
-          )}
+                      .then((response) => response.json())
+                      .then((data) => {
+                        toast.success(
+                          data.info?.message || "Order cancelled successfully",
+                        );
+                        // Refresh the page to show updated status
+                        window.location.reload();
+                      })
+                      .catch((error) => {
+                        toast.error(
+                          "Failed to cancel order. Please try again.",
+                        );
+                        console.error("Error cancelling order:", error);
+                      });
+                  }
+                }}
+              >
+                <XCircleIcon className="size-4 mr-2" />
+                Cancel Order
+              </Button>
+            )}
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
