@@ -130,20 +130,20 @@ export function ProductReviews({ productId }: Readonly<ProductReviewsProps>) {
           )}
 
           {isError && !isFetchingNextPage && (
-            <div className="text-center py-10 px-4 border rounded-md bg-muted">
-              <AlertCircleIcon className="size-10 text-destructive mx-auto mb-3" />
-              <p className="text-destructive font-medium mb-1">
-                Failed to load reviews
-              </p>
-              <p className="text-sm text-muted-foreground mb-4">
-                {error instanceof Error
+            <EmptyState
+              icon={AlertCircleIcon}
+              title="Failed to load reviews"
+              description={
+                error instanceof Error
                   ? error.message
-                  : "An unknown error occurred."}
-              </p>
-              <Button onClick={() => refetch()} variant="outline" size="sm">
-                Try Again
-              </Button>
-            </div>
+                  : "An unknown error occurred."
+              }
+              action={{
+                label: "Try Again",
+                onClick: () => refetch(),
+              }}
+              className="py-10 border rounded-md"
+            />
           )}
 
           {!isFetching && !isError && allReviews.length === 0 && (

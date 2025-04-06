@@ -14,7 +14,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
+import {
+  AlertCircleIcon,
+  Loader2Icon,
+  PackageIcon,
+  SearchIcon,
+} from "lucide-react";
+
+import { EmptyState } from "~/app/_components/empty-state";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -190,7 +197,9 @@ export default function ProductsPage() {
 
     params.delete("page");
 
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    const newUrl = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
 
     router.push(newUrl);
   };
@@ -204,7 +213,9 @@ export default function ProductsPage() {
       params.delete("page");
     }
 
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    const newUrl = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
     router.push(newUrl);
   };
 
@@ -225,21 +236,16 @@ export default function ProductsPage() {
   if (productsQueryIsError || !productsQuery?.data?.products) {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <AlertCircleIcon className="size-12 text-destructive mx-auto mb-2" />
-            <CardTitle>Error Loading Products</CardTitle>
-            <CardDescription>
-              We couldn't load your products information. Please try again
-              later.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button onClick={() => window.location.reload()} variant="outline">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={AlertCircleIcon}
+          title="Error Loading Products"
+          description="We couldn't load your products information. Please try again later."
+          action={{
+            label: "Retry",
+            onClick: () => window.location.reload(),
+          }}
+          className="w-full max-w-md"
+        />
       </section>
     );
   }
@@ -287,57 +293,78 @@ export default function ProductsPage() {
         </div>
         <Card>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {productsQuery.data.products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className={cn("flex items-center gap-2")}>
-                      <Avatar className="size-10 rounded-md">
-                        <AvatarImage
-                          src={`${process.env.NEXT_PUBLIC_FILE_URL}/${product.pictureIds[0]}`}
-                          alt={product.name}
-                          className={cn("object-cover")}
-                        />
-                        <AvatarFallback className={cn("rounded-md")}>
-                          {product.name
-                            .split(" ")
-                            .map((part) => part.charAt(0).toUpperCase())
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col text-wrap">
-                        <span className="text-sm font-medium">
-                          {product.name}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {product.description}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{product.stock}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{product.category.name}</Badge>
-                    </TableCell>
-                    <TableCell>{formatPrice(product.price)}</TableCell>
-                    <TableCell className={cn("space-x-2")}>
-                      <ToggleDeleteProduct
-                        id={product.id}
-                        isDeleted={product.isDeleted}
-                      />
-                    </TableCell>
+            {productsQuery.data.products.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Stock</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {productsQuery.data.products.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell className={cn("flex items-center gap-2")}>
+                        <Avatar className="size-10 rounded-md">
+                          <AvatarImage
+                            src={`${process.env.NEXT_PUBLIC_FILE_URL}/${product.pictureIds[0]}`}
+                            alt={product.name}
+                            className={cn("object-cover")}
+                          />
+                          <AvatarFallback className={cn("rounded-md")}>
+                            {product.name
+                              .split(" ")
+                              .map((part) => part.charAt(0).toUpperCase())
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col text-wrap">
+                          <span className="text-sm font-medium">
+                            {product.name}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {product.description}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{product.stock}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{product.category.name}</Badge>
+                      </TableCell>
+                      <TableCell>{formatPrice(product.price)}</TableCell>
+                      <TableCell className={cn("space-x-2")}>
+                        <ToggleDeleteProduct
+                          id={product.id}
+                          isDeleted={product.isDeleted}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <EmptyState
+                icon={PackageIcon}
+                title="No products found"
+                description={
+                  currentName ||
+                  currentCategoryId ||
+                  currentMinStock ||
+                  currentMinPrice ||
+                  currentMaxPrice ||
+                  currentIsDeleted
+                    ? "No products match your current filters. Try adjusting your search criteria."
+                    : "There are no products available at the moment."
+                }
+                action={{
+                  label: "Clear Filters",
+                  onClick: () => router.push(routes.app.admin.products.url()),
+                }}
+              />
+            )}
           </CardContent>
           <CardFooter className={cn("flex items-center gap-8")}>
             <CardDescription>

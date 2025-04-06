@@ -2,12 +2,20 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { MinusIcon, PlusIcon, ShoppingCartIcon, XIcon } from "lucide-react";
+import {
+  MinusIcon,
+  PlusIcon,
+  ShoppingBagIcon,
+  ShoppingCartIcon,
+  XIcon,
+} from "lucide-react";
+
+import { EmptyState } from "~/app/_components/empty-state";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -24,6 +32,7 @@ import { $cart } from "~/stores/cart";
 
 export function RootHeaderCartButton() {
   const pathName = usePathname();
+  const router = useRouter();
   const cart = useStore($cart);
 
   const [isCartPopoverOpen, setIsCartPopoverOpen] = useState(false);
@@ -108,8 +117,20 @@ export function RootHeaderCartButton() {
         </div>
         <Separator />
         {cart.items.length === 0 ? (
-          <div className={cn("p-6 text-center text-sm text-muted-foreground")}>
-            Your cart is empty.
+          <div className={cn("p-4")}>
+            <EmptyState
+              icon={ShoppingBagIcon}
+              title="Your cart is empty"
+              description="Add some products to your cart to checkout."
+              action={{
+                label: "Browse Products",
+                onClick: () => {
+                  setIsCartPopoverOpen(false);
+                  router.push(routes.app.public.products.url());
+                },
+              }}
+              className="border-none bg-transparent"
+            />
           </div>
         ) : (
           <>

@@ -92,20 +92,16 @@ export function RelatedProducts({ vendorId }: Readonly<RelatedProductsProps>) {
   if (isErrorRelatedProducts) {
     return (
       <section className="flex flex-1 items-center justify-center p-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <AlertCircleIcon className="mx-auto mb-2 size-12 text-destructive" />
-            <CardTitle>Error Loading Products</CardTitle>
-            <CardDescription>
-              We couldn't load related products. Please try again later.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button onClick={() => window.location.reload()} variant="outline">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={AlertCircleIcon}
+          title="Error Loading Products"
+          description="We couldn't load related products. Please try again later."
+          action={{
+            label: "Retry",
+            onClick: () => window.location.reload(),
+          }}
+          className="w-full max-w-md"
+        />
       </section>
     );
   }

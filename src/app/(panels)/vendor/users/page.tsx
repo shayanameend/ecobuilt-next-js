@@ -13,7 +13,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
+import {
+  AlertCircleIcon,
+  Loader2Icon,
+  SearchIcon,
+  UserIcon,
+} from "lucide-react";
+
+import { EmptyState } from "~/app/_components/empty-state";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -212,21 +219,16 @@ export default function UsersPage() {
   if (usersQueryIsError || !usersQuery?.data?.users) {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <AlertCircleIcon className="size-12 text-destructive mx-auto mb-2" />
-            <CardTitle>Error Loading Customers</CardTitle>
-            <CardDescription>
-              We couldn't load your customers information. Please try again
-              later.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button onClick={() => window.location.reload()} variant="outline">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={AlertCircleIcon}
+          title="Error Loading Customers"
+          description="We couldn't load your customers information. Please try again later."
+          action={{
+            label: "Retry",
+            onClick: () => window.location.reload(),
+          }}
+          className="w-full max-w-md"
+        />
       </section>
     );
   }

@@ -232,18 +232,16 @@ export default function OrdersPage() {
   if (ordersQueryIsError) {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
-        <div className="text-center space-y-4">
-          <AlertCircleIcon className="size-8 text-destructive mx-auto" />
-          <p className="text-muted-foreground">
-            Failed to load orders. Please try again.
-          </p>
-          <Button
-            onClick={() => router.push(window.location.pathname)}
-            variant="outline"
-          >
-            Retry
-          </Button>
-        </div>
+        <EmptyState
+          icon={AlertCircleIcon}
+          title="Failed to load orders"
+          description="We couldn't load your orders information. Please try again."
+          action={{
+            label: "Retry",
+            onClick: () => router.push(window.location.pathname),
+          }}
+          className="w-full max-w-md"
+        />
       </section>
     );
   }

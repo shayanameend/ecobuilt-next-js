@@ -3,12 +3,19 @@
 import type { PublicCategoryType, SingleResponseType } from "~/lib/types";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
 import axios from "axios";
-import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
+import {
+  AlertCircleIcon,
+  FolderIcon,
+  Loader2Icon,
+  SearchIcon,
+} from "lucide-react";
+
+import { EmptyState } from "~/app/_components/empty-state";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -26,11 +33,7 @@ import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 import { NewCategory } from "./_components/new-category";
 
-async function getCategories({
-  token,
-}: {
-  token: string | null;
-}) {
+async function getCategories({ token }: { token: string | null }) {
   const response = await axios.get(routes.api.public.categories.url(), {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -46,6 +49,9 @@ export default function CategoriesPage() {
   const { token } = useAuthContext();
 
   const [queryTerm, setQueryTerm] = useState("");
+  const [filteredCategories, setFilteredCategories] = useState<
+    PublicCategoryType[]
+  >([]);
 
   const {
     data: categoriesQuery,
@@ -60,10 +66,15 @@ export default function CategoriesPage() {
     queryFn: () => getCategories({ token }),
   });
 
-  const filteredCategories =
-    categoriesQuery?.data?.categories?.filter((category) =>
-      category.name.toLowerCase().includes(queryTerm.toLowerCase()),
-    ) || [];
+  useEffect(() => {
+    if (categoriesQuery?.data?.categories) {
+      setFilteredCategories(
+        categoriesQuery.data.categories.filter((category) =>
+          category.name.toLowerCase().includes(queryTerm.toLowerCase()),
+        ),
+      );
+    }
+  }, [categoriesQuery?.data?.categories, queryTerm]);
 
   if (categoriesQueryIsLoading) {
     return (
@@ -78,21 +89,16 @@ export default function CategoriesPage() {
   if (categoriesQueryIsError || !categoriesQuery?.data?.categories) {
     return (
       <section className="flex-1 flex items-center justify-center p-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <AlertCircleIcon className="size-12 text-destructive mx-auto mb-2" />
-            <CardTitle>Error Loading Categories</CardTitle>
-            <CardDescription>
-              We couldn't load your categories information. Please try again
-              later.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button onClick={() => window.location.reload()} variant="outline">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={AlertCircleIcon}
+          title="Error Loading Categories"
+          description="We couldn't load your categories information. Please try again later."
+          action={{
+            label: "Retry",
+            onClick: () => window.location.reload(),
+          }}
+          className="w-full max-w-md"
+        />
       </section>
     );
   }
@@ -145,7 +151,9 @@ export default function CategoriesPage() {
                     className={cn("flex-1")}
                     onClick={() => {
                       router.push(
-                        `${routes.app.admin.products.url()}?categoryId=${category.id}`,
+                        `${routes.app.admin.products.url()}?categoryId=${
+                          category.id
+                        }`,
                       );
                     }}
                   >
@@ -155,10 +163,21 @@ export default function CategoriesPage() {
               </Card>
             ))
           ) : (
-            <div className="col-span-full text-center py-8">
-              <p className="text-muted-foreground">
-                No categories found matching "{queryTerm}"
-              </p>
+            <div className="col-span-full">
+              <EmptyState
+                icon={FolderIcon}
+                title="No categories found"
+                description={`No categories match your search for "${queryTerm}".`}
+                action={{
+                  label: "Clear Search",
+                  onClick: () => {
+                    setQueryTerm("");
+                    setFilteredCategories(
+                      categoriesQuery?.data?.categories || [],
+                    );
+                  },
+                }}
+              />
             </div>
           )}
         </div>
