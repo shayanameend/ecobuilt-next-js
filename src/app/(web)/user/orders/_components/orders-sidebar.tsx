@@ -68,9 +68,8 @@ const FilterFormSchema = zod.object({
   sort: zod.preprocess(
     (val) => (val === "" ? undefined : val),
     zod
-      .enum(["LATEST", "OLDEST", "PRICE_HIGH_TO_LOW", "PRICE_LOW_TO_HIGH"], {
-        message:
-          "Sort must be one of 'LATEST', 'OLDEST', 'PRICE_HIGH_TO_LOW', 'PRICE_LOW_TO_HIGH'",
+      .enum(["LATEST", "OLDEST"], {
+        message: "Sort must be one of 'LATEST', 'OLDEST'",
       })
       .optional(),
   ),
@@ -132,12 +131,7 @@ export function OrdersSidebar() {
     defaultValues: {
       categoryId: currentCategoryId,
       status: currentStatus as OrderStatus | undefined,
-      sort: currentSort as
-        | "LATEST"
-        | "OLDEST"
-        | "PRICE_HIGH_TO_LOW"
-        | "PRICE_LOW_TO_HIGH"
-        | undefined,
+      sort: currentSort as "LATEST" | "OLDEST" | undefined,
       vendorName: currentVendorName,
       minTotalPrice: currentMinTotalPrice,
       maxTotalPrice: currentMaxTotalPrice,
@@ -148,12 +142,7 @@ export function OrdersSidebar() {
     form.reset({
       categoryId: currentCategoryId,
       status: currentStatus as OrderStatus | undefined,
-      sort: currentSort as
-        | "LATEST"
-        | "OLDEST"
-        | "PRICE_HIGH_TO_LOW"
-        | "PRICE_LOW_TO_HIGH"
-        | undefined,
+      sort: currentSort as "LATEST" | "OLDEST" | undefined,
       vendorName: currentVendorName,
       minTotalPrice: currentMinTotalPrice,
       maxTotalPrice: currentMaxTotalPrice,
@@ -339,12 +328,6 @@ export function OrdersSidebar() {
                   <SelectContent>
                     <SelectItem value="LATEST">Latest</SelectItem>
                     <SelectItem value="OLDEST">Oldest</SelectItem>
-                    <SelectItem value="PRICE_HIGH_TO_LOW">
-                      Price: High to Low
-                    </SelectItem>
-                    <SelectItem value="PRICE_LOW_TO_HIGH">
-                      Price: Low to High
-                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
