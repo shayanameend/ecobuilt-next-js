@@ -18,7 +18,6 @@ import {
   PhoneIcon,
   ShieldIcon,
   TagIcon,
-  UserIcon,
 } from "lucide-react";
 
 import { EmptyState } from "~/app/_components/empty-state";
@@ -36,7 +35,7 @@ import {
 } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { useAuthContext } from "~/context/auth";
-import { domine } from "~/lib/fonts";
+
 import { routes } from "~/lib/routes";
 import { UserStatus } from "~/lib/types";
 import { cn } from "~/lib/utils";
@@ -101,14 +100,7 @@ export default function SettingsPage() {
       <section className={cn("flex-1 space-y-8 py-8 px-4 max-w-7xl mx-auto")}>
         <div className={cn("flex items-center justify-between gap-6")}>
           <div className={cn("space-y-2")}>
-            <h2
-              className={cn(
-                "text-black/75 text-3xl font-bold",
-                domine.className,
-              )}
-            >
-              Settings
-            </h2>
+            <h2 className={cn("text-black/75 text-3xl font-bold")}>Settings</h2>
             <p className={cn("text-muted-foreground text-base font-medium")}>
               Manage your account settings, and update profile information.
             </p>
@@ -129,13 +121,11 @@ export default function SettingsPage() {
             </Button>
           </div>
         </div>
-        <div className={cn("grid grid-cols-1 gap-4 lg:grid-cols-2")}>
-          <Card>
+        <div className={cn("flex flex-col lg:flex-row gap-6 items-start")}>
+          <Card className={cn("w-full lg:flex-1 min-w-0 self-start")}>
             <CardHeader>
               <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
-                  Update Profile
-                </h3>
+                <h3 className={cn("text-2xl font-bold")}>Update Profile</h3>
               </CardTitle>
               <CardDescription>
                 <p className={cn("text-muted-foreground text-sm font-medium")}>
@@ -144,13 +134,13 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <UpdateVendorProfileForm profile={profileQuery?.data?.profile} />
+              <UpdateVendorProfileForm profile={profileQuery?.data?.profile!} />
             </CardContent>
           </Card>
-          <Card className={cn("hidden lg:flex")}>
+          <Card className={cn("hidden lg:block lg:flex-1 min-w-0 self-start")}>
             <CardHeader>
               <CardTitle>
-                <h3 className={cn("text-2xl font-bold", domine.className)}>
+                <h3 className={cn("text-2xl font-bold")}>
                   Profile Information
                 </h3>
               </CardTitle>
@@ -220,7 +210,7 @@ export default function SettingsPage() {
                 <Separator />
                 <div className="space-y-4">
                   <h4 className="text-base font-semibold">Account Details</h4>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-2 text-sm">
                       <ShieldIcon className="size-4 text-muted-foreground" />
                       <span className="font-medium">Status:</span>
