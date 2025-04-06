@@ -123,7 +123,7 @@ export default function CategoriesPage() {
                   className={cn("flex-1")}
                   onClick={() => {
                     router.push(
-                      `${routes.app.admin.products.url()}?categoryId=${
+                      `${routes.app.vendor.products.url()}?categoryId=${
                         category.id
                       }`,
                     );

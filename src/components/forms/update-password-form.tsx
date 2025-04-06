@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
@@ -31,17 +32,31 @@ const UpdatePasswordFormSchema = zod.object({
 });
 
 async function updatePassword({
-  password,
-}: zod.infer<typeof UpdatePasswordFormSchema>) {
-  const response = await axios.post(routes.api.auth.updatePassword.url(), {
-    password,
-  });
+  token,
+  data,
+}: {
+  token: string | null;
+  data: zod.infer<typeof UpdatePasswordFormSchema>;
+}) {
+  const response = await axios.post(
+    routes.api.auth.updatePassword.url(),
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${
+          token ? token : sessionStorage.getItem("token")
+        }`,
+      },
+    },
+  );
 
   return response.data;
 }
 
 export function UpdatePasswordForm() {
   const router = useRouter();
+
+  const { token } = useAuthContext();
 
   const form = useForm<zod.infer<typeof UpdatePasswordFormSchema>>({
     resolver: zodResolver(UpdatePasswordFormSchema),
@@ -70,7 +85,7 @@ export function UpdatePasswordForm() {
   });
 
   const onSubmit = (data: zod.infer<typeof UpdatePasswordFormSchema>) => {
-    updatePasswordMutation.mutate(data);
+    updatePasswordMutation.mutate({ token, data });
   };
 
   return (
