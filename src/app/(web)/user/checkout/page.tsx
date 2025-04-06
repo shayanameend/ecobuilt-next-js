@@ -255,9 +255,9 @@ export default function CheckoutPage() {
         </p>
       </div>
 
-      <div className={cn("grid grid-cols-1 gap-8 md:grid-cols-2")}>
+      <div className={cn("flex flex-col gap-8 md:flex-row items-start")}>
         {/* Order Summary */}
-        <Card>
+        <Card className={cn("flex-1")}>
           <CardHeader>
             <CardTitle>
               <h3 className={cn("text-2xl font-bold", domine.className)}>
@@ -347,7 +347,7 @@ export default function CheckoutPage() {
         </Card>
 
         {/* Information Tabs */}
-        <div className={cn("space-y-6")}>
+        <div className={cn("space-y-6 flex-1")}>
           <Tabs defaultValue="customer" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="customer">
