@@ -61,6 +61,9 @@ const api = {
     profile: {
       url: () => `${process.env.NEXT_PUBLIC_API_URL}/admin/profile`,
     },
+    dashboard: {
+      url: () => `${process.env.NEXT_PUBLIC_API_URL}/admin/dashboard`,
+    },
     users: {
       url: (id?: string) =>
         id
@@ -96,6 +99,9 @@ const api = {
     profile: {
       url: () => `${process.env.NEXT_PUBLIC_API_URL}/vendor/profile`,
     },
+    dashboard: {
+      url: () => `${process.env.NEXT_PUBLIC_API_URL}/vendor/dashboard`,
+    },   
     users: {
       url: (id?: string) =>
         id
