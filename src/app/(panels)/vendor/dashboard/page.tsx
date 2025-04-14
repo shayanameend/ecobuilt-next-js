@@ -1,22 +1,23 @@
+"use client";
+
+import type { SingleResponseType, VendorDashboardKPIsType } from "~/lib/types";
+
+import { useQuery } from "@tanstack/react-query";
+
+import axios from "axios";
 import {
   PackageIcon,
   ShoppingCartIcon,
   TrendingUpIcon,
   UsersIcon,
 } from "lucide-react";
+import Link from "next/link";
 
-import { VendorPageLayout } from "~/app/(panels)/_components/vendor-page-layout";
-
+import { AdminPageLayout } from "~/app/(panels)/_components/admin-page-layout";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Button, buttonVariants } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   Table,
   TableBody,
@@ -25,13 +26,36 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { cn, formatPrice } from "~/lib/utils";
+import { useAuthContext } from "~/context/auth";
+import { routes } from "~/lib/routes";
+import { cn, formatDate, formatPrice } from "~/lib/utils";
+
+async function getDashboardKPIs(token: string | null) {
+  const response = await axios.get(routes.api.vendor.dashboard.url(), {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}
 
 export default function DashboardPage() {
+  const { token } = useAuthContext();
+
+  const {
+    data: kpisQuery,
+    isLoading: kpisQueryIsLoading,
+    isError: kpisQueryIsError,
+  } = useQuery<SingleResponseType<VendorDashboardKPIsType>>({
+    queryKey: ["kpis"],
+    queryFn: () => getDashboardKPIs(token),
+  });
+
   return (
-    <VendorPageLayout
+    <AdminPageLayout
       title="Dashboard"
-      description="Welcome to the vendor dashboard. Here you can manage your content, monitor analytics, and configure system settings."
+      description="Welcome to the admin dashboard. Here you can manage your content, monitor analytics, and configure system settings."
     >
       <div
         className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4")}
@@ -47,11 +71,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <h4 className={cn("text-2xl font-bold")}>
-              {formatPrice(45231.89)}
+              {kpisQuery?.data.totalRevenue &&
+                formatPrice(kpisQuery.data.totalRevenue)}
             </h4>
-            <p className={cn("text-muted-foreground text-base font-medium")}>
-              +20.1% from last month
-            </p>
           </CardContent>
         </Card>
         <Card>
@@ -64,10 +86,9 @@ export default function DashboardPage() {
             <PackageIcon className={cn("size-5 text-muted-foreground")} />
           </CardHeader>
           <CardContent>
-            <h4 className={cn("text-2xl font-bold")}>+24</h4>
-            <p className={cn("text-muted-foreground text-base font-medium")}>
-              +12% from last month
-            </p>
+            <h4 className={cn("text-2xl font-bold")}>
+              {kpisQuery?.data.productsCount}
+            </h4>
           </CardContent>
         </Card>
         <Card>
@@ -80,10 +101,9 @@ export default function DashboardPage() {
             <ShoppingCartIcon className={cn("size-5 text-muted-foreground")} />
           </CardHeader>
           <CardContent>
-            <h4 className={cn("text-2xl font-bold")}>+573</h4>
-            <p className={cn("text-muted-foreground text-base font-medium")}>
-              +19% from last month
-            </p>
+            <h4 className={cn("text-2xl font-bold")}>
+              {kpisQuery?.data.ordersCount}
+            </h4>
           </CardContent>
         </Card>
         <Card>
@@ -96,10 +116,9 @@ export default function DashboardPage() {
             <UsersIcon className={cn("size-5 text-muted-foreground")} />
           </CardHeader>
           <CardContent>
-            <h4 className={cn("text-2xl font-bold")}>+2350</h4>
-            <p className={cn("text-muted-foreground text-base font-medium")}>
-              +7% from last month
-            </p>
+            <h4 className={cn("text-2xl font-bold")}>
+              {kpisQuery?.data.usersCount}
+            </h4>
           </CardContent>
         </Card>
       </div>
@@ -111,146 +130,84 @@ export default function DashboardPage() {
             <CardTitle>
               <h3 className={cn("text-2xl font-bold")}>Recent Orders</h3>
             </CardTitle>
-            <CardDescription>
-              <p className={cn("text-muted-foreground text-sm font-medium")}>
-                You have 12 orders this month.
-              </p>
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>#1234</TableCell>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage src="/avatars/john.png" alt="John Doe" />
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">John Doe</span>
-                      <span className="text-xs text-muted-foreground">
-                        john.doe@example.com
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Completed</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(123.45)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
+            {kpisQuery?.data?.recentOrders &&
+            kpisQuery.data.recentOrders.length > 0 ? (
+              <div className="overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Order ID</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Items</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {kpisQuery.data.recentOrders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell>
+                          <div className={cn("flex items-center gap-2")}>
+                            <Avatar className="size-8">
+                              <AvatarImage
+                                src={`${process.env.NEXT_PUBLIC_FILE_URL}/${order.user.pictureId}`}
+                                alt={order.user.name}
+                                className={cn("object-cover")}
+                              />
+                              <AvatarFallback>
+                                {order.user.name
+                                  .split(" ")
+                                  .map((part) => part.charAt(0).toUpperCase())
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm font-medium">
+                              {order.user.name}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>#{order.id.slice(0, 8)}</TableCell>
+                        <TableCell>{formatDate(order.createdAt)}</TableCell>
+                        <TableCell>{order.orderToProduct.length}</TableCell>
+                        <TableCell>{formatPrice(order.totalPrice)}</TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              order.status === "DELIVERED"
+                                ? "default"
+                                : order.status === "CANCELLED" ||
+                                    order.status === "REJECTED"
+                                  ? "destructive"
+                                  : "secondary"
+                            }
+                            className="whitespace-nowrap"
+                          >
+                            {order.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">
+                No recent orders found
+              </div>
+            )}
+            {kpisQuery?.data?.recentOrders &&
+              kpisQuery.data.recentOrders.length > 0 && (
+                <div className="flex justify-end mt-4">
+                  <Link href={routes.app.vendor.orders.url()}>
+                    <Button variant="outline" size="sm">
+                      Go to Orders
                     </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>#1235</TableCell>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage src="/avatars/john.png" alt="John Doe" />
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">John Doe</span>
-                      <span className="text-xs text-muted-foreground">
-                        john.doe@example.com
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Completed</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(234.56)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>#1236</TableCell>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage src="/avatars/john.png" alt="John Doe" />
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">John Doe</span>
-                      <span className="text-xs text-muted-foreground">
-                        john.doe@example.com
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Completed</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(345.67)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>#1237</TableCell>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage src="/avatars/john.png" alt="John Doe" />
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">John Doe</span>
-                      <span className="text-xs text-muted-foreground">
-                        john.doe@example.com
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Completed</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(456.78)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>#1238</TableCell>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage src="/avatars/john.png" alt="John Doe" />
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">John Doe</span>
-                      <span className="text-xs text-muted-foreground">
-                        john.doe@example.com
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Completed</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(567.89)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+                  </Link>
+                </div>
+              )}
           </CardContent>
         </Card>
         <Card className={cn("col-span-3")}>
@@ -258,163 +215,76 @@ export default function DashboardPage() {
             <CardTitle>
               <h3 className={cn("text-2xl font-bold")}>Recent Products</h3>
             </CardTitle>
-            <CardDescription>
-              <p className={cn("text-muted-foreground text-sm font-medium")}>
-                You added 5 products this month.
-              </p>
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage
-                        src="/products/iphone-12.jpg"
-                        alt="iPhone 12"
-                      />
-                      <AvatarFallback>IP</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">iPhone 12</span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>12</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(799.99)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage
-                        src="/products/macbook-pro.jpg"
-                        alt="MacBook Pro"
-                      />
-                      <AvatarFallback>MP</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">MacBook Pro</span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>8</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(1299.99)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage
-                        src="/products/iphone-12-mini.jpg"
-                        alt="iPhone 12 Mini"
-                      />
-                      <AvatarFallback>IM</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">
-                        iPhone 12 Mini
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>15</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(399.99)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage
-                        src="/products/airpods-pro.jpg"
-                        alt="AirPods Pro"
-                      />
-                      <AvatarFallback>AP</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">AirPods Pro</span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>20</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(199.99)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={cn("flex items-center gap-2")}>
-                    <Avatar className="size-8">
-                      <AvatarImage src="/avatars/ipad-pro.png" alt="John Doe" />
-                      <AvatarFallback>IP</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">iPad Pro</span>
-                      <span className="text-xs text-muted-foreground">
-                        Apple
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>10</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Electronics</Badge>
-                  </TableCell>
-                  <TableCell>{formatPrice(999.99)}</TableCell>
-                  <TableCell>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+            {kpisQuery?.data?.recentProducts &&
+            kpisQuery.data.recentProducts.length > 0 ? (
+              <div className="overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Product</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Price</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {kpisQuery.data.recentProducts.map((product) => (
+                      <TableRow key={product.id}>
+                        <TableCell>
+                          <div className={cn("flex items-center gap-2")}>
+                            {product.pictureIds?.[0] && (
+                              <div className="relative h-8 w-8 overflow-hidden rounded-md border">
+                                <Avatar className="size-8">
+                                  <AvatarImage
+                                    src={`${process.env.NEXT_PUBLIC_FILE_URL}/${product.pictureIds[0]}`}
+                                    alt={product.name}
+                                    className={cn("object-cover")}
+                                  />
+                                  <AvatarFallback>
+                                    {product.name.charAt(0).toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </div>
+                            )}
+                            <span className="text-sm font-medium truncate max-w-[140px]">
+                              {product.name}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {product.category.name}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{formatPrice(product.price)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">
+                No recent products found
+              </div>
+            )}
+            {kpisQuery?.data?.recentProducts &&
+              kpisQuery.data.recentProducts.length > 0 && (
+                <div className="flex justify-end mt-4">
+                  <Link
+                    href={routes.app.vendor.products.url()}
+                    className={buttonVariants({
+                      variant: "outline",
+                      size: "sm",
+                    })}
+                  >
+                    Go to Products
+                  </Link>
+                </div>
+              )}
           </CardContent>
         </Card>
       </div>
-    </VendorPageLayout>
+    </AdminPageLayout>
   );
 }
