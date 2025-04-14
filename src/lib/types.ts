@@ -142,14 +142,15 @@ export type AdminDashboardKPIsType = {
   productsCount: number;
   ordersCount: number;
   usersCount: number;
-  recentOrders: PublicOrderType[];
-  orderToProduct: (PublicOrderToProductType & {
-    product: ProductType & {
-      category: CategoryType;
-      vendor: VendorProfileType;
-    };
+  recentOrders: (PublicOrderType & {
+    orderToProduct: (PublicOrderToProductType & {
+      product: ProductType & {
+        category: CategoryType;
+        vendor: VendorProfileType;
+      };
+    })[];
+    user: UserProfileType;
   })[];
-  user: UserProfileType;
   recentProducts: (ProductType & {
     category: CategoryType;
     vendor: VendorProfileType;
