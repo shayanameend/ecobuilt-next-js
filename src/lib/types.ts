@@ -138,22 +138,22 @@ export type PublicReviewType = {
 };
 
 export type AdminDashboardKPIsType = {
-vendorsCount: number;
-productsCount: number;
-ordersCount: number;
-usersCount: number;
-recentOrders: PublicOrderType[];
-orderToProduct: (PublicOrderToProductType & {
-  product: ProductType & {
+  vendorsCount: number;
+  productsCount: number;
+  ordersCount: number;
+  usersCount: number;
+  recentOrders: PublicOrderType[];
+  orderToProduct: (PublicOrderToProductType & {
+    product: ProductType & {
+      category: CategoryType;
+      vendor: VendorProfileType;
+    };
+  })[];
+  user: UserProfileType;
+  recentProducts: (ProductType & {
     category: CategoryType;
     vendor: VendorProfileType;
-  };
-})[];
-user: UserProfileType;
-recentProducts: (ProductType & {
-  category: CategoryType;
-  vendor: VendorProfileType;
-})[];
+  })[];
 };
 
 export type SingleResponseType<T> = {

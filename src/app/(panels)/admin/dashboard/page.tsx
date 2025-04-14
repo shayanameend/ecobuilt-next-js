@@ -1,5 +1,10 @@
 "use client";
 
+import type { AdminDashboardKPIsType, SingleResponseType } from "~/lib/types";
+
+import { useQuery } from "@tanstack/react-query";
+
+import axios from "axios";
 import {
   PackageIcon,
   ShoppingCartIcon,
@@ -7,11 +12,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 
-import axios from "axios";
-import { routes } from "~/lib/routes"; // Adjust the path based on your project structure
-
 import { AdminPageLayout } from "~/app/(panels)/_components/admin-page-layout";
-
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -30,37 +31,33 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { cn, formatPrice } from "~/lib/utils";
-import { AdminDashboardKPIsType, SingleResponseType } from "~/lib/types";
 import { useAuthContext } from "~/context/auth";
-import { use } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { routes } from "~/lib/routes";
+import { cn, formatPrice } from "~/lib/utils";
 
 async function getDashboardKPIs(token: string | null) {
   const response = await axios.get(routes.api.admin.dashboard.url(), {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-});
+  });
 
-return response.data;
+  return response.data;
 }
 
 export default function DashboardPage() {
-const { token } = useAuthContext();
+  const { token } = useAuthContext();
 
   const {
     data: kpisQuery,
     isLoading: kpisQueryIsLoading,
     isError: kpisQueryIsError,
-  } = useQuery<
-    SingleResponseType<{
-      KPIs:AdminDashboardKPIsType}>>({
-        queryKey: ["kpis"],
-        queryFn: () => getDashboardKPIs(token),
-      });
+  } = useQuery<SingleResponseType<AdminDashboardKPIsType>>({
+    queryKey: ["kpis"],
+    queryFn: () => getDashboardKPIs(token),
+  });
 
-      console.log(kpisQuery);
+  console.log(kpisQuery);
 
   return (
     <AdminPageLayout

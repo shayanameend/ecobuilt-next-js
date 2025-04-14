@@ -101,7 +101,7 @@ const api = {
     },
     dashboard: {
       url: () => `${process.env.NEXT_PUBLIC_API_URL}/vendor/dashboard`,
-    },   
+    },
     users: {
       url: (id?: string) =>
         id
