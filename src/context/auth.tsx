@@ -52,7 +52,7 @@ async function refresh() {
       headers: {
         authorization: `Bearer ${token}`,
       },
-    },
+    }
   );
 
   return response.data;
@@ -107,16 +107,16 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
     const isPublicRoute = publicRoutes.some(
       (route) =>
         pathname === route ||
-        (pathname.startsWith(route) && route !== routes.app.public.home.url()),
+        (pathname.startsWith(route) && route !== routes.app.public.home.url())
     );
     const isProfileRoute = pathname.startsWith(
-      routes.app.unspecified.profile.url(),
+      routes.app.unspecified.profile.url()
     );
     const isAdminRoute = adminRoutes.some((route) =>
-      pathname.startsWith(route),
+      pathname.startsWith(route)
     );
     const isVendorRoute = vendorRoutes.some((route) =>
-      pathname.startsWith(route),
+      pathname.startsWith(route)
     );
     const isUserRoute = userRoutes.some((route) => pathname.startsWith(route));
 
@@ -160,7 +160,7 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
             break;
         }
 
-        router.push(url);
+        return router.push(url);
       }
 
       if (!isProfileRoute && auth.role === Role.UNSPECIFIED) {
@@ -168,8 +168,29 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
       }
 
       if (isProfileRoute && auth.role !== Role.UNSPECIFIED) {
-        return router.push(routes.app.public.home.url());
+        let url: string;
+
+        switch (auth.role) {
+          case Role.SUPER_ADMIN:
+          case Role.ADMIN:
+            url = routes.app.admin.dashboard.url();
+            break;
+          case Role.VENDOR:
+            url = routes.app.vendor.dashboard.url();
+            break;
+          case Role.USER:
+            url = routes.app.user.settings.url();
+            break;
+          default:
+            url = routes.app.unspecified.profile.url();
+            break;
+        }
+
+        return router.push(url);
       }
+
+      // if the user is deleted go to the page where it shows the status the user and provides a link to contact
+      // if the user status is not approved go to the page where it shows the status the user and provides a link to contact
 
       if (
         isAdminRoute &&
