@@ -198,6 +198,14 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
       }
 
       if (
+        pathname === routes.app.unspecified.status.url() &&
+        auth.status === UserStatus.APPROVED &&
+        !auth.isDeleted
+      ) {
+        return router.push(routes.app.public.home.url());
+      }
+
+      if (
         isAdminRoute &&
         auth.role !== Role.SUPER_ADMIN &&
         auth.role !== Role.ADMIN

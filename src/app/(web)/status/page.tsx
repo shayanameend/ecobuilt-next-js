@@ -69,7 +69,7 @@ export default function ContactPage() {
                           : "default"
                     }
                   >
-                    {(auth?.status || (auth?.isDeleted && "REJECTED")) ?? "N/A"}
+                    {((auth?.isDeleted && "REJECTED") || auth?.status) ?? "N/A"}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
