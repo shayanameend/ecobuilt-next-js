@@ -20,6 +20,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
+import { useAuthContext } from "~/context/auth";
 import { routes } from "~/lib/routes";
 import { cn } from "~/lib/utils";
 
@@ -64,11 +65,13 @@ async function contact({
 }
 
 export function ContactForm() {
+  const { auth } = useAuthContext();
+
   const form = useForm<zod.infer<typeof ContactFormSchema>>({
     resolver: zodResolver(ContactFormSchema),
     defaultValues: {
       name: "",
-      email: "",
+      email: auth ? auth.email : "",
       phone: "",
       subject: "",
       message: "",
@@ -133,7 +136,12 @@ export function ContactForm() {
               <FormItem className={cn("flex-1")}>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="john@domain.com" {...field} />
+                  <Input
+                    disabled={!!auth}
+                    type="text"
+                    placeholder="john@domain.com"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

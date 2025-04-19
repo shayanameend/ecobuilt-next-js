@@ -1,7 +1,7 @@
 "use client";
 
 import type { Dispatch, PropsWithChildren, SetStateAction } from "react";
-import { type AuthType, Role } from "~/lib/types";
+import { type AuthType, Role, UserStatus } from "~/lib/types";
 
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -52,7 +52,7 @@ async function refresh() {
       headers: {
         authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   return response.data;
@@ -107,16 +107,16 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
     const isPublicRoute = publicRoutes.some(
       (route) =>
         pathname === route ||
-        (pathname.startsWith(route) && route !== routes.app.public.home.url())
+        (pathname.startsWith(route) && route !== routes.app.public.home.url()),
     );
     const isProfileRoute = pathname.startsWith(
-      routes.app.unspecified.profile.url()
+      routes.app.unspecified.profile.url(),
     );
     const isAdminRoute = adminRoutes.some((route) =>
-      pathname.startsWith(route)
+      pathname.startsWith(route),
     );
     const isVendorRoute = vendorRoutes.some((route) =>
-      pathname.startsWith(route)
+      pathname.startsWith(route),
     );
     const isUserRoute = userRoutes.some((route) => pathname.startsWith(route));
 
@@ -189,8 +189,13 @@ export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
         return router.push(url);
       }
 
-      // if the user is deleted go to the page where it shows the status the user and provides a link to contact
-      // if the user status is not approved go to the page where it shows the status the user and provides a link to contact
+      if (!isPublicRoute && auth.status !== UserStatus.APPROVED) {
+        return router.push(routes.app.unspecified.status.url());
+      }
+
+      if (!isPublicRoute && auth.isDeleted) {
+        return router.push(routes.app.unspecified.status.url());
+      }
 
       if (
         isAdminRoute &&

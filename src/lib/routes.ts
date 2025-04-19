@@ -199,6 +199,10 @@ const app = {
       url: () => "/profile",
       label: "Profile",
     },
+    status: {
+      url: () => "/status",
+      label: "Status",
+    },
   },
   superAdmin: {
     admins: {
